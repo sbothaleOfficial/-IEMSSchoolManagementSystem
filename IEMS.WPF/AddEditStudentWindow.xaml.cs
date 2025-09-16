@@ -8,12 +8,14 @@ namespace IEMS.WPF;
 public partial class AddEditStudentWindow : Window
 {
     private readonly StudentService _studentService;
+    private readonly ClassService _classService;
     private readonly StudentDto? _studentToEdit;
 
-    public AddEditStudentWindow(StudentService studentService, StudentDto? studentToEdit = null)
+    public AddEditStudentWindow(StudentService studentService, ClassService classService, StudentDto? studentToEdit = null)
     {
         InitializeComponent();
         _studentService = studentService;
+        _classService = classService;
         _studentToEdit = studentToEdit;
 
         LoadClasses();
@@ -22,17 +24,18 @@ public partial class AddEditStudentWindow : Window
         Title = studentToEdit == null ? "Add Student" : "Edit Student";
     }
 
-    private void LoadClasses()
+    private async void LoadClasses()
     {
         try
         {
-            var classes = new[]
+            var classes = await _classService.GetAllClassesAsync();
+            var classList = classes.Select(c => new
             {
-                new { Id = 1, Name = "Grade 10 - A" },
-                new { Id = 2, Name = "Grade 10 - B" }
-            };
+                Id = c.Id,
+                Name = c.DisplayName
+            }).ToList();
 
-            cmbClass.ItemsSource = classes;
+            cmbClass.ItemsSource = classList;
         }
         catch (Exception ex)
         {

@@ -52,26 +52,37 @@
 
 ## How to Run & Test
 
-### Single Command to Run:
+### 🚀 **RECOMMENDED METHODS:**
+
+#### **Development Mode (Always Latest Code):**
 ```cmd
-cd C:\Users\SP\Development\IEMSSchoolManagementSystem && publish\IEMS.WPF.exe
+# Method 1: Direct run from source (fastest for development)
+cd C:\Users\SP\Development\IEMSSchoolManagementSystem
+dotnet run --project IEMS.WPF
+
+# Method 2: Use the automated script
+Double-click "RunLatest.cmd"
 ```
 
-### Alternative Methods:
-- Double-click `StartApp.cmd` in project root
-- Run `.\LaunchApp.ps1` in PowerShell
-- Navigate to `publish` folder and run `IEMS.WPF.exe`
+#### **Published Mode (Standalone Executable):**
+```cmd
+# Method 1: Use the automated script (handles everything)
+Double-click "PublishAndRun.cmd"
 
-### Development Commands:
-```bash
-# Build solution
-dotnet build
-
-# Rebuild and publish
+# Method 2: Manual publish and run
+taskkill /F /IM "IEMS.WPF.exe"
 dotnet publish IEMS.WPF/IEMS.WPF.csproj -c Release -r win-x64 --self-contained false -o ./publish --force
+publish\IEMS.WPF.exe
+```
 
-# Test from source
-dotnet run --project IEMS.WPF
+### ⚠️ **Important Notes:**
+- **Development**: Use `dotnet run` for faster development cycle
+- **Distribution**: Use published version for sharing with others
+- **No Need for Multiple Publish Folders**: Always stop running apps first, then republish to same folder
+
+### **Legacy/Emergency Method:**
+```cmd
+cd C:\Users\SP\Development\IEMSSchoolManagementSystem && publish_new\IEMS.WPF.exe
 ```
 
 ## Next Development Phase

@@ -26,6 +26,7 @@ public partial class App : System.Windows.Application
                 services.AddScoped<ITeacherRepository, TeacherRepository>();
                 services.AddScoped<StudentService>();
                 services.AddScoped<TeacherService>();
+                services.AddScoped<ClassService>();
 
                 services.AddSingleton<MainWindow>();
             })
