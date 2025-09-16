@@ -1,7 +1,7 @@
 <Window x:Class="IEMS.WPF.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="IEMS - School Management System" Height="600" Width="1600"
+        Title="IEMS - School Management System" Height="700" Width="1200"
         WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
@@ -10,117 +10,235 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" Background="DarkBlue" Orientation="Horizontal" Height="60">
-            <Image Source="../School_logo.png" Width="50" Height="50" Margin="10,5,10,5"/>
-            <TextBlock Text="IEMS - School Management System"
-                       FontSize="20" FontWeight="Bold" Foreground="White"
-                       VerticalAlignment="Center" Margin="10,0,0,0"/>
-        </StackPanel>
+        <!-- Header Section -->
+        <Grid Grid.Row="0" Background="DarkBlue" Height="80">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-        <TabControl Grid.Row="1" Margin="10">
-            <TabItem Header="Students">
-                <Grid>
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
+                <Image Source="../School_logo.png" Width="60" Height="60" Margin="0,0,15,0"/>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="IEMS School Management System"
+                               FontSize="24" FontWeight="Bold" Foreground="White"/>
+                    <TextBlock Text="Dashboard"
+                               FontSize="14" Foreground="LightBlue" Margin="0,2,0,0"/>
+                </StackPanel>
+            </StackPanel>
+
+            <TextBlock Grid.Column="2" Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='dddd, MMMM dd, yyyy'}"
+                       xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                       FontSize="12" Foreground="LightGray" VerticalAlignment="Center" Margin="0,0,20,0"/>
+        </Grid>
+
+        <!-- Dashboard Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="20">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Welcome Section -->
+                <TextBlock Grid.Row="0" Text="Welcome to IEMS Dashboard"
+                           FontSize="28" FontWeight="Bold" Margin="0,10,0,30"
+                           HorizontalAlignment="Center" Foreground="#2C3E50"/>
+
+                <!-- Dashboard Cards -->
+                <Grid Grid.Row="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,10">
-                        <Button x:Name="btnAddStudent" Content="Add Student" Width="100" Height="30" Margin="0,0,10,0" Click="BtnAddStudent_Click"/>
-                        <Button x:Name="btnEditStudent" Content="Edit Student" Width="100" Height="30" Margin="0,0,10,0" Click="BtnEditStudent_Click"/>
-                        <Button x:Name="btnDeleteStudent" Content="Delete Student" Width="100" Height="30" Margin="0,0,10,0" Click="BtnDeleteStudent_Click"/>
-                        <Button x:Name="btnRefreshStudents" Content="Refresh" Width="100" Height="30" Margin="0,0,10,0" Click="BtnRefreshStudents_Click"/>
-                    </StackPanel>
-
-                    <DataGrid x:Name="dgStudents" Grid.Row="1" AutoGenerateColumns="False"
-                              CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                              GridLinesVisibility="All" HeadersVisibility="Column">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Serial No" Binding="{Binding SerialNo}" Width="70"/>
-                            <DataGridTextColumn Header="Standard" Binding="{Binding Standard}" Width="70"/>
-                            <DataGridTextColumn Header="Division" Binding="{Binding ClassDivision}" Width="70"/>
-                            <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="100"/>
-                            <DataGridTextColumn Header="Father's Name" Binding="{Binding FatherName}" Width="120"/>
-                            <DataGridTextColumn Header="Surname" Binding="{Binding Surname}" Width="100"/>
-                            <DataGridTextColumn Header="Date of Birth" Binding="{Binding FormattedDateOfBirth}" Width="90"/>
-                            <DataGridTextColumn Header="Gender" Binding="{Binding Gender}" Width="70"/>
-                            <DataGridTextColumn Header="Mother's Name" Binding="{Binding MotherName}" Width="120"/>
-                            <DataGridTextColumn Header="Student No" Binding="{Binding StudentNumber}" Width="90"/>
-                            <DataGridTextColumn Header="Admission Date" Binding="{Binding FormattedAdmissionDate}" Width="90"/>
-                            <DataGridTextColumn Header="Caste Category" Binding="{Binding CasteCategory}" Width="90"/>
-                            <DataGridTextColumn Header="Religion" Binding="{Binding Religion}" Width="80"/>
-                            <DataGridTextColumn Header="BPL" Binding="{Binding IsBPL}" Width="50"/>
-                            <DataGridTextColumn Header="Semi-English" Binding="{Binding IsSemiEnglish}" Width="90"/>
-                            <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="150"/>
-                            <DataGridTextColumn Header="Mobile" Binding="{Binding ParentMobileNumber}" Width="100"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Grid>
-            </TabItem>
-
-            <TabItem Header="Classes">
-                <Grid>
-                    <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,10">
-                        <Button x:Name="btnAddClass" Content="Add Class" Width="100" Height="30" Margin="0,0,10,0" Click="BtnAddClass_Click"/>
-                        <Button x:Name="btnEditClass" Content="Edit Class" Width="100" Height="30" Margin="0,0,10,0" Click="BtnEditClass_Click"/>
-                        <Button x:Name="btnDeleteClass" Content="Delete Class" Width="100" Height="30" Margin="0,0,10,0" Click="BtnDeleteClass_Click"/>
-                        <Button x:Name="btnRefreshClasses" Content="Refresh" Width="100" Height="30" Margin="0,0,10,0" Click="BtnRefreshClasses_Click"/>
-                        <Button x:Name="btnViewStudents" Content="View Students" Width="100" Height="30" Margin="0,0,10,0" Click="BtnViewStudents_Click"/>
-                    </StackPanel>
+                    <!-- Students Management Card -->
+                    <Border Grid.Row="0" Grid.Column="0" Background="White" CornerRadius="10"
+                            Margin="10" Padding="20" BorderBrush="#E0E0E0" BorderThickness="1"
+                            Effect="{x:Null}">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Gray" ShadowDepth="3" BlurRadius="8" Opacity="0.3"/>
+                        </Border.Effect>
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                    <DataGrid x:Name="dgClasses" Grid.Row="1" AutoGenerateColumns="False"
-                              CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                              GridLinesVisibility="All" HeadersVisibility="Column">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Class" Binding="{Binding DisplayName}" Width="120"/>
-                            <DataGridTextColumn Header="Teacher" Binding="{Binding TeacherName}" Width="150"/>
-                            <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="120"/>
-                            <DataGridTextColumn Header="Email" Binding="{Binding TeacherEmail}" Width="200"/>
-                            <DataGridTextColumn Header="Students" Binding="{Binding StudentCount}" Width="80"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
+                                <Border Grid.Column="0" Background="#3498DB" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
+                                    <TextBlock Text="👥" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="Students Management" FontSize="20" FontWeight="Bold" Foreground="#2C3E50"/>
+                                    <TextBlock Text="Manage students, classes and academic records" FontSize="12" Foreground="Gray" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <UniformGrid Columns="2" Margin="0,20,0,0">
+                                <Button x:Name="btnStudentsModule" Content="View Students"
+                                        Background="#3498DB" Foreground="White" BorderThickness="0"
+                                        Height="35" Margin="5" Click="BtnStudentsModule_Click"
+                                        Style="{DynamicResource ModernButtonStyle}"/>
+                                <Button x:Name="btnClassesModule" Content="View Classes"
+                                        Background="#2ECC71" Foreground="White" BorderThickness="0"
+                                        Height="35" Margin="5" Click="BtnClassesModule_Click"
+                                        Style="{DynamicResource ModernButtonStyle}"/>
+                            </UniformGrid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Transport Management Card -->
+                    <Border Grid.Row="0" Grid.Column="1" Background="White" CornerRadius="10"
+                            Margin="10" Padding="20" BorderBrush="#E0E0E0" BorderThickness="1"
+                            Effect="{x:Null}">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Gray" ShadowDepth="3" BlurRadius="8" Opacity="0.3"/>
+                        </Border.Effect>
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0" Background="#E67E22" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
+                                    <TextBlock Text="🚌" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="Transport Management" FontSize="20" FontWeight="Bold" Foreground="#2C3E50"/>
+                                    <TextBlock Text="Manage buses, routes and student transport" FontSize="12" Foreground="Gray" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <UniformGrid Columns="2" Margin="0,20,0,0">
+                                <Button x:Name="btnBusesModule" Content="Buses"
+                                        Background="#E67E22" Foreground="White" BorderThickness="0"
+                                        Height="35" Margin="5" Click="BtnBusesModule_Click"
+                                        Style="{DynamicResource ModernButtonStyle}"/>
+                                <Button x:Name="btnRoutesModule" Content="Routes"
+                                        Background="#D35400" Foreground="White" BorderThickness="0"
+                                        Height="35" Margin="5" Click="BtnRoutesModule_Click"
+                                        Style="{DynamicResource ModernButtonStyle}"/>
+                            </UniformGrid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Staff Management Card -->
+                    <Border Grid.Row="1" Grid.Column="0" Background="White" CornerRadius="10"
+                            Margin="10" Padding="20" BorderBrush="#E0E0E0" BorderThickness="1"
+                            Effect="{x:Null}">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Gray" ShadowDepth="3" BlurRadius="8" Opacity="0.3"/>
+                        </Border.Effect>
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0" Background="#9B59B6" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
+                                    <TextBlock Text="👨‍🏫" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="Staff Management" FontSize="20" FontWeight="Bold" Foreground="#2C3E50"/>
+                                    <TextBlock Text="Manage teachers, drivers, and support staff" FontSize="12" Foreground="Gray" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <UniformGrid Columns="2" Margin="0,20,0,0">
+                                <Button x:Name="btnTeachersModule" Content="Teachers"
+                                        Background="#9B59B6" Foreground="White" BorderThickness="0"
+                                        Height="35" Margin="5" Click="BtnTeachersModule_Click"
+                                        Style="{DynamicResource ModernButtonStyle}"/>
+                                <Button x:Name="btnSupportStaffModule" Content="Support Staff"
+                                        Background="#8E44AD" Foreground="White" BorderThickness="0"
+                                        Height="35" Margin="5" Click="BtnSupportStaffModule_Click"
+                                        Style="{DynamicResource ModernButtonStyle}"/>
+                            </UniformGrid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Expense Management Card -->
+                    <Border Grid.Row="1" Grid.Column="1" Background="White" CornerRadius="10"
+                            Margin="10" Padding="20" BorderBrush="#E0E0E0" BorderThickness="1"
+                            Effect="{x:Null}">
+                        <Border.Effect>
+                            <DropShadowEffect Color="Gray" ShadowDepth="3" BlurRadius="8" Opacity="0.3"/>
+                        </Border.Effect>
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0" Background="#E74C3C" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
+                                    <TextBlock Text="💰" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="Expense Management" FontSize="20" FontWeight="Bold" Foreground="#2C3E50"/>
+                                    <TextBlock Text="Track finances, fees and expenditures" FontSize="12" Foreground="Gray" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <UniformGrid Columns="2" Margin="0,20,0,0">
+                                <Button x:Name="btnFeesModule" Content="Student Fees"
+                                        Background="#E74C3C" Foreground="White" BorderThickness="0"
+                                        Height="35" Margin="5" Click="BtnFeesModule_Click"
+                                        Style="{DynamicResource ModernButtonStyle}"/>
+                                <Button x:Name="btnExpensesModule" Content="Expenses"
+                                        Background="#C0392B" Foreground="White" BorderThickness="0"
+                                        Height="35" Margin="5" Click="BtnExpensesModule_Click"
+                                        Style="{DynamicResource ModernButtonStyle}"/>
+                            </UniformGrid>
+                        </StackPanel>
+                    </Border>
                 </Grid>
-            </TabItem>
+            </Grid>
+        </ScrollViewer>
 
-            <TabItem Header="Teachers">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,10">
-                        <Button x:Name="btnAddTeacher" Content="Add Teacher" Width="100" Height="30" Margin="0,0,10,0" Click="BtnAddTeacher_Click"/>
-                        <Button x:Name="btnEditTeacher" Content="Edit Teacher" Width="100" Height="30" Margin="0,0,10,0" Click="BtnEditTeacher_Click"/>
-                        <Button x:Name="btnDeleteTeacher" Content="Delete Teacher" Width="100" Height="30" Margin="0,0,10,0" Click="BtnDeleteTeacher_Click"/>
-                        <Button x:Name="btnRefreshTeachers" Content="Refresh" Width="100" Height="30" Margin="0,0,10,0" Click="BtnRefreshTeachers_Click"/>
-                    </StackPanel>
-
-                    <DataGrid x:Name="dgTeachers" Grid.Row="1" AutoGenerateColumns="False"
-                              CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                              GridLinesVisibility="All" HeadersVisibility="Column">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Employee ID" Binding="{Binding EmployeeId}" Width="100"/>
-                            <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="120"/>
-                            <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" Width="120"/>
-                            <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="200"/>
-                            <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="150"/>
-                            <DataGridTextColumn Header="Classes" Binding="{Binding ClassCount}" Width="80"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Grid>
-            </TabItem>
-        </TabControl>
-
-        <StatusBar Grid.Row="2" Height="25">
+        <!-- Status Bar -->
+        <StatusBar Grid.Row="2" Height="30" Background="#34495E">
             <StatusBarItem>
-                <TextBlock x:Name="lblStatus" Text="Ready" />
+                <TextBlock x:Name="lblStatus" Text="Dashboard Ready" Foreground="White"/>
             </StatusBarItem>
         </StatusBar>
     </Grid>
+
+    <!-- Resources for Modern Button Style -->
+    <Window.Resources>
+        <Style x:Key="ModernButtonStyle" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="5" BorderThickness="0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Opacity" Value="0.6"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+    </Window.Resources>
 </Window>

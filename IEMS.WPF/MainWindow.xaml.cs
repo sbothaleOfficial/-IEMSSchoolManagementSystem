@@ -17,257 +17,84 @@ public partial class MainWindow : Window
         _studentService = studentService;
         _teacherService = teacherService;
         _classService = classService;
-        LoadStudents();
-        LoadTeachers();
-        LoadClasses();
+
+        lblStatus.Text = "Dashboard loaded successfully";
     }
 
-    private async void LoadStudents()
+    // Dashboard Navigation Event Handlers
+
+    private void BtnStudentsModule_Click(object sender, RoutedEventArgs e)
     {
         try
         {
-            lblStatus.Text = "Loading students...";
-            var students = await _studentService.GetAllStudentsAsync();
-            dgStudents.ItemsSource = students;
-            lblStatus.Text = $"Loaded {students.Count()} students";
+            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService);
+            studentsWindow.ShowDialog();
+            lblStatus.Text = "Students Management module accessed";
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error loading students: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            lblStatus.Text = "Error loading students";
+            MessageBox.Show($"Error opening Students Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening Students Management";
         }
     }
 
-    private void BtnAddStudent_Click(object sender, RoutedEventArgs e)
-    {
-        var addWindow = new AddEditStudentWindow(_studentService, _classService);
-        if (addWindow.ShowDialog() == true)
-        {
-            LoadStudents();
-        }
-    }
-
-    private void BtnEditStudent_Click(object sender, RoutedEventArgs e)
-    {
-        if (dgStudents.SelectedItem is StudentDto selectedStudent)
-        {
-            var editWindow = new AddEditStudentWindow(_studentService, _classService, selectedStudent);
-            if (editWindow.ShowDialog() == true)
-            {
-                LoadStudents();
-            }
-        }
-        else
-        {
-            MessageBox.Show("Please select a student to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-    }
-
-    private async void BtnDeleteStudent_Click(object sender, RoutedEventArgs e)
-    {
-        if (dgStudents.SelectedItem is StudentDto selectedStudent)
-        {
-            var result = MessageBox.Show($"Are you sure you want to delete student {selectedStudent.FullName}?",
-                                       "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                try
-                {
-                    await _studentService.DeleteStudentAsync(selectedStudent.Id);
-                    LoadStudents();
-                    lblStatus.Text = "Student deleted successfully";
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error deleting student: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-        }
-        else
-        {
-            MessageBox.Show("Please select a student to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-    }
-
-    private void BtnRefreshStudents_Click(object sender, RoutedEventArgs e)
-    {
-        LoadStudents();
-    }
-
-    private async void LoadTeachers()
+    private void BtnClassesModule_Click(object sender, RoutedEventArgs e)
     {
         try
         {
-            lblStatus.Text = "Loading teachers...";
-            var teachers = await _teacherService.GetAllTeachersAsync();
-            dgTeachers.ItemsSource = teachers;
-            lblStatus.Text = $"Loaded {teachers.Count()} teachers";
+            var classesWindow = new ClassesManagementWindow(_classService, _teacherService, _studentService);
+            classesWindow.ShowDialog();
+            lblStatus.Text = "Classes Management module accessed";
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error loading teachers: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            lblStatus.Text = "Error loading teachers";
+            MessageBox.Show($"Error opening Classes Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening Classes Management";
         }
     }
 
-    private void BtnAddTeacher_Click(object sender, RoutedEventArgs e)
-    {
-        var addWindow = new AddEditTeacherWindow(_teacherService);
-        if (addWindow.ShowDialog() == true)
-        {
-            LoadTeachers();
-        }
-    }
-
-    private void BtnEditTeacher_Click(object sender, RoutedEventArgs e)
-    {
-        if (dgTeachers.SelectedItem is TeacherDto selectedTeacher)
-        {
-            var editWindow = new AddEditTeacherWindow(_teacherService, selectedTeacher);
-            if (editWindow.ShowDialog() == true)
-            {
-                LoadTeachers();
-            }
-        }
-        else
-        {
-            MessageBox.Show("Please select a teacher to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-    }
-
-    private async void BtnDeleteTeacher_Click(object sender, RoutedEventArgs e)
-    {
-        if (dgTeachers.SelectedItem is TeacherDto selectedTeacher)
-        {
-            var result = MessageBox.Show($"Are you sure you want to delete teacher {selectedTeacher.FullName}?",
-                                       "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                try
-                {
-                    await _teacherService.DeleteTeacherAsync(selectedTeacher.Id);
-                    LoadTeachers();
-                    lblStatus.Text = "Teacher deleted successfully";
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error deleting teacher: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-        }
-        else
-        {
-            MessageBox.Show("Please select a teacher to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-    }
-
-    private void BtnRefreshTeachers_Click(object sender, RoutedEventArgs e)
-    {
-        LoadTeachers();
-    }
-
-    private async void LoadClasses()
+    private void BtnTeachersModule_Click(object sender, RoutedEventArgs e)
     {
         try
         {
-            lblStatus.Text = "Loading classes...";
-            var classes = await _classService.GetAllClassesAsync();
-            dgClasses.ItemsSource = classes;
-            lblStatus.Text = $"Loaded {classes.Count()} classes";
+            var teachersWindow = new TeachersManagementWindow(_teacherService, _classService);
+            teachersWindow.ShowDialog();
+            lblStatus.Text = "Teachers Management module accessed";
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error loading classes: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            lblStatus.Text = "Error loading classes";
+            MessageBox.Show($"Error opening Teachers Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening Teachers Management";
         }
     }
 
-    private void BtnAddClass_Click(object sender, RoutedEventArgs e)
+    private void BtnBusesModule_Click(object sender, RoutedEventArgs e)
     {
-        var addWindow = new AddEditClassWindow(_classService, _teacherService);
-        if (addWindow.ShowDialog() == true)
-        {
-            LoadClasses();
-            LoadTeachers(); // Refresh teacher class counts
-        }
+        MessageBox.Show("Transport Management - Buses module\nComing soon!", "Module Under Development", MessageBoxButton.OK, MessageBoxImage.Information);
+        lblStatus.Text = "Transport Management - Buses (Coming Soon)";
     }
 
-    private void BtnEditClass_Click(object sender, RoutedEventArgs e)
+    private void BtnRoutesModule_Click(object sender, RoutedEventArgs e)
     {
-        if (dgClasses.SelectedItem is ClassDto selectedClass)
-        {
-            var editWindow = new AddEditClassWindow(_classService, _teacherService, selectedClass);
-            if (editWindow.ShowDialog() == true)
-            {
-                LoadClasses();
-                LoadTeachers(); // Refresh teacher class counts
-            }
-        }
-        else
-        {
-            MessageBox.Show("Please select a class to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
+        MessageBox.Show("Transport Management - Routes module\nComing soon!", "Module Under Development", MessageBoxButton.OK, MessageBoxImage.Information);
+        lblStatus.Text = "Transport Management - Routes (Coming Soon)";
     }
 
-    private async void BtnDeleteClass_Click(object sender, RoutedEventArgs e)
+    private void BtnSupportStaffModule_Click(object sender, RoutedEventArgs e)
     {
-        if (dgClasses.SelectedItem is ClassDto selectedClass)
-        {
-            var result = MessageBox.Show($"Are you sure you want to delete class {selectedClass.DisplayName}?",
-                                       "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                try
-                {
-                    await _classService.DeleteClassAsync(selectedClass.Id);
-                    LoadClasses();
-                    LoadTeachers(); // Refresh teacher class counts
-                    lblStatus.Text = "Class deleted successfully";
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error deleting class: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-        }
-        else
-        {
-            MessageBox.Show("Please select a class to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
+        MessageBox.Show("Staff Management - Support Staff module\nComing soon!", "Module Under Development", MessageBoxButton.OK, MessageBoxImage.Information);
+        lblStatus.Text = "Staff Management - Support Staff (Coming Soon)";
     }
 
-    private void BtnRefreshClasses_Click(object sender, RoutedEventArgs e)
+    private void BtnFeesModule_Click(object sender, RoutedEventArgs e)
     {
-        LoadClasses();
+        MessageBox.Show("Expense Management - Student Fees module\nComing soon!", "Module Under Development", MessageBoxButton.OK, MessageBoxImage.Information);
+        lblStatus.Text = "Expense Management - Student Fees (Coming Soon)";
     }
 
-    private async void BtnViewStudents_Click(object sender, RoutedEventArgs e)
+    private void BtnExpensesModule_Click(object sender, RoutedEventArgs e)
     {
-        if (dgClasses.SelectedItem is ClassDto selectedClass)
-        {
-            try
-            {
-                var students = await _studentService.GetAllStudentsAsync();
-                var classStudents = students.Where(s => s.ClassId == selectedClass.Id).ToList();
-
-                var message = classStudents.Any()
-                    ? $"Students in {selectedClass.DisplayName}:\n\n" +
-                      string.Join("\n", classStudents.Select(s => $"• {s.StudentNumber} - {s.FullName}"))
-                    : $"No students enrolled in {selectedClass.DisplayName}";
-
-                MessageBox.Show(message, $"Students in {selectedClass.DisplayName}", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading students: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-        else
-        {
-            MessageBox.Show("Please select a class to view students.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
+        MessageBox.Show("Expense Management - Expenses module\nComing soon!", "Module Under Development", MessageBoxButton.OK, MessageBoxImage.Information);
+        lblStatus.Text = "Expense Management - Expenses (Coming Soon)";
     }
 }
