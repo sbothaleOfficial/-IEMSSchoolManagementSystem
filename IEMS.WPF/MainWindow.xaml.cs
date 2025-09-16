@@ -13,8 +13,10 @@ public partial class MainWindow : Window
     private readonly StaffService _staffService;
     private readonly FeePaymentService _feePaymentService;
     private readonly FeeStructureService _feeStructureService;
+    private readonly VehicleService _vehicleService;
+    private readonly TransportExpenseService _transportExpenseService;
 
-    public MainWindow(StudentService studentService, TeacherService teacherService, ClassService classService, StaffService staffService, FeePaymentService feePaymentService, FeeStructureService feeStructureService)
+    public MainWindow(StudentService studentService, TeacherService teacherService, ClassService classService, StaffService staffService, FeePaymentService feePaymentService, FeeStructureService feeStructureService, VehicleService vehicleService, TransportExpenseService transportExpenseService)
     {
         InitializeComponent();
         _studentService = studentService;
@@ -23,6 +25,8 @@ public partial class MainWindow : Window
         _staffService = staffService;
         _feePaymentService = feePaymentService;
         _feeStructureService = feeStructureService;
+        _vehicleService = vehicleService;
+        _transportExpenseService = transportExpenseService;
 
         lblStatus.Text = "Dashboard loaded successfully";
     }
@@ -76,14 +80,32 @@ public partial class MainWindow : Window
 
     private void BtnBusesModule_Click(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show("Transport Management - Buses module\nComing soon!", "Module Under Development", MessageBoxButton.OK, MessageBoxImage.Information);
-        lblStatus.Text = "Transport Management - Buses (Coming Soon)";
+        try
+        {
+            var transportWindow = new TransportManagementWindow(_vehicleService, _transportExpenseService);
+            transportWindow.ShowDialog();
+            lblStatus.Text = "Transport Management module accessed";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening Transport Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening Transport Management";
+        }
     }
 
     private void BtnRoutesModule_Click(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show("Transport Management - Routes module\nComing soon!", "Module Under Development", MessageBoxButton.OK, MessageBoxImage.Information);
-        lblStatus.Text = "Transport Management - Routes (Coming Soon)";
+        try
+        {
+            var transportWindow = new TransportManagementWindow(_vehicleService, _transportExpenseService);
+            transportWindow.ShowDialog();
+            lblStatus.Text = "Transport Management module accessed";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening Transport Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening Transport Management";
+        }
     }
 
     private void BtnSupportStaffModule_Click(object sender, RoutedEventArgs e)
