@@ -1,0 +1,15 @@
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Application\bin\Release\net8.0\IEMS.Application.deps.json
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Application\bin\Release\net8.0\IEMS.Application.dll
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Application\bin\Release\net8.0\IEMS.Application.pdb
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Application\bin\Release\net8.0\IEMS.Core.dll
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Application\bin\Release\net8.0\IEMS.Core.pdb
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Application\obj\Release\net8.0\IEMS.Application.csproj.AssemblyReference.cache
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Application\obj\Release\net8.0\IEMS.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Application\obj\Release\net8.0\IEMS.Application.AssemblyInfoInputs.cache
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Application\obj\Release\net8.0\IEMS.Application.AssemblyInfo.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Application\obj\Release\net8.0\IEMS.Application.csproj.CoreCompileInputs.cache
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Application\obj\Release\net8.0\IEMS.App.DBAAF97F.Up2Date
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Application\obj\Release\net8.0\IEMS.Application.dll
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Application\obj\Release\net8.0\refint\IEMS.Application.dll
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Application\obj\Release\net8.0\IEMS.Application.pdb
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Application\obj\Release\net8.0\ref\IEMS.Application.dll

@@ -6,7 +6,17 @@
       "Bash(dotnet build:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(dotnet run:*)"
+      "Bash(dotnet run:*)",
+      "Bash(dotnet --list-sdks)",
+      "Bash(dotnet --list-runtimes)",
+      "Bash(taskkill:*)",
+      "Bash(dotnet publish:*)",
+      "Bash(cmd.exe /c \"start publish\\IEMS.WPF.exe\")",
+      "Bash(csc:*)",
+      "Bash(tasklist)",
+      "Bash(explorer.exe publish:*)",
+      "Bash(powershell:*)",
+      "Bash(timeout:*)"
     ],
     "deny": [],
     "ask": []

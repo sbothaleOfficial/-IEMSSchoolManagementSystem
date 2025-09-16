@@ -154,3 +154,4 @@ C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-win
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\IEMS.WPF.pdb
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\IEMS.WPF.genruntimeconfig.cache
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\ref\IEMS.WPF.dll
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\App.baml
