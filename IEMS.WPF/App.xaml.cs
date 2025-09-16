@@ -13,7 +13,7 @@ public partial class App : System.Windows.Application
 {
     private IHost? _host;
 
-    protected override void OnStartup(StartupEventArgs e)
+    protected override async void OnStartup(StartupEventArgs e)
     {
         _host = Host.CreateDefaultBuilder()
             .ConfigureServices((context, services) =>
@@ -28,6 +28,8 @@ public partial class App : System.Windows.Application
                 services.AddSingleton<MainWindow>();
             })
             .Build();
+
+        await _host.StartAsync();
 
         using (var scope = _host.Services.CreateScope())
         {

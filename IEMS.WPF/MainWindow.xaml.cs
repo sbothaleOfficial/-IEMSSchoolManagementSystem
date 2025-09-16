@@ -32,7 +32,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private async void BtnAddStudent_Click(object sender, RoutedEventArgs e)
+    private void BtnAddStudent_Click(object sender, RoutedEventArgs e)
     {
         var addWindow = new AddEditStudentWindow(_studentService);
         if (addWindow.ShowDialog() == true)
@@ -41,7 +41,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private async void BtnEditStudent_Click(object sender, RoutedEventArgs e)
+    private void BtnEditStudent_Click(object sender, RoutedEventArgs e)
     {
         if (dgStudents.SelectedItem is StudentDto selectedStudent)
         {
