@@ -13,6 +13,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<Teacher> Teachers { get; set; }
     public DbSet<Class> Classes { get; set; }
     public DbSet<Staff> Staff { get; set; }
+    public DbSet<FeePayment> FeePayments { get; set; }
+    public DbSet<FeeStructure> FeeStructures { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,11 +50,8 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.FirstName).IsRequired().HasMaxLength(50);
             entity.Property(e => e.LastName).IsRequired().HasMaxLength(50);
-            entity.Property(e => e.Email).IsRequired().HasMaxLength(100);
             entity.Property(e => e.EmployeeId).IsRequired().HasMaxLength(20);
-            entity.Property(e => e.Subject).IsRequired().HasMaxLength(100);
             entity.HasIndex(e => e.EmployeeId).IsUnique();
-            entity.HasIndex(e => e.Email).IsUnique();
         });
 
         modelBuilder.Entity<Class>(entity =>
@@ -73,20 +72,50 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.EmployeeId).IsRequired().HasMaxLength(20);
             entity.Property(e => e.FirstName).IsRequired().HasMaxLength(50);
             entity.Property(e => e.LastName).IsRequired().HasMaxLength(50);
-            entity.Property(e => e.Email).IsRequired().HasMaxLength(100);
             entity.Property(e => e.PhoneNumber).IsRequired().HasMaxLength(15);
             entity.Property(e => e.Gender).IsRequired().HasMaxLength(10);
             entity.Property(e => e.Address).HasMaxLength(200);
             entity.Property(e => e.Position).IsRequired().HasMaxLength(50);
-            entity.Property(e => e.Department).IsRequired().HasMaxLength(50);
-            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
-            entity.Property(e => e.EmergencyContact).HasMaxLength(50);
-            entity.Property(e => e.EmergencyContactPhone).HasMaxLength(15);
-            entity.Property(e => e.Qualifications).HasMaxLength(200);
-            entity.Property(e => e.Experience).HasMaxLength(50);
-            entity.Property(e => e.Remarks).HasMaxLength(500);
             entity.Property(e => e.Salary).HasColumnType("decimal(18,2)");
             entity.HasIndex(e => e.EmployeeId).IsUnique();
+        });
+
+        modelBuilder.Entity<FeePayment>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.ReceiptNumber).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.AmountPaid).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.PreviousBalance).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.RemainingBalance).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.LateFee).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.Discount).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.TransactionId).HasMaxLength(100);
+            entity.Property(e => e.ChequeNumber).HasMaxLength(50);
+            entity.Property(e => e.BankName).HasMaxLength(100);
+            entity.Property(e => e.PaymentNotes).HasMaxLength(500);
+            entity.Property(e => e.AcademicYear).IsRequired().HasMaxLength(10);
+            entity.Property(e => e.GeneratedBy).IsRequired().HasMaxLength(100);
+            entity.HasIndex(e => e.ReceiptNumber).IsUnique();
+
+            entity.HasOne(e => e.Student)
+                  .WithMany(s => s.FeePayments)
+                  .HasForeignKey(e => e.StudentId)
+                  .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<FeeStructure>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Amount).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.AcademicYear).IsRequired().HasMaxLength(10);
+            entity.Property(e => e.Description).HasMaxLength(200);
+
+            entity.HasOne(e => e.Class)
+                  .WithMany(c => c.FeeStructures)
+                  .HasForeignKey(e => e.ClassId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => new { e.ClassId, e.FeeType, e.AcademicYear }).IsUnique();
         });
 
         SeedData(modelBuilder);
@@ -95,8 +124,8 @@ public class ApplicationDbContext : DbContext
     private static void SeedData(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Teacher>().HasData(
-            new Teacher { Id = 1, FirstName = "John", LastName = "Smith", Email = "john.smith@school.edu", EmployeeId = "T001", Subject = "Mathematics" },
-            new Teacher { Id = 2, FirstName = "Sarah", LastName = "Johnson", Email = "sarah.johnson@school.edu", EmployeeId = "T002", Subject = "English" }
+            new Teacher { Id = 1, FirstName = "John", LastName = "Smith", EmployeeId = "T001" },
+            new Teacher { Id = 2, FirstName = "Sarah", LastName = "Johnson", EmployeeId = "T002" }
         );
 
         modelBuilder.Entity<Class>().HasData(
@@ -141,36 +170,32 @@ public class ApplicationDbContext : DbContext
             new Staff
             {
                 Id = 1, EmployeeId = "ST001", FirstName = "Rajesh", LastName = "Kumar",
-                Email = "rajesh.kumar@school.edu", PhoneNumber = "9876543213",
-                DateOfBirth = new DateTime(1985, 3, 15), Gender = "Male",
-                Address = "101 Transport Ave, City", Position = "Bus Driver", Department = "Transport",
-                HireDate = new DateTime(2020, 4, 1), Salary = 25000, Status = "Active",
-                EmergencyContact = "Sunita Kumar", EmergencyContactPhone = "9876543214",
-                Qualifications = "Commercial Driving License", Experience = "8 years",
-                Remarks = "Excellent safety record"
+                PhoneNumber = "9876543213", DateOfBirth = new DateTime(1985, 3, 15), Gender = "Male",
+                Address = "101 Transport Ave, City", Position = "Driver", Salary = 25000
             },
             new Staff
             {
                 Id = 2, EmployeeId = "ST002", FirstName = "Kamala", LastName = "Devi",
-                Email = "kamala.devi@school.edu", PhoneNumber = "9876543215",
-                DateOfBirth = new DateTime(1978, 7, 22), Gender = "Female",
-                Address = "202 Clean St, City", Position = "Cleaner", Department = "Maintenance",
-                HireDate = new DateTime(2018, 6, 15), Salary = 18000, Status = "Active",
-                EmergencyContact = "Ram Lal", EmergencyContactPhone = "9876543216",
-                Qualifications = "10th Pass", Experience = "12 years",
-                Remarks = "Dedicated and hardworking"
+                PhoneNumber = "9876543215", DateOfBirth = new DateTime(1978, 7, 22), Gender = "Female",
+                Address = "202 Clean St, City", Position = "Peon", Salary = 18000
             },
             new Staff
             {
                 Id = 3, EmployeeId = "ST003", FirstName = "Suresh", LastName = "Singh",
-                Email = "suresh.singh@school.edu", PhoneNumber = "9876543217",
-                DateOfBirth = new DateTime(1982, 11, 8), Gender = "Male",
-                Address = "303 Security Lane, City", Position = "Security Guard", Department = "Security",
-                HireDate = new DateTime(2019, 8, 1), Salary = 22000, Status = "Active",
-                EmergencyContact = "Meera Singh", EmergencyContactPhone = "9876543218",
-                Qualifications = "12th Pass, Security Training", Experience = "10 years",
-                Remarks = "Night shift supervisor"
+                PhoneNumber = "9876543217", DateOfBirth = new DateTime(1982, 11, 8), Gender = "Male",
+                Address = "303 Office Lane, City", Position = "Clerk", Salary = 22000
             }
+        );
+
+        modelBuilder.Entity<FeeStructure>().HasData(
+            new FeeStructure { Id = 1, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 60000, AcademicYear = "2024-25", Description = "Annual Tuition Fees" },
+            new FeeStructure { Id = 2, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.ADMISSION, Amount = 5000, AcademicYear = "2024-25", Description = "One-time Admission Fees" },
+            new FeeStructure { Id = 3, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 2000, AcademicYear = "2024-25", Description = "Examination Fees" },
+            new FeeStructure { Id = 4, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 12000, AcademicYear = "2024-25", Description = "Annual Transport Fees" },
+            new FeeStructure { Id = 5, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 60000, AcademicYear = "2024-25", Description = "Annual Tuition Fees" },
+            new FeeStructure { Id = 6, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.ADMISSION, Amount = 5000, AcademicYear = "2024-25", Description = "One-time Admission Fees" },
+            new FeeStructure { Id = 7, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 2000, AcademicYear = "2024-25", Description = "Examination Fees" },
+            new FeeStructure { Id = 8, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 12000, AcademicYear = "2024-25", Description = "Annual Transport Fees" }
         );
     }
 }

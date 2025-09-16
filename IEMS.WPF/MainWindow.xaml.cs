@@ -11,14 +11,18 @@ public partial class MainWindow : Window
     private readonly TeacherService _teacherService;
     private readonly ClassService _classService;
     private readonly StaffService _staffService;
+    private readonly FeePaymentService _feePaymentService;
+    private readonly FeeStructureService _feeStructureService;
 
-    public MainWindow(StudentService studentService, TeacherService teacherService, ClassService classService, StaffService staffService)
+    public MainWindow(StudentService studentService, TeacherService teacherService, ClassService classService, StaffService staffService, FeePaymentService feePaymentService, FeeStructureService feeStructureService)
     {
         InitializeComponent();
         _studentService = studentService;
         _teacherService = teacherService;
         _classService = classService;
         _staffService = staffService;
+        _feePaymentService = feePaymentService;
+        _feeStructureService = feeStructureService;
 
         lblStatus.Text = "Dashboard loaded successfully";
     }
@@ -29,7 +33,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService);
+            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService, _feePaymentService, _feeStructureService);
             studentsWindow.ShowDialog();
             lblStatus.Text = "Students Management module accessed";
         }
