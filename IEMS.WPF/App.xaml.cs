@@ -38,6 +38,7 @@ public partial class App : System.Windows.Application
         }
 
         var mainWindow = _host.Services.GetRequiredService<MainWindow>();
+        this.MainWindow = mainWindow;
         mainWindow.Show();
 
         base.OnStartup(e);
