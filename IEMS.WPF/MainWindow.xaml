@@ -59,8 +59,7 @@
 
                     <!-- Students Management Card -->
                     <Border Grid.Row="0" Grid.Column="0" Background="White" CornerRadius="10"
-                            Margin="10" Padding="20" BorderBrush="#E0E0E0" BorderThickness="1"
-                            Effect="{x:Null}">
+                            Margin="10" Padding="20" BorderBrush="#E0E0E0" BorderThickness="1">
                         <Border.Effect>
                             <DropShadowEffect Color="Gray" ShadowDepth="3" BlurRadius="8" Opacity="0.3"/>
                         </Border.Effect>
@@ -96,8 +95,7 @@
 
                     <!-- Transport Management Card -->
                     <Border Grid.Row="0" Grid.Column="1" Background="White" CornerRadius="10"
-                            Margin="10" Padding="20" BorderBrush="#E0E0E0" BorderThickness="1"
-                            Effect="{x:Null}">
+                            Margin="10" Padding="20" BorderBrush="#E0E0E0" BorderThickness="1">
                         <Border.Effect>
                             <DropShadowEffect Color="Gray" ShadowDepth="3" BlurRadius="8" Opacity="0.3"/>
                         </Border.Effect>
@@ -133,8 +131,7 @@
 
                     <!-- Staff Management Card -->
                     <Border Grid.Row="1" Grid.Column="0" Background="White" CornerRadius="10"
-                            Margin="10" Padding="20" BorderBrush="#E0E0E0" BorderThickness="1"
-                            Effect="{x:Null}">
+                            Margin="10" Padding="20" BorderBrush="#E0E0E0" BorderThickness="1">
                         <Border.Effect>
                             <DropShadowEffect Color="Gray" ShadowDepth="3" BlurRadius="8" Opacity="0.3"/>
                         </Border.Effect>
@@ -170,8 +167,7 @@
 
                     <!-- Expense Management Card -->
                     <Border Grid.Row="1" Grid.Column="1" Background="White" CornerRadius="10"
-                            Margin="10" Padding="20" BorderBrush="#E0E0E0" BorderThickness="1"
-                            Effect="{x:Null}">
+                            Margin="10" Padding="20" BorderBrush="#E0E0E0" BorderThickness="1">
                         <Border.Effect>
                             <DropShadowEffect Color="Gray" ShadowDepth="3" BlurRadius="8" Opacity="0.3"/>
                         </Border.Effect>
