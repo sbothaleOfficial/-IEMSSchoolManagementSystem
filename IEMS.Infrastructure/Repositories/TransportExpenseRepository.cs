@@ -88,24 +88,33 @@ public class TransportExpenseRepository : ITransportExpenseRepository
 
     public async Task<decimal> GetTotalExpensesByVehicleAsync(int vehicleId)
     {
-        return await _context.TransportExpenses
+        var expenses = await _context.TransportExpenses
             .Where(e => e.VehicleId == vehicleId)
-            .SumAsync(e => e.Amount);
+            .Select(e => e.Amount)
+            .ToListAsync();
+
+        return expenses.Sum();
     }
 
     public async Task<decimal> GetTotalExpensesByCategoryAsync(ExpenseCategory category)
     {
-        return await _context.TransportExpenses
+        var expenses = await _context.TransportExpenses
             .Where(e => e.Category == category)
-            .SumAsync(e => e.Amount);
+            .Select(e => e.Amount)
+            .ToListAsync();
+
+        return expenses.Sum();
     }
 
     public async Task<decimal> GetMonthlyExpensesByVehicleAsync(int vehicleId, int year, int month)
     {
-        return await _context.TransportExpenses
+        var expenses = await _context.TransportExpenses
             .Where(e => e.VehicleId == vehicleId &&
                        e.ExpenseDate.Year == year &&
                        e.ExpenseDate.Month == month)
-            .SumAsync(e => e.Amount);
+            .Select(e => e.Amount)
+            .ToListAsync();
+
+        return expenses.Sum();
     }
 }
