@@ -10,6 +10,7 @@ public partial class StudentsManagementWindow : Window
     private readonly StudentService _studentService;
     private readonly ClassService _classService;
     private readonly TeacherService _teacherService;
+    private List<StudentDto> _allStudents = new List<StudentDto>();
 
     public StudentsManagementWindow(StudentService studentService, ClassService classService, TeacherService teacherService)
     {
@@ -27,7 +28,8 @@ public partial class StudentsManagementWindow : Window
         {
             lblStatus.Text = "Loading students...";
             var students = await _studentService.GetAllStudentsAsync();
-            dgStudents.ItemsSource = students;
+            _allStudents = students.ToList();
+            dgStudents.ItemsSource = _allStudents;
             lblStatus.Text = $"Loaded {students.Count()} students";
         }
         catch (Exception ex)
@@ -59,8 +61,11 @@ public partial class StudentsManagementWindow : Window
         var addWindow = new AddEditStudentWindow(_studentService, _classService);
         if (addWindow.ShowDialog() == true)
         {
+            var currentSearch = txtSearchStudents.Text;
             LoadStudents();
             LoadClasses(); // Refresh to update student counts in classes
+            txtSearchStudents.Text = currentSearch; // Restore search after refresh
+            FilterStudents();
         }
     }
 
@@ -71,8 +76,11 @@ public partial class StudentsManagementWindow : Window
             var editWindow = new AddEditStudentWindow(_studentService, _classService, selectedStudent);
             if (editWindow.ShowDialog() == true)
             {
+                var currentSearch = txtSearchStudents.Text;
                 LoadStudents();
                 LoadClasses(); // Refresh to update student counts in classes
+                txtSearchStudents.Text = currentSearch; // Restore search after refresh
+                FilterStudents();
             }
         }
         else
@@ -93,8 +101,11 @@ public partial class StudentsManagementWindow : Window
                 try
                 {
                     await _studentService.DeleteStudentAsync(selectedStudent.Id);
+                    var currentSearch = txtSearchStudents.Text;
                     LoadStudents();
                     LoadClasses(); // Refresh to update student counts in classes
+                    txtSearchStudents.Text = currentSearch; // Restore search after refresh
+                    FilterStudents();
                     lblStatus.Text = "Student deleted successfully";
                 }
                 catch (Exception ex)
@@ -112,6 +123,7 @@ public partial class StudentsManagementWindow : Window
     private void BtnRefreshStudents_Click(object sender, RoutedEventArgs e)
     {
         LoadStudents();
+        txtSearchStudents.Text = ""; // Clear search when refreshing
     }
 
     // Class Management Events
@@ -197,5 +209,44 @@ public partial class StudentsManagementWindow : Window
         {
             MessageBox.Show("Please select a class to view students.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+    }
+
+    // Search Functionality
+    private void TxtSearchStudents_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        FilterStudents();
+    }
+
+    private void FilterStudents()
+    {
+        if (_allStudents == null || !_allStudents.Any())
+            return;
+
+        var searchText = txtSearchStudents.Text.Trim().ToLower();
+
+        if (string.IsNullOrEmpty(searchText))
+        {
+            // Show all students if search is empty
+            dgStudents.ItemsSource = _allStudents;
+            lblStatus.Text = $"Showing all {_allStudents.Count} students";
+            return;
+        }
+
+        // Filter students based on multiple criteria
+        var filteredStudents = _allStudents.Where(student =>
+            student.FirstName.ToLower().Contains(searchText) ||
+            student.Surname.ToLower().Contains(searchText) ||
+            student.FullName.ToLower().Contains(searchText) ||
+            student.FatherName.ToLower().Contains(searchText) ||
+            student.MotherName.ToLower().Contains(searchText) ||
+            student.StudentNumber.ToLower().Contains(searchText) ||
+            student.ParentMobileNumber.ToLower().Contains(searchText) ||
+            student.Standard.ToLower().Contains(searchText) ||
+            student.ClassDivision.ToLower().Contains(searchText) ||
+            student.Address.ToLower().Contains(searchText)
+        ).ToList();
+
+        dgStudents.ItemsSource = filteredStudents;
+        lblStatus.Text = $"Found {filteredStudents.Count} students matching '{txtSearchStudents.Text}'";
     }
 }
