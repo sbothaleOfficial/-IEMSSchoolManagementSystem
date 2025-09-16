@@ -10,13 +10,15 @@ public partial class MainWindow : Window
     private readonly StudentService _studentService;
     private readonly TeacherService _teacherService;
     private readonly ClassService _classService;
+    private readonly StaffService _staffService;
 
-    public MainWindow(StudentService studentService, TeacherService teacherService, ClassService classService)
+    public MainWindow(StudentService studentService, TeacherService teacherService, ClassService classService, StaffService staffService)
     {
         InitializeComponent();
         _studentService = studentService;
         _teacherService = teacherService;
         _classService = classService;
+        _staffService = staffService;
 
         lblStatus.Text = "Dashboard loaded successfully";
     }
@@ -82,8 +84,17 @@ public partial class MainWindow : Window
 
     private void BtnSupportStaffModule_Click(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show("Staff Management - Support Staff module\nComing soon!", "Module Under Development", MessageBoxButton.OK, MessageBoxImage.Information);
-        lblStatus.Text = "Staff Management - Support Staff (Coming Soon)";
+        try
+        {
+            var supportStaffWindow = new SupportStaffManagementWindow(_staffService);
+            supportStaffWindow.ShowDialog();
+            lblStatus.Text = "Support Staff Management module accessed";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening Support Staff Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening Support Staff Management";
+        }
     }
 
     private void BtnFeesModule_Click(object sender, RoutedEventArgs e)

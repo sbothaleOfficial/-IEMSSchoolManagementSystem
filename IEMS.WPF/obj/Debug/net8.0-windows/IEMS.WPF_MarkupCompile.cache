@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET8_0;NETCOREAPP
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\App.xaml
-3673555914
+9-2065902752
 
-5-343503419
+11718593320
 255-2070486149
-AddEditStudentWindow.xaml;AddEditTeacherWindow.xaml;MainWindow.xaml;
+AddEditClassWindow.xaml;AddEditStaffWindow.xaml;AddEditStudentWindow.xaml;AddEditTeacherWindow.xaml;ClassesManagementWindow.xaml;MainWindow.xaml;StudentsManagementWindow.xaml;SupportStaffManagementWindow.xaml;TeachersManagementWindow.xaml;
 
 False
 

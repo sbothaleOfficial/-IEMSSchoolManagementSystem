@@ -12,6 +12,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Student> Students { get; set; }
     public DbSet<Teacher> Teachers { get; set; }
     public DbSet<Class> Classes { get; set; }
+    public DbSet<Staff> Staff { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -66,6 +67,28 @@ public class ApplicationDbContext : DbContext
                   .OnDelete(DeleteBehavior.Restrict);
         });
 
+        modelBuilder.Entity<Staff>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.EmployeeId).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.FirstName).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.LastName).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Email).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.PhoneNumber).IsRequired().HasMaxLength(15);
+            entity.Property(e => e.Gender).IsRequired().HasMaxLength(10);
+            entity.Property(e => e.Address).HasMaxLength(200);
+            entity.Property(e => e.Position).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Department).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Status).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.EmergencyContact).HasMaxLength(50);
+            entity.Property(e => e.EmergencyContactPhone).HasMaxLength(15);
+            entity.Property(e => e.Qualifications).HasMaxLength(200);
+            entity.Property(e => e.Experience).HasMaxLength(50);
+            entity.Property(e => e.Remarks).HasMaxLength(500);
+            entity.Property(e => e.Salary).HasColumnType("decimal(18,2)");
+            entity.HasIndex(e => e.EmployeeId).IsUnique();
+        });
+
         SeedData(modelBuilder);
     }
 
@@ -111,6 +134,42 @@ public class ApplicationDbContext : DbContext
                 AdmissionDate = new DateTime(2023, 6, 1), CasteCategory = "SC",
                 Religion = "Hindu", IsBPL = true, IsSemiEnglish = true,
                 Address = "789 Pine Rd, City", ParentMobileNumber = "9876543212", ClassId = 2
+            }
+        );
+
+        modelBuilder.Entity<Staff>().HasData(
+            new Staff
+            {
+                Id = 1, EmployeeId = "ST001", FirstName = "Rajesh", LastName = "Kumar",
+                Email = "rajesh.kumar@school.edu", PhoneNumber = "9876543213",
+                DateOfBirth = new DateTime(1985, 3, 15), Gender = "Male",
+                Address = "101 Transport Ave, City", Position = "Bus Driver", Department = "Transport",
+                HireDate = new DateTime(2020, 4, 1), Salary = 25000, Status = "Active",
+                EmergencyContact = "Sunita Kumar", EmergencyContactPhone = "9876543214",
+                Qualifications = "Commercial Driving License", Experience = "8 years",
+                Remarks = "Excellent safety record"
+            },
+            new Staff
+            {
+                Id = 2, EmployeeId = "ST002", FirstName = "Kamala", LastName = "Devi",
+                Email = "kamala.devi@school.edu", PhoneNumber = "9876543215",
+                DateOfBirth = new DateTime(1978, 7, 22), Gender = "Female",
+                Address = "202 Clean St, City", Position = "Cleaner", Department = "Maintenance",
+                HireDate = new DateTime(2018, 6, 15), Salary = 18000, Status = "Active",
+                EmergencyContact = "Ram Lal", EmergencyContactPhone = "9876543216",
+                Qualifications = "10th Pass", Experience = "12 years",
+                Remarks = "Dedicated and hardworking"
+            },
+            new Staff
+            {
+                Id = 3, EmployeeId = "ST003", FirstName = "Suresh", LastName = "Singh",
+                Email = "suresh.singh@school.edu", PhoneNumber = "9876543217",
+                DateOfBirth = new DateTime(1982, 11, 8), Gender = "Male",
+                Address = "303 Security Lane, City", Position = "Security Guard", Department = "Security",
+                HireDate = new DateTime(2019, 8, 1), Salary = 22000, Status = "Active",
+                EmergencyContact = "Meera Singh", EmergencyContactPhone = "9876543218",
+                Qualifications = "12th Pass, Security Training", Experience = "10 years",
+                Remarks = "Night shift supervisor"
             }
         );
     }

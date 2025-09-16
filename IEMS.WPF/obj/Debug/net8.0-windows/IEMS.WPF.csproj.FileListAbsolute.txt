@@ -157,3 +157,15 @@ C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-win
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\App.baml
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\AddEditTeacherWindow.baml
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\AddEditTeacherWindow.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\AddEditClassWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\AddEditClassWindow.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\ClassesManagementWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\StudentsManagementWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\TeachersManagementWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\ClassesManagementWindow.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\StudentsManagementWindow.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\TeachersManagementWindow.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\AddEditStaffWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\SupportStaffManagementWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\AddEditStaffWindow.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\SupportStaffManagementWindow.g.cs

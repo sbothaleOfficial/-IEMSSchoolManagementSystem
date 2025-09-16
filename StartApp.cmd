@@ -7,18 +7,18 @@ echo.
 
 cd /d "%~dp0"
 
-if exist "publish\IEMS.WPF.exe" (
+if exist "publish_new\IEMS.WPF.exe" (
     echo Starting application...
-    start "" "publish\IEMS.WPF.exe"
+    start "" "publish_new\IEMS.WPF.exe"
     echo.
     echo Application started! Check for the window.
     timeout /t 3
 ) else (
     echo Publishing application first...
-    call dotnet publish IEMS.WPF\IEMS.WPF.csproj -c Release -r win-x64 --self-contained false -o publish
+    call dotnet publish IEMS.WPF\IEMS.WPF.csproj -c Release -r win-x64 --self-contained false -o publish_new
     echo.
     echo Starting application...
-    start "" "publish\IEMS.WPF.exe"
+    start "" "publish_new\IEMS.WPF.exe"
     echo.
     echo Application started! Check for the window.
     timeout /t 3

@@ -138,3 +138,5 @@ C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-w
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\App.baml
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\AddEditTeacherWindow.baml
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\AddEditTeacherWindow.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\AddEditClassWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\AddEditClassWindow.g.cs

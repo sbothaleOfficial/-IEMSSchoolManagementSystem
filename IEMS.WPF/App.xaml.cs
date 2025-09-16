@@ -24,9 +24,11 @@ public partial class App : System.Windows.Application
                 services.AddScoped<IStudentRepository, StudentRepository>();
                 services.AddScoped<IClassRepository, ClassRepository>();
                 services.AddScoped<ITeacherRepository, TeacherRepository>();
+                services.AddScoped<IStaffRepository, StaffRepository>();
                 services.AddScoped<StudentService>();
                 services.AddScoped<TeacherService>();
                 services.AddScoped<ClassService>();
+                services.AddScoped<StaffService>();
 
                 services.AddSingleton<MainWindow>();
             })

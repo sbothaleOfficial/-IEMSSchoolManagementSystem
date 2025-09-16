@@ -1,0 +1,100 @@
+<Window x:Class="IEMS.WPF.SupportStaffManagementWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Support Staff Management" Height="700" Width="1400"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Background="#8E44AD" Orientation="Horizontal" Height="60">
+            <TextBlock Text="👨‍💼" FontSize="30" Margin="20,0" VerticalAlignment="Center"/>
+            <TextBlock Text="Support Staff Management System"
+                       FontSize="20" FontWeight="Bold" Foreground="White"
+                       VerticalAlignment="Center" Margin="10,0,0,0"/>
+        </StackPanel>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1" Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Action Buttons -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,20">
+                <Button x:Name="btnAddStaff" Content="Add Staff" Width="100" Height="35" Margin="0,0,10,0"
+                        Click="BtnAddStaff_Click" Background="#2ECC71" Foreground="White" BorderThickness="0"/>
+                <Button x:Name="btnEditStaff" Content="Edit Staff" Width="100" Height="35" Margin="0,0,10,0"
+                        Click="BtnEditStaff_Click" Background="#F39C12" Foreground="White" BorderThickness="0"/>
+                <Button x:Name="btnDeleteStaff" Content="Delete Staff" Width="100" Height="35" Margin="0,0,10,0"
+                        Click="BtnDeleteStaff_Click" Background="#E74C3C" Foreground="White" BorderThickness="0"/>
+                <Button x:Name="btnRefreshStaff" Content="Refresh" Width="100" Height="35" Margin="0,0,10,0"
+                        Click="BtnRefreshStaff_Click" Background="#95A5A6" Foreground="White" BorderThickness="0"/>
+                <Separator Width="20"/>
+                <TextBlock Text="Search:" VerticalAlignment="Center" Margin="10,0,5,0"/>
+                <TextBox x:Name="txtSearchStaff" Width="200" Height="25" VerticalAlignment="Center"
+                         TextChanged="TxtSearchStaff_TextChanged"
+                         ToolTip="Search by name, employee ID, position, or department"/>
+            </StackPanel>
+
+            <!-- Filter Options -->
+            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15">
+                <TextBlock Text="Filter by:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Bold"/>
+                <TextBlock Text="Department:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <ComboBox x:Name="cmbDepartmentFilter" Width="120" Height="25" Margin="0,0,20,0"
+                          SelectionChanged="CmbDepartmentFilter_SelectionChanged"/>
+                <TextBlock Text="Position:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <ComboBox x:Name="cmbPositionFilter" Width="120" Height="25" Margin="0,0,20,0"
+                          SelectionChanged="CmbPositionFilter_SelectionChanged"/>
+                <TextBlock Text="Status:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <ComboBox x:Name="cmbStatusFilter" Width="100" Height="25"
+                          SelectionChanged="CmbStatusFilter_SelectionChanged">
+                    <ComboBoxItem Content="All" IsSelected="True"/>
+                    <ComboBoxItem Content="Active"/>
+                    <ComboBoxItem Content="Inactive"/>
+                    <ComboBoxItem Content="On Leave"/>
+                </ComboBox>
+            </StackPanel>
+
+            <!-- Staff DataGrid -->
+            <DataGrid x:Name="dgStaff" Grid.Row="2" AutoGenerateColumns="False"
+                      CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                      GridLinesVisibility="All" HeadersVisibility="Column" AlternatingRowBackground="#F8F9FA">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Employee ID" Binding="{Binding EmployeeId}" Width="100"/>
+                    <DataGridTextColumn Header="Name" Binding="{Binding FullName}" Width="150"/>
+                    <DataGridTextColumn Header="Position" Binding="{Binding Position}" Width="120"/>
+                    <DataGridTextColumn Header="Department" Binding="{Binding Department}" Width="120"/>
+                    <DataGridTextColumn Header="Phone" Binding="{Binding PhoneNumber}" Width="120"/>
+                    <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="200"/>
+                    <DataGridTextColumn Header="Hire Date" Binding="{Binding FormattedHireDate}" Width="90"/>
+                    <DataGridTextColumn Header="Salary" Binding="{Binding FormattedSalary}" Width="100"/>
+                    <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="80"/>
+                    <DataGridTextColumn Header="Age" Binding="{Binding Age}" Width="50"/>
+                    <DataGridTextColumn Header="Service" Binding="{Binding ServiceYears}" Width="80"/>
+                    <DataGridTextColumn Header="Emergency Contact" Binding="{Binding EmergencyContact}" Width="150"/>
+                    <DataGridTextColumn Header="Emergency Phone" Binding="{Binding EmergencyContactPhone}" Width="120"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
+
+        <!-- Status Bar -->
+        <StatusBar Grid.Row="2" Height="30" Background="#34495E">
+            <StatusBarItem>
+                <TextBlock x:Name="lblStatus" Text="Ready" Foreground="White"/>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="lblTotalStaff" Text="Total: 0" Foreground="White" Margin="0,0,20,0"/>
+                    <TextBlock x:Name="lblActiveStaff" Text="Active: 0" Foreground="White"/>
+                </StackPanel>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>

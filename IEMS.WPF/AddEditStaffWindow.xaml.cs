@@ -1,0 +1,247 @@
+using System.Windows;
+using IEMS.Application.Services;
+using IEMS.Application.DTOs;
+
+namespace IEMS.WPF;
+
+public partial class AddEditStaffWindow : Window
+{
+    private readonly StaffService _staffService;
+    private readonly StaffDto? _existingStaff;
+    private readonly bool _isEditMode;
+
+    public AddEditStaffWindow(StaffService staffService, StaffDto? existingStaff = null)
+    {
+        InitializeComponent();
+        _staffService = staffService;
+        _existingStaff = existingStaff;
+        _isEditMode = existingStaff != null;
+
+        InitializeForm();
+    }
+
+    private void InitializeForm()
+    {
+        if (_isEditMode && _existingStaff != null)
+        {
+            lblTitle.Text = "Edit Staff Member";
+            PopulateFormFields();
+        }
+        else
+        {
+            lblTitle.Text = "Add New Staff Member";
+            SetDefaultValues();
+        }
+    }
+
+    private void SetDefaultValues()
+    {
+        dpDateOfBirth.SelectedDate = DateTime.Now.AddYears(-25);
+        dpHireDate.SelectedDate = DateTime.Now;
+        cmbStatus.SelectedIndex = 0; // Active
+    }
+
+    private void PopulateFormFields()
+    {
+        if (_existingStaff == null) return;
+
+        txtEmployeeId.Text = _existingStaff.EmployeeId;
+        txtFirstName.Text = _existingStaff.FirstName;
+        txtLastName.Text = _existingStaff.LastName;
+        txtEmail.Text = _existingStaff.Email;
+        txtPhoneNumber.Text = _existingStaff.PhoneNumber;
+        dpDateOfBirth.SelectedDate = _existingStaff.DateOfBirth;
+
+        // Set gender
+        cmbGender.Text = _existingStaff.Gender;
+
+        txtAddress.Text = _existingStaff.Address;
+        cmbPosition.Text = _existingStaff.Position;
+        cmbDepartment.Text = _existingStaff.Department;
+        dpHireDate.SelectedDate = _existingStaff.HireDate;
+        txtSalary.Text = _existingStaff.Salary.ToString("F2");
+
+        // Set status
+        cmbStatus.Text = _existingStaff.Status;
+
+        txtEmergencyContact.Text = _existingStaff.EmergencyContact;
+        txtEmergencyContactPhone.Text = _existingStaff.EmergencyContactPhone;
+        txtQualifications.Text = _existingStaff.Qualifications;
+        txtExperience.Text = _existingStaff.Experience;
+        txtRemarks.Text = _existingStaff.Remarks;
+    }
+
+    private async void BtnSave_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (!ValidateForm())
+                return;
+
+            var staffDto = CreateStaffDto();
+
+            if (_isEditMode && _existingStaff != null)
+            {
+                staffDto.Id = _existingStaff.Id;
+                await _staffService.UpdateStaffAsync(staffDto);
+                MessageBox.Show("Staff member updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                await _staffService.CreateStaffAsync(staffDto);
+                MessageBox.Show("Staff member added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+
+            DialogResult = true;
+            Close();
+        }
+        catch (ArgumentException ex)
+        {
+            MessageBox.Show(ex.Message, "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error saving staff member: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private bool ValidateForm()
+    {
+        if (string.IsNullOrWhiteSpace(txtEmployeeId.Text))
+        {
+            MessageBox.Show("Employee ID is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtEmployeeId.Focus();
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(txtFirstName.Text))
+        {
+            MessageBox.Show("First name is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtFirstName.Focus();
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(txtLastName.Text))
+        {
+            MessageBox.Show("Last name is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtLastName.Focus();
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(txtEmail.Text))
+        {
+            MessageBox.Show("Email is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtEmail.Focus();
+            return false;
+        }
+
+        if (!IsValidEmail(txtEmail.Text))
+        {
+            MessageBox.Show("Please enter a valid email address.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtEmail.Focus();
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(txtPhoneNumber.Text))
+        {
+            MessageBox.Show("Phone number is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtPhoneNumber.Focus();
+            return false;
+        }
+
+        if (!dpDateOfBirth.SelectedDate.HasValue)
+        {
+            MessageBox.Show("Date of birth is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            dpDateOfBirth.Focus();
+            return false;
+        }
+
+        if (dpDateOfBirth.SelectedDate.Value > DateTime.Now.AddYears(-16))
+        {
+            MessageBox.Show("Staff member must be at least 16 years old.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            dpDateOfBirth.Focus();
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(cmbGender.Text))
+        {
+            MessageBox.Show("Gender is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            cmbGender.Focus();
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(cmbPosition.Text))
+        {
+            MessageBox.Show("Position is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            cmbPosition.Focus();
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(cmbDepartment.Text))
+        {
+            MessageBox.Show("Department is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            cmbDepartment.Focus();
+            return false;
+        }
+
+        if (!dpHireDate.SelectedDate.HasValue)
+        {
+            MessageBox.Show("Hire date is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            dpHireDate.Focus();
+            return false;
+        }
+
+        if (!decimal.TryParse(txtSalary.Text, out decimal salary) || salary < 0)
+        {
+            MessageBox.Show("Please enter a valid salary amount.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtSalary.Focus();
+            return false;
+        }
+
+        return true;
+    }
+
+    private StaffDto CreateStaffDto()
+    {
+        return new StaffDto
+        {
+            EmployeeId = txtEmployeeId.Text.Trim(),
+            FirstName = txtFirstName.Text.Trim(),
+            LastName = txtLastName.Text.Trim(),
+            Email = txtEmail.Text.Trim().ToLower(),
+            PhoneNumber = txtPhoneNumber.Text.Trim(),
+            DateOfBirth = dpDateOfBirth.SelectedDate!.Value,
+            Gender = cmbGender.Text.Trim(),
+            Address = txtAddress.Text.Trim(),
+            Position = cmbPosition.Text.Trim(),
+            Department = cmbDepartment.Text.Trim(),
+            HireDate = dpHireDate.SelectedDate!.Value,
+            Salary = decimal.Parse(txtSalary.Text),
+            Status = cmbStatus.Text.Trim(),
+            EmergencyContact = txtEmergencyContact.Text.Trim(),
+            EmergencyContactPhone = txtEmergencyContactPhone.Text.Trim(),
+            Qualifications = txtQualifications.Text.Trim(),
+            Experience = txtExperience.Text.Trim(),
+            Remarks = txtRemarks.Text.Trim()
+        };
+    }
+
+    private static bool IsValidEmail(string email)
+    {
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private void BtnCancel_Click(object sender, RoutedEventArgs e)
+    {
+        DialogResult = false;
+        Close();
+    }
+}

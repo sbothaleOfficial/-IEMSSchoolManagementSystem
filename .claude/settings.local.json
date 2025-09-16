@@ -16,7 +16,11 @@
       "Bash(tasklist)",
       "Bash(explorer.exe publish:*)",
       "Bash(powershell:*)",
-      "Bash(timeout:*)"
+      "Bash(timeout:*)",
+      "Bash(publish_newIEMS.WPF.exe)",
+      "Bash(publish_new/IEMS.WPF.exe)",
+      "Bash(publish_latest/IEMS.WPF.exe)",
+      "Bash(git tag:*)"
     ],
     "deny": [],
     "ask": []
