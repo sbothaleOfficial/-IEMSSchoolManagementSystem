@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "q/RpSE98gSM=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\SP\\Development\\IEMSSchoolManagementSystem\\IEMS.Application\\IEMS.Application.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\SP\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512"
+  ],
+  "logs": []
+}

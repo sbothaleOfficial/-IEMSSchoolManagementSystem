@@ -1,0 +1,9 @@
+using IEMS.Core.Entities;
+
+namespace IEMS.Core.Interfaces;
+
+public interface IStudentRepository : IRepository<Student>
+{
+    Task<IEnumerable<Student>> GetStudentsByClassIdAsync(int classId);
+    Task<Student?> GetStudentByRollNumberAsync(string rollNumber);
+}

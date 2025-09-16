@@ -1,0 +1,12 @@
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Core\bin\Debug\net8.0\IEMS.Core.deps.json
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Core\bin\Debug\net8.0\IEMS.Core.dll
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Core\bin\Debug\net8.0\IEMS.Core.pdb
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Core\obj\Debug\net8.0\IEMS.Core.csproj.AssemblyReference.cache
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Core\obj\Debug\net8.0\IEMS.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Core\obj\Debug\net8.0\IEMS.Core.AssemblyInfoInputs.cache
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Core\obj\Debug\net8.0\IEMS.Core.AssemblyInfo.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Core\obj\Debug\net8.0\IEMS.Core.csproj.CoreCompileInputs.cache
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Core\obj\Debug\net8.0\IEMS.Core.dll
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Core\obj\Debug\net8.0\refint\IEMS.Core.dll
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Core\obj\Debug\net8.0\IEMS.Core.pdb
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.Core\obj\Debug\net8.0\ref\IEMS.Core.dll
