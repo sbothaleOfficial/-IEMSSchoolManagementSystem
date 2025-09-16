@@ -93,11 +93,50 @@
                               CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                               GridLinesVisibility="All" HeadersVisibility="Column" AlternatingRowBackground="#F8F9FA">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Class" Binding="{Binding DisplayName}" Width="120"/>
-                            <DataGridTextColumn Header="Teacher" Binding="{Binding TeacherName}" Width="150"/>
-                            <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="120"/>
-                            <DataGridTextColumn Header="Email" Binding="{Binding TeacherEmail}" Width="200"/>
-                            <DataGridTextColumn Header="Students" Binding="{Binding StudentCount}" Width="80"/>
+                            <DataGridTextColumn Header="Class" Binding="{Binding DisplayName}" Width="150"/>
+                            <DataGridTextColumn Header="Class Teacher" Binding="{Binding TeacherName}" Width="200"/>
+                            <DataGridTextColumn Header="Students Enrolled" Binding="{Binding StudentCount}" Width="120"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="💰 Fee Payments" FontSize="14">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,10">
+                        <Button x:Name="btnAddFeePayment" Content="Record Payment" Width="120" Height="35" Margin="0,0,10,0"
+                                Click="BtnAddFeePayment_Click" Background="#2ECC71" Foreground="White" BorderThickness="0"/>
+                        <Button x:Name="btnViewReceipt" Content="View Receipt" Width="100" Height="35" Margin="0,0,10,0"
+                                Click="BtnViewReceipt_Click" Background="#3498DB" Foreground="White" BorderThickness="0"/>
+                        <Button x:Name="btnPrintReceipt" Content="Print Receipt" Width="100" Height="35" Margin="0,0,10,0"
+                                Click="BtnPrintReceipt_Click" Background="#9B59B6" Foreground="White" BorderThickness="0"/>
+                        <Button x:Name="btnRefreshFeePayments" Content="Refresh" Width="100" Height="35" Margin="0,0,10,0"
+                                Click="BtnRefreshFeePayments_Click" Background="#95A5A6" Foreground="White" BorderThickness="0"/>
+                        <Separator Width="20"/>
+                        <TextBlock Text="Search:" VerticalAlignment="Center" Margin="10,0,5,0"/>
+                        <TextBox x:Name="txtSearchFeePayments" Width="200" Height="25" VerticalAlignment="Center"
+                                 TextChanged="TxtSearchFeePayments_TextChanged"
+                                 ToolTip="Search by receipt number, student name, or fee type"/>
+                    </StackPanel>
+
+                    <DataGrid x:Name="dgFeePayments" Grid.Row="1" AutoGenerateColumns="False"
+                              CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                              GridLinesVisibility="All" HeadersVisibility="Column" AlternatingRowBackground="#F8F9FA">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Receipt No" Binding="{Binding ReceiptNumber}" Width="100"/>
+                            <DataGridTextColumn Header="Student Name" Binding="{Binding StudentName}" Width="150"/>
+                            <DataGridTextColumn Header="Class" Binding="{Binding ClassName}" Width="100"/>
+                            <DataGridTextColumn Header="Fee Type" Binding="{Binding FeeTypeDisplay}" Width="100"/>
+                            <DataGridTextColumn Header="Amount Paid" Binding="{Binding AmountPaidFormatted}" Width="100"/>
+                            <DataGridTextColumn Header="Payment Method" Binding="{Binding PaymentMethodDisplay}" Width="120"/>
+                            <DataGridTextColumn Header="Payment Date" Binding="{Binding PaymentDateFormatted}" Width="100"/>
+                            <DataGridTextColumn Header="Remaining Balance" Binding="{Binding RemainingBalanceFormatted}" Width="120"/>
+                            <DataGridTextColumn Header="Academic Year" Binding="{Binding AcademicYear}" Width="100"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>

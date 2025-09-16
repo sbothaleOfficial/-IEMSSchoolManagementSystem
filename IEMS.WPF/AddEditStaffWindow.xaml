@@ -22,9 +22,6 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <!-- Personal Information Section -->
@@ -46,12 +43,6 @@
                         <Label Grid.Row="0" Grid.Column="0" Content="Employee ID:" Margin="5"/>
                         <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtEmployeeId" Margin="5" Height="25"/>
 
-                        <Label Grid.Row="0" Grid.Column="2" Content="Status:" Margin="5"/>
-                        <ComboBox Grid.Row="0" Grid.Column="3" x:Name="cmbStatus" Margin="5" Height="25">
-                            <ComboBoxItem Content="Active" IsSelected="True"/>
-                            <ComboBoxItem Content="Inactive"/>
-                            <ComboBoxItem Content="On Leave"/>
-                        </ComboBox>
 
                         <Label Grid.Row="1" Grid.Column="0" Content="First Name:" Margin="5"/>
                         <TextBox Grid.Row="1" Grid.Column="1" x:Name="txtFirstName" Margin="5" Height="25"/>
@@ -71,8 +62,6 @@
                         <Label Grid.Row="3" Grid.Column="0" Content="Phone Number:" Margin="5"/>
                         <TextBox Grid.Row="3" Grid.Column="1" x:Name="txtPhoneNumber" Margin="5" Height="25"/>
 
-                        <Label Grid.Row="3" Grid.Column="2" Content="Email:" Margin="5"/>
-                        <TextBox Grid.Row="3" Grid.Column="3" x:Name="txtEmail" Margin="5" Height="25"/>
                     </Grid>
                 </GroupBox>
 
@@ -91,33 +80,14 @@
                         </Grid.ColumnDefinitions>
 
                         <Label Grid.Row="0" Grid.Column="0" Content="Position:" Margin="5"/>
-                        <ComboBox Grid.Row="0" Grid.Column="1" x:Name="cmbPosition" Margin="5" Height="25" IsEditable="True">
-                            <ComboBoxItem Content="Bus Driver"/>
-                            <ComboBoxItem Content="Cleaner"/>
-                            <ComboBoxItem Content="Security Guard"/>
+                        <ComboBox Grid.Row="0" Grid.Column="1" x:Name="cmbPosition" Margin="5" Height="25">
                             <ComboBoxItem Content="Peon"/>
-                            <ComboBoxItem Content="Gardener"/>
-                            <ComboBoxItem Content="Librarian"/>
-                            <ComboBoxItem Content="Lab Assistant"/>
-                            <ComboBoxItem Content="Accountant"/>
+                            <ComboBoxItem Content="Driver"/>
+                            <ComboBoxItem Content="Clerk"/>
                         </ComboBox>
 
-                        <Label Grid.Row="0" Grid.Column="2" Content="Department:" Margin="5"/>
-                        <ComboBox Grid.Row="0" Grid.Column="3" x:Name="cmbDepartment" Margin="5" Height="25" IsEditable="True">
-                            <ComboBoxItem Content="Transport"/>
-                            <ComboBoxItem Content="Maintenance"/>
-                            <ComboBoxItem Content="Security"/>
-                            <ComboBoxItem Content="Administration"/>
-                            <ComboBoxItem Content="Library"/>
-                            <ComboBoxItem Content="Laboratory"/>
-                            <ComboBoxItem Content="Accounts"/>
-                        </ComboBox>
-
-                        <Label Grid.Row="1" Grid.Column="0" Content="Hire Date:" Margin="5"/>
-                        <DatePicker Grid.Row="1" Grid.Column="1" x:Name="dpHireDate" Margin="5" Height="25"/>
-
-                        <Label Grid.Row="1" Grid.Column="2" Content="Salary (₹):" Margin="5"/>
-                        <TextBox Grid.Row="1" Grid.Column="3" x:Name="txtSalary" Margin="5" Height="25"/>
+                        <Label Grid.Row="0" Grid.Column="2" Content="Salary (₹):" Margin="5"/>
+                        <TextBox Grid.Row="0" Grid.Column="3" x:Name="txtSalary" Margin="5" Height="25"/>
                     </Grid>
                 </GroupBox>
 
@@ -127,48 +97,6 @@
                              VerticalScrollBarVisibility="Auto"/>
                 </GroupBox>
 
-                <!-- Emergency Contact Section -->
-                <GroupBox Grid.Row="3" Header="Emergency Contact" Margin="0,0,0,15" Padding="10">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-
-                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                            <Label Content="Emergency Contact Name:" Margin="5"/>
-                            <TextBox x:Name="txtEmergencyContact" Margin="5" Height="25"/>
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="1" Margin="10,0,0,0">
-                            <Label Content="Emergency Contact Phone:" Margin="5"/>
-                            <TextBox x:Name="txtEmergencyContactPhone" Margin="5" Height="25"/>
-                        </StackPanel>
-                    </Grid>
-                </GroupBox>
-
-                <!-- Additional Information Section -->
-                <GroupBox Grid.Row="4" Header="Additional Information" Margin="0,0,0,15" Padding="10">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-                            <Label Content="Qualifications:" Width="120" Margin="5"/>
-                            <TextBox x:Name="txtQualifications" Width="300" Height="25" Margin="5"/>
-                            <Label Content="Experience:" Width="80" Margin="15,5,5,5"/>
-                            <TextBox x:Name="txtExperience" Width="150" Height="25" Margin="5"/>
-                        </StackPanel>
-
-                        <StackPanel Grid.Row="1">
-                            <Label Content="Remarks:" Margin="5"/>
-                            <TextBox x:Name="txtRemarks" Height="60" TextWrapping="Wrap" AcceptsReturn="True"
-                                     VerticalScrollBarVisibility="Auto" Margin="5"/>
-                        </StackPanel>
-                    </Grid>
-                </GroupBox>
             </Grid>
 
             <!-- Action Buttons -->

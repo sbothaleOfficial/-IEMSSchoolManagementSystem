@@ -34,8 +34,6 @@ public class ClassService
                 Section = classEntity.Section,
                 TeacherId = classEntity.TeacherId,
                 TeacherName = teacher != null ? $"{teacher.FirstName} {teacher.LastName}" : "Unassigned",
-                TeacherEmail = teacher?.Email ?? "",
-                Subject = teacher?.Subject ?? "",
                 StudentCount = students.Count()
             });
         }
@@ -58,8 +56,6 @@ public class ClassService
             Section = classEntity.Section,
             TeacherId = classEntity.TeacherId,
             TeacherName = teacher != null ? $"{teacher.FirstName} {teacher.LastName}" : "Unassigned",
-            TeacherEmail = teacher?.Email ?? "",
-            Subject = teacher?.Subject ?? "",
             StudentCount = students.Count()
         };
     }
@@ -128,8 +124,6 @@ public class ClassService
                 Section = classEntity.Section,
                 TeacherId = classEntity.TeacherId,
                 TeacherName = teacher != null ? $"{teacher.FirstName} {teacher.LastName}" : "Unassigned",
-                TeacherEmail = teacher?.Email ?? "",
-                Subject = teacher?.Subject ?? "",
                 StudentCount = students.Count()
             });
         }
@@ -151,8 +145,6 @@ public class ClassService
             Section = classEntity.Section,
             TeacherId = classEntity.TeacherId,
             TeacherName = teacher != null ? $"{teacher.FirstName} {teacher.LastName}" : "Unassigned",
-            TeacherEmail = teacher?.Email ?? "",
-            Subject = teacher?.Subject ?? "",
             StudentCount = classEntity.Students?.Count() ?? 0
         };
     }
@@ -170,9 +162,7 @@ public class ClassService
                 Id = teacher.Id,
                 FirstName = teacher.FirstName,
                 LastName = teacher.LastName,
-                Email = teacher.Email,
                 EmployeeId = teacher.EmployeeId,
-                Subject = teacher.Subject,
                 ClassCount = classes.Count()
             });
         }

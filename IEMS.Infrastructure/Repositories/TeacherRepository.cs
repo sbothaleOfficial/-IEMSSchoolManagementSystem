@@ -58,11 +58,4 @@ public class TeacherRepository : ITeacherRepository
             .FirstOrDefaultAsync(t => t.EmployeeId == employeeId);
     }
 
-    public async Task<IEnumerable<Teacher>> GetTeachersBySubjectAsync(string subject)
-    {
-        return await _context.Teachers
-            .Include(t => t.Classes)
-            .Where(t => t.Subject.ToLower().Contains(subject.ToLower()))
-            .ToListAsync();
-    }
 }

@@ -31,11 +31,6 @@ public class StaffService
         return staff != null ? MapToDto(staff) : null;
     }
 
-    public async Task<IEnumerable<StaffDto>> GetStaffByDepartmentAsync(string department)
-    {
-        var staff = await _staffRepository.GetStaffByDepartmentAsync(department);
-        return staff.Select(MapToDto);
-    }
 
     public async Task<IEnumerable<StaffDto>> GetStaffByPositionAsync(string position)
     {
@@ -58,21 +53,12 @@ public class StaffService
             EmployeeId = staffDto.EmployeeId,
             FirstName = staffDto.FirstName,
             LastName = staffDto.LastName,
-            Email = staffDto.Email,
             PhoneNumber = staffDto.PhoneNumber,
             DateOfBirth = staffDto.DateOfBirth,
             Gender = staffDto.Gender,
             Address = staffDto.Address,
             Position = staffDto.Position,
-            Department = staffDto.Department,
-            HireDate = staffDto.HireDate,
             Salary = staffDto.Salary,
-            Status = staffDto.Status,
-            EmergencyContact = staffDto.EmergencyContact,
-            EmergencyContactPhone = staffDto.EmergencyContactPhone,
-            Qualifications = staffDto.Qualifications,
-            Experience = staffDto.Experience,
-            Remarks = staffDto.Remarks,
             CreatedAt = DateTime.Now,
             UpdatedAt = DateTime.Now
         };
@@ -99,21 +85,12 @@ public class StaffService
         staff.EmployeeId = staffDto.EmployeeId;
         staff.FirstName = staffDto.FirstName;
         staff.LastName = staffDto.LastName;
-        staff.Email = staffDto.Email;
         staff.PhoneNumber = staffDto.PhoneNumber;
         staff.DateOfBirth = staffDto.DateOfBirth;
         staff.Gender = staffDto.Gender;
         staff.Address = staffDto.Address;
         staff.Position = staffDto.Position;
-        staff.Department = staffDto.Department;
-        staff.HireDate = staffDto.HireDate;
         staff.Salary = staffDto.Salary;
-        staff.Status = staffDto.Status;
-        staff.EmergencyContact = staffDto.EmergencyContact;
-        staff.EmergencyContactPhone = staffDto.EmergencyContactPhone;
-        staff.Qualifications = staffDto.Qualifications;
-        staff.Experience = staffDto.Experience;
-        staff.Remarks = staffDto.Remarks;
         staff.UpdatedAt = DateTime.Now;
 
         await _staffRepository.UpdateAsync(staff);
@@ -131,10 +108,6 @@ public class StaffService
         await _staffRepository.DeleteAsync(id);
     }
 
-    public async Task<IEnumerable<string>> GetDepartmentsAsync()
-    {
-        return await _staffRepository.GetDepartmentsAsync();
-    }
 
     public async Task<IEnumerable<string>> GetPositionsAsync()
     {
@@ -147,10 +120,6 @@ public class StaffService
         return allStaff.Count();
     }
 
-    public async Task<int> GetActiveStaffCountAsync()
-    {
-        return await _staffRepository.GetActiveStaffCountAsync();
-    }
 
     private static StaffDto MapToDto(Staff staff)
     {
@@ -160,21 +129,12 @@ public class StaffService
             EmployeeId = staff.EmployeeId,
             FirstName = staff.FirstName,
             LastName = staff.LastName,
-            Email = staff.Email,
             PhoneNumber = staff.PhoneNumber,
             DateOfBirth = staff.DateOfBirth,
             Gender = staff.Gender,
             Address = staff.Address,
             Position = staff.Position,
-            Department = staff.Department,
-            HireDate = staff.HireDate,
             Salary = staff.Salary,
-            Status = staff.Status,
-            EmergencyContact = staff.EmergencyContact,
-            EmergencyContactPhone = staff.EmergencyContactPhone,
-            Qualifications = staff.Qualifications,
-            Experience = staff.Experience,
-            Remarks = staff.Remarks,
             CreatedAt = staff.CreatedAt,
             UpdatedAt = staff.UpdatedAt
         };

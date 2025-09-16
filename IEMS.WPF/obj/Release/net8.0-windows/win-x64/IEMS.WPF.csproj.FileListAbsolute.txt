@@ -140,3 +140,17 @@ C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-w
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\AddEditTeacherWindow.g.cs
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\AddEditClassWindow.baml
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\AddEditClassWindow.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\AddEditStaffWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\ClassesManagementWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\StudentsManagementWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\SupportStaffManagementWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\TeachersManagementWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\AddEditStaffWindow.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\ClassesManagementWindow.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\StudentsManagementWindow.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\SupportStaffManagementWindow.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\TeachersManagementWindow.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\AddEditFeePaymentWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\FeeReceiptWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\AddEditFeePaymentWindow.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\FeeReceiptWindow.g.cs

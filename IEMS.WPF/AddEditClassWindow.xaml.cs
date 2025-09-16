@@ -37,7 +37,7 @@ public partial class AddEditClassWindow : Window
             var teacherList = teachers.Select(t => new
             {
                 Id = t.Id,
-                DisplayName = $"{t.FirstName} {t.LastName} - {t.Subject}"
+                DisplayName = $"{t.FirstName} {t.LastName} (ID: {t.EmployeeId})"
             }).ToList();
 
             teacherList.Insert(0, new { Id = 0, DisplayName = "-- Select Teacher --" });

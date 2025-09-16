@@ -42,11 +42,9 @@
                       CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
                       GridLinesVisibility="All" HeadersVisibility="Column" AlternatingRowBackground="#F8F9FA">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Class" Binding="{Binding DisplayName}" Width="120"/>
-                    <DataGridTextColumn Header="Teacher" Binding="{Binding TeacherName}" Width="150"/>
-                    <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="120"/>
-                    <DataGridTextColumn Header="Email" Binding="{Binding TeacherEmail}" Width="200"/>
-                    <DataGridTextColumn Header="Students" Binding="{Binding StudentCount}" Width="80"/>
+                    <DataGridTextColumn Header="Class" Binding="{Binding DisplayName}" Width="150"/>
+                    <DataGridTextColumn Header="Class Teacher" Binding="{Binding TeacherName}" Width="200"/>
+                    <DataGridTextColumn Header="Students Enrolled" Binding="{Binding StudentCount}" Width="120"/>
                 </DataGrid.Columns>
             </DataGrid>
         </Grid>

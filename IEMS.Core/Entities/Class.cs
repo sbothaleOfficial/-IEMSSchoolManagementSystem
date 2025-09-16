@@ -11,4 +11,5 @@ public class Class
 
     public virtual Teacher? Teacher { get; set; }
     public virtual ICollection<Student> Students { get; set; } = new List<Student>();
+    public virtual ICollection<FeeStructure> FeeStructures { get; set; } = new List<FeeStructure>();
 }

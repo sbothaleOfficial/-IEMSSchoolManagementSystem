@@ -43,192 +43,148 @@ public partial class SupportStaffManagementWindow : Window
     {
         try
         {
-            var departments = await _staffService.GetDepartmentsAsync();
             var positions = await _staffService.GetPositionsAsync();
-
-            cmbDepartmentFilter.Items.Clear();
-            cmbDepartmentFilter.Items.Add(new ComboBoxItem { Content = "All Departments", IsSelected = true });
-            foreach (var dept in departments)
-            {
-                cmbDepartmentFilter.Items.Add(new ComboBoxItem { Content = dept });
-            }
 
             cmbPositionFilter.Items.Clear();
             cmbPositionFilter.Items.Add(new ComboBoxItem { Content = "All Positions", IsSelected = true });
-            foreach (var pos in positions)
+            foreach (var position in positions)
             {
-                cmbPositionFilter.Items.Add(new ComboBoxItem { Content = pos });
+                cmbPositionFilter.Items.Add(new ComboBoxItem { Content = position });
             }
         }
         catch (Exception ex)
         {
-            // Silently handle filter loading errors
-            System.Diagnostics.Debug.WriteLine($"Error loading filters: {ex.Message}");
+            MessageBox.Show($"Error loading filters: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
     private void UpdateStatusCounts()
     {
-        lblTotalStaff.Text = $"Total: {_filteredStaff.Count}";
-        lblActiveStaff.Text = $"Active: {_filteredStaff.Count(s => s.Status == "Active")}";
+        var totalCount = _allStaff.Count;
+        lblTotalStaff.Text = $"Total Staff: {totalCount}";
     }
 
-    // Search and Filter Methods
-    private void TxtSearchStaff_TextChanged(object sender, TextChangedEventArgs e)
+    private void ApplyFilters()
     {
-        FilterStaff();
+        _filteredStaff = _allStaff.Where(staff =>
+        {
+            // Search filter
+            if (!string.IsNullOrEmpty(txtSearch.Text))
+            {
+                var searchTerm = txtSearch.Text.ToLower();
+                if (!staff.FullName.ToLower().Contains(searchTerm) &&
+                    !staff.EmployeeId.ToLower().Contains(searchTerm) &&
+                    !staff.PhoneNumber.Contains(searchTerm) &&
+                    !staff.Position.ToLower().Contains(searchTerm) &&
+                    !staff.Address.ToLower().Contains(searchTerm))
+                    return false;
+            }
+
+            // Position filter
+            var selectedPosition = (cmbPositionFilter.SelectedItem as ComboBoxItem)?.Content?.ToString();
+            if (selectedPosition != null && selectedPosition != "All Positions")
+            {
+                if (staff.Position != selectedPosition)
+                    return false;
+            }
+
+            return true;
+        }).ToList();
+
+        dgStaff.ItemsSource = _filteredStaff;
+        lblStatus.Text = $"Showing {_filteredStaff.Count} of {_allStaff.Count} staff members";
     }
 
-    private void CmbDepartmentFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void TxtSearch_TextChanged(object sender, TextChangedEventArgs e)
     {
-        FilterStaff();
+        ApplyFilters();
     }
 
     private void CmbPositionFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        FilterStaff();
+        ApplyFilters();
     }
 
-    private void CmbStatusFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async void BtnAddStaff_Click(object sender, RoutedEventArgs e)
     {
-        FilterStaff();
-    }
-
-    private void FilterStaff()
-    {
-        if (_allStaff == null || !_allStaff.Any())
-            return;
-
-        var searchText = txtSearchStaff?.Text?.Trim().ToLower() ?? "";
-        var selectedDept = (cmbDepartmentFilter?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "All Departments";
-        var selectedPos = (cmbPositionFilter?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "All Positions";
-        var selectedStatus = (cmbStatusFilter?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "All";
-
-        _filteredStaff = _allStaff.Where(staff =>
-            // Search filter
-            (string.IsNullOrEmpty(searchText) ||
-             staff.FullName.ToLower().Contains(searchText) ||
-             staff.EmployeeId.ToLower().Contains(searchText) ||
-             staff.Position.ToLower().Contains(searchText) ||
-             staff.Department.ToLower().Contains(searchText) ||
-             staff.PhoneNumber.ToLower().Contains(searchText) ||
-             staff.Email.ToLower().Contains(searchText)) &&
-
-            // Department filter
-            (selectedDept == "All Departments" || staff.Department == selectedDept) &&
-
-            // Position filter
-            (selectedPos == "All Positions" || staff.Position == selectedPos) &&
-
-            // Status filter
-            (selectedStatus == "All" || staff.Status == selectedStatus)
-        ).ToList();
-
-        dgStaff.ItemsSource = _filteredStaff;
-        UpdateStatusCounts();
-
-        if (!string.IsNullOrEmpty(searchText) || selectedDept != "All Departments" ||
-            selectedPos != "All Positions" || selectedStatus != "All")
+        try
         {
-            lblStatus.Text = $"Found {_filteredStaff.Count} staff members matching filters";
-        }
-        else
-        {
-            lblStatus.Text = $"Showing all {_filteredStaff.Count} staff members";
-        }
-    }
-
-    // CRUD Event Handlers
-    private void BtnAddStaff_Click(object sender, RoutedEventArgs e)
-    {
-        var addWindow = new AddEditStaffWindow(_staffService);
-        if (addWindow.ShowDialog() == true)
-        {
-            var currentSearch = txtSearchStaff.Text;
-            var currentDept = cmbDepartmentFilter.SelectedIndex;
-            var currentPos = cmbPositionFilter.SelectedIndex;
-            var currentStatus = cmbStatusFilter.SelectedIndex;
-
-            LoadStaff();
-            LoadFilters();
-
-            // Restore filter states
-            txtSearchStaff.Text = currentSearch;
-            cmbDepartmentFilter.SelectedIndex = currentDept;
-            cmbPositionFilter.SelectedIndex = currentPos;
-            cmbStatusFilter.SelectedIndex = currentStatus;
-
-            FilterStaff();
-        }
-    }
-
-    private void BtnEditStaff_Click(object sender, RoutedEventArgs e)
-    {
-        if (dgStaff.SelectedItem is StaffDto selectedStaff)
-        {
-            var editWindow = new AddEditStaffWindow(_staffService, selectedStaff);
-            if (editWindow.ShowDialog() == true)
+            var addWindow = new AddEditStaffWindow(_staffService);
+            if (addWindow.ShowDialog() == true)
             {
-                var currentSearch = txtSearchStaff.Text;
-                var currentDept = cmbDepartmentFilter.SelectedIndex;
-                var currentPos = cmbPositionFilter.SelectedIndex;
-                var currentStatus = cmbStatusFilter.SelectedIndex;
-
                 LoadStaff();
-                LoadFilters();
-
-                // Restore filter states
-                txtSearchStaff.Text = currentSearch;
-                cmbDepartmentFilter.SelectedIndex = currentDept;
-                cmbPositionFilter.SelectedIndex = currentPos;
-                cmbStatusFilter.SelectedIndex = currentStatus;
-
-                FilterStaff();
+                lblStatus.Text = "Staff member added successfully";
             }
         }
-        else
+        catch (Exception ex)
         {
-            MessageBox.Show("Please select a staff member to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show($"Error opening add staff window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private async void BtnEditStaff_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (dgStaff.SelectedItem is StaffDto selectedStaff)
+            {
+                var editWindow = new AddEditStaffWindow(_staffService, selectedStaff);
+                if (editWindow.ShowDialog() == true)
+                {
+                    LoadStaff();
+                    lblStatus.Text = "Staff member updated successfully";
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a staff member to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening edit staff window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
     private async void BtnDeleteStaff_Click(object sender, RoutedEventArgs e)
     {
-        if (dgStaff.SelectedItem is StaffDto selectedStaff)
+        try
         {
-            var result = MessageBox.Show($"Are you sure you want to delete staff member {selectedStaff.FullName}?",
-                                       "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
+            if (dgStaff.SelectedItem is StaffDto selectedStaff)
             {
-                try
+                var result = MessageBox.Show(
+                    $"Are you sure you want to delete {selectedStaff.FullName}?",
+                    "Confirm Delete",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
                 {
                     await _staffService.DeleteStaffAsync(selectedStaff.Id);
                     LoadStaff();
-                    LoadFilters();
-                    FilterStaff();
                     lblStatus.Text = "Staff member deleted successfully";
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error deleting staff member: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a staff member to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
-        else
+        catch (Exception ex)
         {
-            MessageBox.Show("Please select a staff member to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show($"Error deleting staff member: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
-    private void BtnRefreshStaff_Click(object sender, RoutedEventArgs e)
+    private void BtnRefresh_Click(object sender, RoutedEventArgs e)
     {
         LoadStaff();
-        LoadFilters();
-        txtSearchStaff.Text = "";
-        cmbDepartmentFilter.SelectedIndex = 0;
+    }
+
+    private void BtnClearSearch_Click(object sender, RoutedEventArgs e)
+    {
+        txtSearch.Clear();
         cmbPositionFilter.SelectedIndex = 0;
-        cmbStatusFilter.SelectedIndex = 0;
-        FilterStaff();
+        ApplyFilters();
     }
 }

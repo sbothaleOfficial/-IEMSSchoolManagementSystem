@@ -37,8 +37,6 @@ public partial class AddEditStaffWindow : Window
     private void SetDefaultValues()
     {
         dpDateOfBirth.SelectedDate = DateTime.Now.AddYears(-25);
-        dpHireDate.SelectedDate = DateTime.Now;
-        cmbStatus.SelectedIndex = 0; // Active
     }
 
     private void PopulateFormFields()
@@ -48,7 +46,6 @@ public partial class AddEditStaffWindow : Window
         txtEmployeeId.Text = _existingStaff.EmployeeId;
         txtFirstName.Text = _existingStaff.FirstName;
         txtLastName.Text = _existingStaff.LastName;
-        txtEmail.Text = _existingStaff.Email;
         txtPhoneNumber.Text = _existingStaff.PhoneNumber;
         dpDateOfBirth.SelectedDate = _existingStaff.DateOfBirth;
 
@@ -57,18 +54,7 @@ public partial class AddEditStaffWindow : Window
 
         txtAddress.Text = _existingStaff.Address;
         cmbPosition.Text = _existingStaff.Position;
-        cmbDepartment.Text = _existingStaff.Department;
-        dpHireDate.SelectedDate = _existingStaff.HireDate;
         txtSalary.Text = _existingStaff.Salary.ToString("F2");
-
-        // Set status
-        cmbStatus.Text = _existingStaff.Status;
-
-        txtEmergencyContact.Text = _existingStaff.EmergencyContact;
-        txtEmergencyContactPhone.Text = _existingStaff.EmergencyContactPhone;
-        txtQualifications.Text = _existingStaff.Qualifications;
-        txtExperience.Text = _existingStaff.Experience;
-        txtRemarks.Text = _existingStaff.Remarks;
     }
 
     private async void BtnSave_Click(object sender, RoutedEventArgs e)
@@ -128,19 +114,6 @@ public partial class AddEditStaffWindow : Window
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(txtEmail.Text))
-        {
-            MessageBox.Show("Email is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            txtEmail.Focus();
-            return false;
-        }
-
-        if (!IsValidEmail(txtEmail.Text))
-        {
-            MessageBox.Show("Please enter a valid email address.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            txtEmail.Focus();
-            return false;
-        }
 
         if (string.IsNullOrWhiteSpace(txtPhoneNumber.Text))
         {
@@ -177,19 +150,6 @@ public partial class AddEditStaffWindow : Window
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(cmbDepartment.Text))
-        {
-            MessageBox.Show("Department is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            cmbDepartment.Focus();
-            return false;
-        }
-
-        if (!dpHireDate.SelectedDate.HasValue)
-        {
-            MessageBox.Show("Hire date is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            dpHireDate.Focus();
-            return false;
-        }
 
         if (!decimal.TryParse(txtSalary.Text, out decimal salary) || salary < 0)
         {
@@ -205,24 +165,16 @@ public partial class AddEditStaffWindow : Window
     {
         return new StaffDto
         {
+            Id = _isEditMode ? _existingStaff!.Id : 0,
             EmployeeId = txtEmployeeId.Text.Trim(),
             FirstName = txtFirstName.Text.Trim(),
             LastName = txtLastName.Text.Trim(),
-            Email = txtEmail.Text.Trim().ToLower(),
             PhoneNumber = txtPhoneNumber.Text.Trim(),
             DateOfBirth = dpDateOfBirth.SelectedDate!.Value,
             Gender = cmbGender.Text.Trim(),
             Address = txtAddress.Text.Trim(),
             Position = cmbPosition.Text.Trim(),
-            Department = cmbDepartment.Text.Trim(),
-            HireDate = dpHireDate.SelectedDate!.Value,
-            Salary = decimal.Parse(txtSalary.Text),
-            Status = cmbStatus.Text.Trim(),
-            EmergencyContact = txtEmergencyContact.Text.Trim(),
-            EmergencyContactPhone = txtEmergencyContactPhone.Text.Trim(),
-            Qualifications = txtQualifications.Text.Trim(),
-            Experience = txtExperience.Text.Trim(),
-            Remarks = txtRemarks.Text.Trim()
+            Salary = decimal.Parse(txtSalary.Text)
         };
     }
 

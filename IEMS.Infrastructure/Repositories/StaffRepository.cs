@@ -22,8 +22,7 @@ public class StaffRepository : IStaffRepository
     public async Task<IEnumerable<Staff>> GetAllAsync()
     {
         return await _context.Staff
-            .OrderBy(s => s.Department)
-            .ThenBy(s => s.Position)
+            .OrderBy(s => s.Position)
             .ThenBy(s => s.LastName)
             .ToListAsync();
     }
@@ -56,14 +55,6 @@ public class StaffRepository : IStaffRepository
         return await _context.Staff.FirstOrDefaultAsync(s => s.EmployeeId == employeeId);
     }
 
-    public async Task<IEnumerable<Staff>> GetStaffByDepartmentAsync(string department)
-    {
-        return await _context.Staff
-            .Where(s => s.Department == department)
-            .OrderBy(s => s.Position)
-            .ThenBy(s => s.LastName)
-            .ToListAsync();
-    }
 
     public async Task<IEnumerable<Staff>> GetStaffByPositionAsync(string position)
     {
@@ -73,15 +64,6 @@ public class StaffRepository : IStaffRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<string>> GetDepartmentsAsync()
-    {
-        return await _context.Staff
-            .Select(s => s.Department)
-            .Distinct()
-            .Where(d => !string.IsNullOrEmpty(d))
-            .OrderBy(d => d)
-            .ToListAsync();
-    }
 
     public async Task<IEnumerable<string>> GetPositionsAsync()
     {
@@ -93,8 +75,4 @@ public class StaffRepository : IStaffRepository
             .ToListAsync();
     }
 
-    public async Task<int> GetActiveStaffCountAsync()
-    {
-        return await _context.Staff.CountAsync(s => s.Status == "Active");
-    }
 }

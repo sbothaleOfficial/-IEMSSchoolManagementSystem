@@ -19,26 +19,50 @@ public partial class AddEditFeePaymentWindow : Window
         FeeStructureService feeStructureService,
         StudentService studentService)
     {
-        InitializeComponent();
-        _feePaymentService = feePaymentService;
-        _feeStructureService = feeStructureService;
-        _studentService = studentService;
-
-        LoadData();
-    }
-
-    private async void LoadData()
-    {
         try
         {
-            await LoadStudents();
-            LoadFeeTypes();
-            LoadPaymentMethods();
-            RecalculateTotals(null, null);
+            InitializeComponent();
+
+            // Add null checks for all services
+            _feePaymentService = feePaymentService ?? throw new ArgumentNullException(nameof(feePaymentService));
+            _feeStructureService = feeStructureService ?? throw new ArgumentNullException(nameof(feeStructureService));
+            _studentService = studentService ?? throw new ArgumentNullException(nameof(studentService));
+
+            // Use Loaded event to ensure UI is fully initialized
+            this.Loaded += AddEditFeePaymentWindow_Loaded;
         }
         catch (Exception ex)
         {
-            ShowValidationError($"Error loading data: {ex.Message}");
+            MessageBox.Show($"Error initializing fee payment window: {ex.Message}", "Initialization Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            throw;
+        }
+    }
+
+    private async void AddEditFeePaymentWindow_Loaded(object sender, RoutedEventArgs e)
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            // Check if all UI elements are available
+            if (cmbStudent == null || cmbFeeType == null || cmbPaymentMethod == null || txtPaymentSummary == null)
+            {
+                throw new InvalidOperationException("UI elements not properly initialized");
+            }
+
+            await LoadStudents();
+            LoadFeeTypes();
+            LoadPaymentMethods();
+
+            // Initialize the payment summary instead of calling RecalculateTotals with null
+            txtPaymentSummary.Text = "Amount: ₹0.00\nLate Fee: ₹0.00\nDiscount: ₹0.00\n──────────────────\nTotal Amount: ₹0.00\nIn Words: Zero Rupees Only";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error loading fee payment data: {ex.Message}", "Data Loading Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -121,7 +145,7 @@ public partial class AddEditFeePaymentWindow : Window
         var selectedStudent = _students.FirstOrDefault(s => s.Id == (int)cmbStudent.SelectedValue);
         if (selectedStudent != null)
         {
-            var academicYear = ((ComboBoxItem)cmbAcademicYear.SelectedItem)?.Content?.ToString() ?? "2024-25";
+            var academicYear = "2024-25"; // Default academic year since ComboBox might not be initialized
             _feeStructures = (await _feeStructureService.GetFeeStructuresByClassIdAsync(selectedStudent.ClassId)).ToList();
         }
     }
@@ -143,7 +167,7 @@ public partial class AddEditFeePaymentWindow : Window
         {
             try
             {
-                var academicYear = ((ComboBoxItem)cmbAcademicYear.SelectedItem)?.Content?.ToString() ?? "2024-25";
+                var academicYear = "2024-25"; // Default academic year since ComboBox might not be initialized
                 var feeStructure = await _feeStructureService.GetFeeStructureByClassFeeTypeAndYearAsync(
                     selectedStudent.ClassId, selectedFeeType, academicYear);
 
@@ -212,6 +236,10 @@ public partial class AddEditFeePaymentWindow : Window
 
     private void TxtAmount_TextChanged(object sender, TextChangedEventArgs e)
     {
+        // Skip if UI elements are not fully initialized
+        if (txtAmount == null || txtAmountInWords == null)
+            return;
+
         if (decimal.TryParse(txtAmount.Text, out decimal amount))
         {
             txtAmountInWords.Text = ConvertAmountToWords(amount);
@@ -224,6 +252,10 @@ public partial class AddEditFeePaymentWindow : Window
 
     private void RecalculateTotals(object sender, TextChangedEventArgs e)
     {
+        // Skip if UI elements are not fully initialized
+        if (txtAmount == null || txtLateFee == null || txtDiscount == null || txtPaymentSummary == null)
+            return;
+
         try
         {
             var amount = decimal.TryParse(txtAmount.Text, out decimal amt) ? amt : 0;
@@ -241,7 +273,8 @@ public partial class AddEditFeePaymentWindow : Window
         }
         catch
         {
-            txtPaymentSummary.Text = "Invalid amounts entered";
+            if (txtPaymentSummary != null)
+                txtPaymentSummary.Text = "Invalid amounts entered";
         }
     }
 
@@ -265,7 +298,7 @@ public partial class AddEditFeePaymentWindow : Window
                 Discount = decimal.TryParse(txtDiscount.Text, out decimal disc) ? disc : 0,
                 InstallmentNumber = int.TryParse(txtInstallmentNumber.Text, out int inst) ? inst : null,
                 NextDueDate = dpNextDueDate.SelectedDate,
-                AcademicYear = ((ComboBoxItem)cmbAcademicYear.SelectedItem)?.Content?.ToString() ?? "2024-25",
+                AcademicYear = "2024-25", // Default academic year
                 GeneratedBy = Environment.UserName
             };
 

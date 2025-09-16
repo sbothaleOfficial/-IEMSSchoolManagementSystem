@@ -169,3 +169,7 @@ C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-win
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\SupportStaffManagementWindow.baml
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\AddEditStaffWindow.g.cs
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\SupportStaffManagementWindow.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\AddEditFeePaymentWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\AddEditFeePaymentWindow.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\FeeReceiptWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\FeeReceiptWindow.g.cs

@@ -15,31 +15,9 @@ public partial class AddEditTeacherWindow : Window
         _teacherService = teacherService;
         _teacherToEdit = teacherToEdit;
 
-        LoadSubjects();
         LoadTeacherData();
 
-        Title = teacherToEdit == null ? "Add Teacher" : "Edit Teacher";
-    }
-
-    private void LoadSubjects()
-    {
-        var subjects = new[]
-        {
-            "Mathematics",
-            "English",
-            "Science",
-            "History",
-            "Geography",
-            "Physics",
-            "Chemistry",
-            "Biology",
-            "Computer Science",
-            "Art",
-            "Music",
-            "Physical Education"
-        };
-
-        cmbSubject.ItemsSource = subjects;
+        Title = teacherToEdit == null ? "Add Class Teacher" : "Edit Class Teacher";
     }
 
     private void LoadTeacherData()
@@ -49,8 +27,6 @@ public partial class AddEditTeacherWindow : Window
             txtEmployeeId.Text = _teacherToEdit.EmployeeId;
             txtFirstName.Text = _teacherToEdit.FirstName;
             txtLastName.Text = _teacherToEdit.LastName;
-            txtEmail.Text = _teacherToEdit.Email;
-            cmbSubject.Text = _teacherToEdit.Subject;
         }
     }
 
@@ -66,9 +42,7 @@ public partial class AddEditTeacherWindow : Window
                 Id = _teacherToEdit?.Id ?? 0,
                 EmployeeId = txtEmployeeId.Text.Trim(),
                 FirstName = txtFirstName.Text.Trim(),
-                LastName = txtLastName.Text.Trim(),
-                Email = txtEmail.Text.Trim(),
-                Subject = cmbSubject.Text.Trim()
+                LastName = txtLastName.Text.Trim()
             };
 
             // Check for unique employee ID
@@ -82,12 +56,12 @@ public partial class AddEditTeacherWindow : Window
             if (_teacherToEdit == null)
             {
                 await _teacherService.AddTeacherAsync(teacherDto);
-                MessageBox.Show("Teacher added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Class Teacher added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             else
             {
                 await _teacherService.UpdateTeacherAsync(teacherDto);
-                MessageBox.Show("Teacher updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show("Class Teacher updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
 
             DialogResult = true;
@@ -95,7 +69,7 @@ public partial class AddEditTeacherWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error saving teacher: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"Error saving class teacher: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -128,40 +102,6 @@ public partial class AddEditTeacherWindow : Window
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(txtEmail.Text))
-        {
-            MessageBox.Show("Email is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            txtEmail.Focus();
-            return false;
-        }
-
-        if (!IsValidEmail(txtEmail.Text))
-        {
-            MessageBox.Show("Please enter a valid email address.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            txtEmail.Focus();
-            return false;
-        }
-
-        if (string.IsNullOrWhiteSpace(cmbSubject.Text))
-        {
-            MessageBox.Show("Subject is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            cmbSubject.Focus();
-            return false;
-        }
-
         return true;
-    }
-
-    private bool IsValidEmail(string email)
-    {
-        try
-        {
-            var addr = new System.Net.Mail.MailAddress(email);
-            return addr.Address == email;
-        }
-        catch
-        {
-            return false;
-        }
     }
 }

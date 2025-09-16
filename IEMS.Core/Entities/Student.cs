@@ -25,4 +25,5 @@ public class Student
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     public virtual Class? Class { get; set; }
+    public virtual ICollection<FeePayment> FeePayments { get; set; } = new List<FeePayment>();
 }

@@ -279,6 +279,23 @@ public partial class StudentsManagementWindow : Window
     {
         try
         {
+            // Debug: Check if services are null
+            if (_feePaymentService == null)
+            {
+                MessageBox.Show("Fee Payment Service is not initialized.", "Service Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (_feeStructureService == null)
+            {
+                MessageBox.Show("Fee Structure Service is not initialized.", "Service Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+            if (_studentService == null)
+            {
+                MessageBox.Show("Student Service is not initialized.", "Service Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             var addFeePaymentWindow = new AddEditFeePaymentWindow(_feePaymentService, _feeStructureService, _studentService);
             if (addFeePaymentWindow.ShowDialog() == true)
             {
@@ -288,7 +305,7 @@ public partial class StudentsManagementWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error opening fee payment window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"Error opening fee payment window: {ex.Message}\n\nStack Trace:\n{ex.StackTrace}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 

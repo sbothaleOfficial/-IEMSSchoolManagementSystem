@@ -28,9 +28,7 @@ public class TeacherService
                 Id = teacher.Id,
                 FirstName = teacher.FirstName,
                 LastName = teacher.LastName,
-                Email = teacher.Email,
                 EmployeeId = teacher.EmployeeId,
-                Subject = teacher.Subject,
                 ClassCount = classes.Count()
             });
         }
@@ -49,9 +47,7 @@ public class TeacherService
             Id = teacher.Id,
             FirstName = teacher.FirstName,
             LastName = teacher.LastName,
-            Email = teacher.Email,
             EmployeeId = teacher.EmployeeId,
-            Subject = teacher.Subject,
             ClassCount = classes.Count()
         };
     }
@@ -62,9 +58,7 @@ public class TeacherService
         {
             FirstName = teacherDto.FirstName,
             LastName = teacherDto.LastName,
-            Email = teacherDto.Email,
-            EmployeeId = teacherDto.EmployeeId,
-            Subject = teacherDto.Subject
+            EmployeeId = teacherDto.EmployeeId
         };
 
         return await _teacherRepository.AddAsync(teacher);
@@ -77,9 +71,7 @@ public class TeacherService
         {
             teacher.FirstName = teacherDto.FirstName;
             teacher.LastName = teacherDto.LastName;
-            teacher.Email = teacherDto.Email;
             teacher.EmployeeId = teacherDto.EmployeeId;
-            teacher.Subject = teacherDto.Subject;
             teacher.UpdatedAt = DateTime.UtcNow;
 
             await _teacherRepository.UpdateAsync(teacher);
@@ -101,28 +93,5 @@ public class TeacherService
     {
         var existingTeacher = await _teacherRepository.GetTeacherByEmployeeIdAsync(employeeId);
         return existingTeacher == null || (excludeTeacherId.HasValue && existingTeacher.Id == excludeTeacherId.Value);
-    }
-
-    public async Task<IEnumerable<TeacherDto>> GetTeachersBySubjectAsync(string subject)
-    {
-        var teachers = await _teacherRepository.GetTeachersBySubjectAsync(subject);
-        var teacherDtos = new List<TeacherDto>();
-
-        foreach (var teacher in teachers)
-        {
-            var classes = await _classRepository.GetClassesByTeacherIdAsync(teacher.Id);
-            teacherDtos.Add(new TeacherDto
-            {
-                Id = teacher.Id,
-                FirstName = teacher.FirstName,
-                LastName = teacher.LastName,
-                Email = teacher.Email,
-                EmployeeId = teacher.EmployeeId,
-                Subject = teacher.Subject,
-                ClassCount = classes.Count()
-            });
-        }
-
-        return teacherDtos;
     }
 }
