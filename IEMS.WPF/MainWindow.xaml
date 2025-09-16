@@ -57,9 +57,30 @@
 
             <TabItem Header="Teachers">
                 <Grid>
-                    <TextBlock Text="Teachers management coming soon..."
-                               HorizontalAlignment="Center" VerticalAlignment="Center"
-                               FontSize="16" Foreground="Gray"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,10">
+                        <Button x:Name="btnAddTeacher" Content="Add Teacher" Width="100" Height="30" Margin="0,0,10,0" Click="BtnAddTeacher_Click"/>
+                        <Button x:Name="btnEditTeacher" Content="Edit Teacher" Width="100" Height="30" Margin="0,0,10,0" Click="BtnEditTeacher_Click"/>
+                        <Button x:Name="btnDeleteTeacher" Content="Delete Teacher" Width="100" Height="30" Margin="0,0,10,0" Click="BtnDeleteTeacher_Click"/>
+                        <Button x:Name="btnRefreshTeachers" Content="Refresh" Width="100" Height="30" Margin="0,0,10,0" Click="BtnRefreshTeachers_Click"/>
+                    </StackPanel>
+
+                    <DataGrid x:Name="dgTeachers" Grid.Row="1" AutoGenerateColumns="False"
+                              CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                              GridLinesVisibility="All" HeadersVisibility="Column">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Employee ID" Binding="{Binding EmployeeId}" Width="100"/>
+                            <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="120"/>
+                            <DataGridTextColumn Header="Last Name" Binding="{Binding LastName}" Width="120"/>
+                            <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="200"/>
+                            <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="150"/>
+                            <DataGridTextColumn Header="Classes" Binding="{Binding ClassCount}" Width="80"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
                 </Grid>
             </TabItem>
         </TabControl>

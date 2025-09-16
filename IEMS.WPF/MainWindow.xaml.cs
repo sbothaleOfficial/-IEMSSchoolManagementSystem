@@ -8,12 +8,15 @@ namespace IEMS.WPF;
 public partial class MainWindow : Window
 {
     private readonly StudentService _studentService;
+    private readonly TeacherService _teacherService;
 
-    public MainWindow(StudentService studentService)
+    public MainWindow(StudentService studentService, TeacherService teacherService)
     {
         InitializeComponent();
         _studentService = studentService;
+        _teacherService = teacherService;
         LoadStudents();
+        LoadTeachers();
     }
 
     private async void LoadStudents()
@@ -87,5 +90,78 @@ public partial class MainWindow : Window
     private void BtnRefreshStudents_Click(object sender, RoutedEventArgs e)
     {
         LoadStudents();
+    }
+
+    private async void LoadTeachers()
+    {
+        try
+        {
+            lblStatus.Text = "Loading teachers...";
+            var teachers = await _teacherService.GetAllTeachersAsync();
+            dgTeachers.ItemsSource = teachers;
+            lblStatus.Text = $"Loaded {teachers.Count()} teachers";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error loading teachers: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error loading teachers";
+        }
+    }
+
+    private void BtnAddTeacher_Click(object sender, RoutedEventArgs e)
+    {
+        var addWindow = new AddEditTeacherWindow(_teacherService);
+        if (addWindow.ShowDialog() == true)
+        {
+            LoadTeachers();
+        }
+    }
+
+    private void BtnEditTeacher_Click(object sender, RoutedEventArgs e)
+    {
+        if (dgTeachers.SelectedItem is TeacherDto selectedTeacher)
+        {
+            var editWindow = new AddEditTeacherWindow(_teacherService, selectedTeacher);
+            if (editWindow.ShowDialog() == true)
+            {
+                LoadTeachers();
+            }
+        }
+        else
+        {
+            MessageBox.Show("Please select a teacher to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+    }
+
+    private async void BtnDeleteTeacher_Click(object sender, RoutedEventArgs e)
+    {
+        if (dgTeachers.SelectedItem is TeacherDto selectedTeacher)
+        {
+            var result = MessageBox.Show($"Are you sure you want to delete teacher {selectedTeacher.FullName}?",
+                                       "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                try
+                {
+                    await _teacherService.DeleteTeacherAsync(selectedTeacher.Id);
+                    LoadTeachers();
+                    lblStatus.Text = "Teacher deleted successfully";
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error deleting teacher: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+        }
+        else
+        {
+            MessageBox.Show("Please select a teacher to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+    }
+
+    private void BtnRefreshTeachers_Click(object sender, RoutedEventArgs e)
+    {
+        LoadTeachers();
     }
 }
