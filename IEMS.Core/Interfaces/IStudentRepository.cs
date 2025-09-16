@@ -5,5 +5,5 @@ namespace IEMS.Core.Interfaces;
 public interface IStudentRepository : IRepository<Student>
 {
     Task<IEnumerable<Student>> GetStudentsByClassIdAsync(int classId);
-    Task<Student?> GetStudentByRollNumberAsync(string rollNumber);
+    Task<Student?> GetStudentByStudentNumberAsync(string studentNumber);
 }

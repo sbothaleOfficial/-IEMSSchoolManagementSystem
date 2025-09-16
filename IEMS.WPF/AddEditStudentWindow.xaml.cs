@@ -47,16 +47,32 @@ public partial class AddEditStudentWindow : Window
     {
         if (_studentToEdit != null)
         {
-            txtRollNumber.Text = _studentToEdit.RollNumber;
+            txtSerialNo.Text = _studentToEdit.SerialNo.ToString();
+            txtStandard.Text = _studentToEdit.Standard;
+            txtClassDivision.Text = _studentToEdit.ClassDivision;
             txtFirstName.Text = _studentToEdit.FirstName;
-            txtLastName.Text = _studentToEdit.LastName;
-            txtEmail.Text = _studentToEdit.Email;
+            txtFatherName.Text = _studentToEdit.FatherName;
+            txtSurname.Text = _studentToEdit.Surname;
             dpDateOfBirth.SelectedDate = _studentToEdit.DateOfBirth;
+            cmbGender.Text = _studentToEdit.Gender;
+            txtMotherName.Text = _studentToEdit.MotherName;
+            txtStudentNumber.Text = _studentToEdit.StudentNumber;
+            dpAdmissionDate.SelectedDate = _studentToEdit.AdmissionDate;
+            cmbCasteCategory.Text = _studentToEdit.CasteCategory;
+            cmbReligion.Text = _studentToEdit.Religion;
+            chkBPL.IsChecked = _studentToEdit.IsBPL;
+            chkSemiEnglish.IsChecked = _studentToEdit.IsSemiEnglish;
+            txtAddress.Text = _studentToEdit.Address;
+            txtParentMobile.Text = _studentToEdit.ParentMobileNumber;
             cmbClass.SelectedValue = _studentToEdit.ClassId;
         }
         else
         {
             dpDateOfBirth.SelectedDate = DateTime.Today.AddYears(-15);
+            dpAdmissionDate.SelectedDate = DateTime.Today;
+            cmbGender.SelectedIndex = 0;
+            cmbCasteCategory.SelectedIndex = 0;
+            cmbReligion.SelectedIndex = 0;
         }
     }
 
@@ -70,11 +86,23 @@ public partial class AddEditStudentWindow : Window
             var studentDto = new StudentDto
             {
                 Id = _studentToEdit?.Id ?? 0,
-                RollNumber = txtRollNumber.Text.Trim(),
+                SerialNo = int.Parse(txtSerialNo.Text.Trim()),
+                Standard = txtStandard.Text.Trim(),
+                ClassDivision = txtClassDivision.Text.Trim(),
                 FirstName = txtFirstName.Text.Trim(),
-                LastName = txtLastName.Text.Trim(),
-                Email = txtEmail.Text.Trim(),
+                FatherName = txtFatherName.Text.Trim(),
+                Surname = txtSurname.Text.Trim(),
                 DateOfBirth = dpDateOfBirth.SelectedDate ?? DateTime.Today,
+                Gender = cmbGender.Text,
+                MotherName = txtMotherName.Text.Trim(),
+                StudentNumber = txtStudentNumber.Text.Trim(),
+                AdmissionDate = dpAdmissionDate.SelectedDate ?? DateTime.Today,
+                CasteCategory = cmbCasteCategory.Text,
+                Religion = cmbReligion.Text,
+                IsBPL = chkBPL.IsChecked ?? false,
+                IsSemiEnglish = chkSemiEnglish.IsChecked ?? false,
+                Address = txtAddress.Text.Trim(),
+                ParentMobileNumber = txtParentMobile.Text.Trim(),
                 ClassId = (int)cmbClass.SelectedValue
             };
 
@@ -106,10 +134,24 @@ public partial class AddEditStudentWindow : Window
 
     private bool ValidateInput()
     {
-        if (string.IsNullOrWhiteSpace(txtRollNumber.Text))
+        if (string.IsNullOrWhiteSpace(txtSerialNo.Text) || !int.TryParse(txtSerialNo.Text.Trim(), out _))
         {
-            MessageBox.Show("Roll number is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            txtRollNumber.Focus();
+            MessageBox.Show("Serial number is required and must be a valid number.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtSerialNo.Focus();
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(txtStandard.Text))
+        {
+            MessageBox.Show("Standard is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtStandard.Focus();
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(txtClassDivision.Text))
+        {
+            MessageBox.Show("Class division is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtClassDivision.Focus();
             return false;
         }
 
@@ -120,17 +162,31 @@ public partial class AddEditStudentWindow : Window
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(txtLastName.Text))
+        if (string.IsNullOrWhiteSpace(txtFatherName.Text))
         {
-            MessageBox.Show("Last name is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            txtLastName.Focus();
+            MessageBox.Show("Father's name is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtFatherName.Focus();
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(txtEmail.Text))
+        if (string.IsNullOrWhiteSpace(txtSurname.Text))
         {
-            MessageBox.Show("Email is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            txtEmail.Focus();
+            MessageBox.Show("Surname is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtSurname.Focus();
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(txtMotherName.Text))
+        {
+            MessageBox.Show("Mother's name is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtMotherName.Focus();
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(txtStudentNumber.Text))
+        {
+            MessageBox.Show("Student number is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtStudentNumber.Focus();
             return false;
         }
 
@@ -138,6 +194,27 @@ public partial class AddEditStudentWindow : Window
         {
             MessageBox.Show("Date of birth is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             dpDateOfBirth.Focus();
+            return false;
+        }
+
+        if (dpAdmissionDate.SelectedDate == null)
+        {
+            MessageBox.Show("Admission date is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            dpAdmissionDate.Focus();
+            return false;
+        }
+
+        if (cmbGender.SelectedItem == null)
+        {
+            MessageBox.Show("Gender selection is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            cmbGender.Focus();
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(txtParentMobile.Text))
+        {
+            MessageBox.Show("Parent mobile number is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtParentMobile.Focus();
             return false;
         }
 

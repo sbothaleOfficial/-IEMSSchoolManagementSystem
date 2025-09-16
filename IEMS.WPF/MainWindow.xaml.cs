@@ -67,7 +67,7 @@ public partial class MainWindow : Window
     {
         if (dgStudents.SelectedItem is StudentDto selectedStudent)
         {
-            var result = MessageBox.Show($"Are you sure you want to delete student {selectedStudent.FirstName} {selectedStudent.LastName}?",
+            var result = MessageBox.Show($"Are you sure you want to delete student {selectedStudent.FullName}?",
                                        "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
             if (result == MessageBoxResult.Yes)
@@ -255,7 +255,7 @@ public partial class MainWindow : Window
 
                 var message = classStudents.Any()
                     ? $"Students in {selectedClass.DisplayName}:\n\n" +
-                      string.Join("\n", classStudents.Select(s => $"• {s.RollNumber} - {s.FirstName} {s.LastName}"))
+                      string.Join("\n", classStudents.Select(s => $"• {s.StudentNumber} - {s.FullName}"))
                     : $"No students enrolled in {selectedClass.DisplayName}";
 
                 MessageBox.Show(message, $"Students in {selectedClass.DisplayName}", MessageBoxButton.OK, MessageBoxImage.Information);

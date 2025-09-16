@@ -59,10 +59,10 @@ public class StudentRepository : IStudentRepository
             .ToListAsync();
     }
 
-    public async Task<Student?> GetStudentByRollNumberAsync(string rollNumber)
+    public async Task<Student?> GetStudentByStudentNumberAsync(string studentNumber)
     {
         return await _context.Students
             .Include(s => s.Class)
-            .FirstOrDefaultAsync(s => s.RollNumber == rollNumber);
+            .FirstOrDefaultAsync(s => s.StudentNumber == studentNumber);
     }
 }

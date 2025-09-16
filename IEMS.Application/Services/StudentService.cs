@@ -26,11 +26,23 @@ public class StudentService
             studentDtos.Add(new StudentDto
             {
                 Id = student.Id,
+                SerialNo = student.SerialNo,
+                Standard = student.Standard,
+                ClassDivision = student.ClassDivision,
                 FirstName = student.FirstName,
-                LastName = student.LastName,
-                Email = student.Email,
+                FatherName = student.FatherName,
+                Surname = student.Surname,
                 DateOfBirth = student.DateOfBirth,
-                RollNumber = student.RollNumber,
+                Gender = student.Gender,
+                MotherName = student.MotherName,
+                StudentNumber = student.StudentNumber,
+                AdmissionDate = student.AdmissionDate,
+                CasteCategory = student.CasteCategory,
+                Religion = student.Religion,
+                IsBPL = student.IsBPL,
+                IsSemiEnglish = student.IsSemiEnglish,
+                Address = student.Address,
+                ParentMobileNumber = student.ParentMobileNumber,
                 ClassId = student.ClassId,
                 ClassName = classEntity?.Name ?? "Unknown"
             });
@@ -48,11 +60,23 @@ public class StudentService
         return new StudentDto
         {
             Id = student.Id,
+            SerialNo = student.SerialNo,
+            Standard = student.Standard,
+            ClassDivision = student.ClassDivision,
             FirstName = student.FirstName,
-            LastName = student.LastName,
-            Email = student.Email,
+            FatherName = student.FatherName,
+            Surname = student.Surname,
             DateOfBirth = student.DateOfBirth,
-            RollNumber = student.RollNumber,
+            Gender = student.Gender,
+            MotherName = student.MotherName,
+            StudentNumber = student.StudentNumber,
+            AdmissionDate = student.AdmissionDate,
+            CasteCategory = student.CasteCategory,
+            Religion = student.Religion,
+            IsBPL = student.IsBPL,
+            IsSemiEnglish = student.IsSemiEnglish,
+            Address = student.Address,
+            ParentMobileNumber = student.ParentMobileNumber,
             ClassId = student.ClassId,
             ClassName = classEntity?.Name ?? "Unknown"
         };
@@ -62,11 +86,23 @@ public class StudentService
     {
         var student = new Student
         {
+            SerialNo = studentDto.SerialNo,
+            Standard = studentDto.Standard,
+            ClassDivision = studentDto.ClassDivision,
             FirstName = studentDto.FirstName,
-            LastName = studentDto.LastName,
-            Email = studentDto.Email,
+            FatherName = studentDto.FatherName,
+            Surname = studentDto.Surname,
             DateOfBirth = studentDto.DateOfBirth,
-            RollNumber = studentDto.RollNumber,
+            Gender = studentDto.Gender,
+            MotherName = studentDto.MotherName,
+            StudentNumber = studentDto.StudentNumber,
+            AdmissionDate = studentDto.AdmissionDate,
+            CasteCategory = studentDto.CasteCategory,
+            Religion = studentDto.Religion,
+            IsBPL = studentDto.IsBPL,
+            IsSemiEnglish = studentDto.IsSemiEnglish,
+            Address = studentDto.Address,
+            ParentMobileNumber = studentDto.ParentMobileNumber,
             ClassId = studentDto.ClassId
         };
 
@@ -78,11 +114,23 @@ public class StudentService
         var student = await _studentRepository.GetByIdAsync(studentDto.Id);
         if (student != null)
         {
+            student.SerialNo = studentDto.SerialNo;
+            student.Standard = studentDto.Standard;
+            student.ClassDivision = studentDto.ClassDivision;
             student.FirstName = studentDto.FirstName;
-            student.LastName = studentDto.LastName;
-            student.Email = studentDto.Email;
+            student.FatherName = studentDto.FatherName;
+            student.Surname = studentDto.Surname;
             student.DateOfBirth = studentDto.DateOfBirth;
-            student.RollNumber = studentDto.RollNumber;
+            student.Gender = studentDto.Gender;
+            student.MotherName = studentDto.MotherName;
+            student.StudentNumber = studentDto.StudentNumber;
+            student.AdmissionDate = studentDto.AdmissionDate;
+            student.CasteCategory = studentDto.CasteCategory;
+            student.Religion = studentDto.Religion;
+            student.IsBPL = studentDto.IsBPL;
+            student.IsSemiEnglish = studentDto.IsSemiEnglish;
+            student.Address = studentDto.Address;
+            student.ParentMobileNumber = studentDto.ParentMobileNumber;
             student.ClassId = studentDto.ClassId;
             student.UpdatedAt = DateTime.UtcNow;
 
