@@ -20,8 +20,10 @@
     <Border x:Name="ToastBorder" Background="{Binding ToastBackground, ElementName=ToastControl}"
             CornerRadius="8" Padding="16,12" Margin="0,20,0,0"
             HorizontalAlignment="Center" VerticalAlignment="Top"
-            Effect="{StaticResource {x:Static SystemParameters.DropShadowKey}}"
             Opacity="0">
+        <Border.Effect>
+            <DropShadowEffect Color="#000000" ShadowDepth="2" BlurRadius="8" Opacity="0.3"/>
+        </Border.Effect>
         <StackPanel Orientation="Horizontal">
             <TextBlock x:Name="IconText" Text="{Binding ToastIcon, ElementName=ToastControl}"
                        FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center"
