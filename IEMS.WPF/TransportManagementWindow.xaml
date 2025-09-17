@@ -11,7 +11,7 @@
         </Grid.RowDefinitions>
 
         <!-- Header Section -->
-        <Grid Grid.Row="0" Background="#E67E22" Height="70">
+        <Grid Grid.Row="0" Background="{StaticResource WarningBrush}" Height="70">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -19,26 +19,24 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
-                <Border Background="#D35400" Width="50" Height="50" CornerRadius="25" Margin="0,0,15,0">
+                <Border Background="{StaticResource WarningDarkBrush}" Width="50" Height="50" CornerRadius="25" Margin="0,0,15,0">
                     <TextBlock Text="🚌" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
                 <StackPanel VerticalAlignment="Center">
                     <TextBlock Text="Transport Management"
-                               FontSize="22" FontWeight="Bold" Foreground="White"/>
+                               FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextOnPrimaryBrush}"/>
                     <TextBlock Text="Manage Vehicles and Expenses"
-                               FontSize="14" Foreground="LightGray" Margin="0,2,0,0"/>
+                               FontSize="14" Foreground="{StaticResource TextOnPrimaryBrush}" Margin="0,2,0,0" Opacity="0.8"/>
                 </StackPanel>
             </StackPanel>
 
             <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
                 <Button x:Name="btnRefresh" Content="🔄 Refresh"
-                        Background="#D35400" Foreground="White" BorderThickness="0"
                         Height="35" Width="80" Margin="5" Click="BtnRefresh_Click"
-                        Style="{DynamicResource ModernButtonStyle}"/>
+                        Style="{StaticResource WarningButtonStyle}"/>
                 <Button x:Name="btnClose" Content="✖ Close"
-                        Background="#C0392B" Foreground="White" BorderThickness="0"
                         Height="35" Width="70" Margin="5" Click="BtnClose_Click"
-                        Style="{DynamicResource ModernButtonStyle}"/>
+                        Style="{StaticResource DangerButtonStyle}"/>
             </StackPanel>
         </Grid>
 
@@ -55,21 +53,17 @@
                     <!-- Vehicle Controls -->
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
                         <Button x:Name="btnAddVehicle" Content="➕ Add Vehicle"
-                                Background="#27AE60" Foreground="White" BorderThickness="0"
                                 Height="35" Width="120" Margin="0,0,10,0" Click="BtnAddVehicle_Click"
-                                Style="{DynamicResource ModernButtonStyle}"/>
+                                Style="{StaticResource SuccessButtonStyle}"/>
                         <Button x:Name="btnEditVehicle" Content="✏️ Edit Vehicle"
-                                Background="#3498DB" Foreground="White" BorderThickness="0"
                                 Height="35" Width="120" Margin="0,0,10,0" Click="BtnEditVehicle_Click"
-                                Style="{DynamicResource ModernButtonStyle}"/>
+                                Style="{StaticResource PrimaryButtonStyle}"/>
                         <Button x:Name="btnDeleteVehicle" Content="🗑️ Delete Vehicle"
-                                Background="#E74C3C" Foreground="White" BorderThickness="0"
                                 Height="35" Width="130" Margin="0,0,10,0" Click="BtnDeleteVehicle_Click"
-                                Style="{DynamicResource ModernButtonStyle}"/>
+                                Style="{StaticResource DangerButtonStyle}"/>
                         <Button x:Name="btnViewExpenses" Content="📊 View Expenses"
-                                Background="#9B59B6" Foreground="White" BorderThickness="0"
                                 Height="35" Width="130" Margin="0,0,10,0" Click="BtnViewExpenses_Click"
-                                Style="{DynamicResource ModernButtonStyle}"/>
+                                Style="{StaticResource SecondaryButtonStyle}"/>
                     </StackPanel>
 
                     <!-- Vehicles DataGrid -->
@@ -78,10 +72,10 @@
                               IsReadOnly="True"
                               SelectionMode="Single"
                               CanUserAddRows="False"
-                              Background="White"
-                              BorderBrush="#E0E0E0"
+                              Background="{StaticResource BackgroundBrush}"
+                              BorderBrush="{StaticResource BorderBrush}"
                               GridLinesVisibility="Horizontal"
-                              HorizontalGridLinesBrush="#F0F0F0">
+                              HorizontalGridLinesBrush="{StaticResource BorderBrush}" AlternatingRowBackground="{StaticResource SurfaceBrush}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Vehicle Number" Binding="{Binding VehicleNumber}" Width="120"/>
                             <DataGridTextColumn Header="Type" Binding="{Binding VehicleTypeName}" Width="100"/>
@@ -108,21 +102,18 @@
                     <!-- Expense Controls -->
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
                         <Button x:Name="btnAddExpense" Content="➕ Add Expense"
-                                Background="#27AE60" Foreground="White" BorderThickness="0"
                                 Height="35" Width="120" Margin="0,0,10,0" Click="BtnAddExpense_Click"
-                                Style="{DynamicResource ModernButtonStyle}"/>
+                                Style="{StaticResource SuccessButtonStyle}"/>
                         <Button x:Name="btnEditExpense" Content="✏️ Edit Expense"
-                                Background="#3498DB" Foreground="White" BorderThickness="0"
                                 Height="35" Width="120" Margin="0,0,10,0" Click="BtnEditExpense_Click"
-                                Style="{DynamicResource ModernButtonStyle}"/>
+                                Style="{StaticResource PrimaryButtonStyle}"/>
                         <Button x:Name="btnDeleteExpense" Content="🗑️ Delete Expense"
-                                Background="#E74C3C" Foreground="White" BorderThickness="0"
                                 Height="35" Width="130" Margin="0,0,10,0" Click="BtnDeleteExpense_Click"
-                                Style="{DynamicResource ModernButtonStyle}"/>
+                                Style="{StaticResource DangerButtonStyle}"/>
                     </StackPanel>
 
                     <!-- Filter Panel -->
-                    <Border Grid.Row="1" Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1"
+                    <Border Grid.Row="1" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
                             Padding="15" Margin="0,0,0,10" CornerRadius="5">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Text="Filter by Vehicle:" VerticalAlignment="Center" Margin="0,0,10,0"/>
@@ -142,9 +133,8 @@
                                         SelectedDateChanged="DateFilter_Changed"/>
 
                             <Button x:Name="btnClearFilter" Content="Clear Filter"
-                                    Background="#95A5A6" Foreground="White" BorderThickness="0"
                                     Height="30" Width="80" Click="BtnClearFilter_Click"
-                                    Style="{DynamicResource ModernButtonStyle}"/>
+                                    Style="{StaticResource SecondaryButtonStyle}"/>
                         </StackPanel>
                     </Border>
 
@@ -154,10 +144,10 @@
                               IsReadOnly="True"
                               SelectionMode="Single"
                               CanUserAddRows="False"
-                              Background="White"
-                              BorderBrush="#E0E0E0"
+                              Background="{StaticResource BackgroundBrush}"
+                              BorderBrush="{StaticResource BorderBrush}"
                               GridLinesVisibility="Horizontal"
-                              HorizontalGridLinesBrush="#F0F0F0">
+                              HorizontalGridLinesBrush="{StaticResource BorderBrush}" AlternatingRowBackground="{StaticResource SurfaceBrush}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Vehicle Number" Binding="{Binding VehicleNumber}" Width="120"/>
                             <DataGridTextColumn Header="Category" Binding="{Binding CategoryName}" Width="100"/>
@@ -185,54 +175,54 @@
 
                         <!-- Summary Cards -->
                         <UniformGrid Grid.Row="0" Columns="4" Margin="0,0,0,20">
-                            <Border Background="#3498DB" CornerRadius="10" Margin="10" Padding="20">
+                            <Border Background="{StaticResource PrimaryBrush}" CornerRadius="10" Margin="10" Padding="20">
                                 <StackPanel>
                                     <TextBlock x:Name="lblTotalVehicles" Text="0" FontSize="28" FontWeight="Bold"
-                                               Foreground="White" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="Total Vehicles" FontSize="14" Foreground="White"
+                                               Foreground="{StaticResource TextOnPrimaryBrush}" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Total Vehicles" FontSize="14" Foreground="{StaticResource TextOnPrimaryBrush}"
                                                HorizontalAlignment="Center" Margin="0,5,0,0"/>
                                 </StackPanel>
                             </Border>
 
-                            <Border Background="#E74C3C" CornerRadius="10" Margin="10" Padding="20">
+                            <Border Background="{StaticResource DangerBrush}" CornerRadius="10" Margin="10" Padding="20">
                                 <StackPanel>
                                     <TextBlock x:Name="lblTotalExpenses" Text="₹0" FontSize="28" FontWeight="Bold"
-                                               Foreground="White" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="Total Expenses" FontSize="14" Foreground="White"
+                                               Foreground="{StaticResource TextOnPrimaryBrush}" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Total Expenses" FontSize="14" Foreground="{StaticResource TextOnPrimaryBrush}"
                                                HorizontalAlignment="Center" Margin="0,5,0,0"/>
                                 </StackPanel>
                             </Border>
 
-                            <Border Background="#27AE60" CornerRadius="10" Margin="10" Padding="20">
+                            <Border Background="{StaticResource AccentBrush}" CornerRadius="10" Margin="10" Padding="20">
                                 <StackPanel>
                                     <TextBlock x:Name="lblMonthlyExpenses" Text="₹0" FontSize="28" FontWeight="Bold"
-                                               Foreground="White" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="This Month" FontSize="14" Foreground="White"
+                                               Foreground="{StaticResource TextOnPrimaryBrush}" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="This Month" FontSize="14" Foreground="{StaticResource TextOnPrimaryBrush}"
                                                HorizontalAlignment="Center" Margin="0,5,0,0"/>
                                 </StackPanel>
                             </Border>
 
-                            <Border Background="#9B59B6" CornerRadius="10" Margin="10" Padding="20">
+                            <Border Background="{StaticResource SecondaryBrush}" CornerRadius="10" Margin="10" Padding="20">
                                 <StackPanel>
                                     <TextBlock x:Name="lblAvgExpensePerVehicle" Text="₹0" FontSize="28" FontWeight="Bold"
-                                               Foreground="White" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="Avg per Vehicle" FontSize="14" Foreground="White"
+                                               Foreground="{StaticResource TextOnPrimaryBrush}" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Avg per Vehicle" FontSize="14" Foreground="{StaticResource TextOnPrimaryBrush}"
                                                HorizontalAlignment="Center" Margin="0,5,0,0"/>
                                 </StackPanel>
                             </Border>
                         </UniformGrid>
 
                         <!-- Recent Activities -->
-                        <Border Grid.Row="1" Background="White" CornerRadius="10"
-                                BorderBrush="#E0E0E0" BorderThickness="1" Padding="20">
+                        <Border Grid.Row="1" Background="{StaticResource BackgroundBrush}" CornerRadius="10"
+                                BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Padding="20">
                             <StackPanel>
                                 <TextBlock Text="Recent Transport Activities" FontSize="18" FontWeight="Bold"
-                                           Foreground="#2C3E50" Margin="0,0,0,15"/>
+                                           Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,15"/>
                                 <ListBox x:Name="lstRecentActivities" Background="Transparent" BorderThickness="0">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <Border Background="#F8F9FA" CornerRadius="5" Margin="0,2" Padding="10">
-                                                <TextBlock Text="{Binding}" FontSize="12" Foreground="#34495E"/>
+                                            <Border Background="{StaticResource SurfaceBrush}" CornerRadius="5" Margin="0,2" Padding="10">
+                                                <TextBlock Text="{Binding}" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"/>
                                             </Border>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
@@ -245,9 +235,9 @@
         </TabControl>
 
         <!-- Status Bar -->
-        <StatusBar Grid.Row="2" Height="30" Background="#BDC3C7">
+        <StatusBar Grid.Row="2" Height="30" Background="{StaticResource SecondaryDarkBrush}">
             <StatusBarItem>
-                <TextBlock x:Name="lblStatus" Text="Transport Management Ready" Foreground="#2C3E50"/>
+                <TextBlock x:Name="lblStatus" Text="Transport Management Ready" Foreground="{StaticResource TextOnPrimaryBrush}"/>
             </StatusBarItem>
         </StatusBar>
     </Grid>

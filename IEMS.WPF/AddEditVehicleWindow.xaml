@@ -11,16 +11,16 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Grid Grid.Row="0" Background="#E67E22" Height="60">
+        <Grid Grid.Row="0" Background="{StaticResource WarningBrush}" Height="60">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
-                <Border Background="#D35400" Width="40" Height="40" CornerRadius="20" Margin="0,0,15,0">
+                <Border Background="{StaticResource WarningDarkBrush}" Width="40" Height="40" CornerRadius="20" Margin="0,0,15,0">
                     <TextBlock Text="🚗" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
                 <StackPanel VerticalAlignment="Center">
                     <TextBlock x:Name="lblWindowTitle" Text="Add Vehicle"
-                               FontSize="20" FontWeight="Bold" Foreground="White"/>
+                               FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextOnPrimaryBrush}"/>
                     <TextBlock Text="Enter vehicle information"
-                               FontSize="12" Foreground="LightGray"/>
+                               FontSize="12" Foreground="{StaticResource TextOnPrimaryBrush}" Opacity="0.8"/>
                 </StackPanel>
             </StackPanel>
         </Grid>
@@ -29,55 +29,55 @@
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="30">
             <StackPanel>
                 <!-- Validation Message -->
-                <Border x:Name="borderValidation" Background="#FFE6E6" BorderBrush="#FF6B6B"
+                <Border x:Name="borderValidation" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource DangerBrush}"
                         BorderThickness="1" CornerRadius="5" Padding="15" Margin="0,0,0,20"
                         Visibility="Collapsed">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="⚠️" FontSize="16" Margin="0,0,10,0"/>
                         <TextBlock x:Name="lblValidationMessage" Text="Validation Error"
-                                   FontSize="14" Foreground="#CC0000" TextWrapping="Wrap"/>
+                                   FontSize="14" Foreground="{StaticResource DangerBrush}" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Border>
 
                 <!-- Vehicle Number -->
                 <StackPanel Margin="0,0,0,20">
                     <TextBlock Text="Vehicle Number *" FontWeight="Bold" FontSize="14"
-                               Foreground="#2C3E50" Margin="0,0,0,8"/>
+                               Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
                     <TextBox x:Name="txtVehicleNumber" Height="35" FontSize="14"
-                             BorderBrush="#BDC3C7" BorderThickness="2" Padding="10"/>
-                    <TextBlock Text="e.g., MH12AB1234" FontSize="11" Foreground="Gray" Margin="0,3,0,0"/>
+                             BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="2" Padding="10"/>
+                    <TextBlock Text="e.g., MH12AB1234" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,3,0,0"/>
                 </StackPanel>
 
                 <!-- Vehicle Type -->
                 <StackPanel Margin="0,0,0,20">
                     <TextBlock Text="Vehicle Type *" FontWeight="Bold" FontSize="14"
-                               Foreground="#2C3E50" Margin="0,0,0,8"/>
+                               Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
                     <ComboBox x:Name="cmbVehicleType" Height="35" FontSize="14"
-                              BorderBrush="#BDC3C7" BorderThickness="2"/>
+                              BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="2"/>
                 </StackPanel>
 
                 <!-- Driver Information -->
-                <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1"
+                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
                         CornerRadius="8" Padding="20" Margin="0,0,0,20">
                     <StackPanel>
                         <TextBlock Text="Driver Information" FontSize="16" FontWeight="Bold"
-                                   Foreground="#2C3E50" Margin="0,0,0,15"/>
+                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,15"/>
 
                         <!-- Driver Name -->
                         <StackPanel Margin="0,0,0,15">
                             <TextBlock Text="Driver Name *" FontWeight="Bold" FontSize="14"
-                                       Foreground="#2C3E50" Margin="0,0,0,8"/>
+                                       Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
                             <TextBox x:Name="txtDriverName" Height="35" FontSize="14"
-                                     BorderBrush="#BDC3C7" BorderThickness="2" Padding="10"/>
+                                     BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="2" Padding="10"/>
                         </StackPanel>
 
                         <!-- Driver Phone -->
                         <StackPanel Margin="0,0,0,0">
                             <TextBlock Text="Driver Phone" FontWeight="Bold" FontSize="14"
-                                       Foreground="#2C3E50" Margin="0,0,0,8"/>
+                                       Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
                             <TextBox x:Name="txtDriverPhone" Height="35" FontSize="14"
-                                     BorderBrush="#BDC3C7" BorderThickness="2" Padding="10"/>
-                            <TextBlock Text="e.g., 9876543210" FontSize="11" Foreground="Gray" Margin="0,3,0,0"/>
+                                     BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="2" Padding="10"/>
+                            <TextBlock Text="e.g., 9876543210" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,3,0,0"/>
                         </StackPanel>
                     </StackPanel>
                 </Border>
@@ -85,25 +85,23 @@
                 <!-- Route Information -->
                 <StackPanel Margin="0,0,0,20">
                     <TextBlock Text="Route" FontWeight="Bold" FontSize="14"
-                               Foreground="#2C3E50" Margin="0,0,0,8"/>
+                               Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
                     <TextBox x:Name="txtRoute" Height="35" FontSize="14"
-                             BorderBrush="#BDC3C7" BorderThickness="2" Padding="10"/>
-                    <TextBlock Text="e.g., Main Street - School Campus" FontSize="11" Foreground="Gray" Margin="0,3,0,0"/>
+                             BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="2" Padding="10"/>
+                    <TextBlock Text="e.g., Main Street - School Campus" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,3,0,0"/>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
 
         <!-- Action Buttons -->
-        <Border Grid.Row="2" Background="#ECF0F1" Padding="20">
+        <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" Padding="20">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button x:Name="btnCancel" Content="Cancel"
-                        Background="#95A5A6" Foreground="White" BorderThickness="0"
                         Height="40" Width="100" Margin="0,0,10,0" Click="BtnCancel_Click"
-                        Style="{DynamicResource ModernButtonStyle}"/>
+                        Style="{StaticResource SecondaryButtonStyle}"/>
                 <Button x:Name="btnSave" Content="Save Vehicle"
-                        Background="#27AE60" Foreground="White" BorderThickness="0"
                         Height="40" Width="120" Click="BtnSave_Click"
-                        Style="{DynamicResource ModernButtonStyle}"/>
+                        Style="{StaticResource SuccessButtonStyle}"/>
             </StackPanel>
         </Border>
     </Grid>

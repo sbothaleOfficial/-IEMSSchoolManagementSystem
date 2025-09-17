@@ -11,7 +11,7 @@
         </Grid.RowDefinitions>
 
         <!-- Header Section -->
-        <Grid Grid.Row="0" Background="DarkBlue" Height="80">
+        <Grid Grid.Row="0" Background="{StaticResource PrimaryBrush}" Height="80">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -22,15 +22,15 @@
                 <Image Source="../School_logo.png" Width="60" Height="60" Margin="0,0,15,0"/>
                 <StackPanel VerticalAlignment="Center">
                     <TextBlock Text="IEMS School Management System"
-                               FontSize="24" FontWeight="Bold" Foreground="White"/>
+                               FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextOnPrimaryBrush}"/>
                     <TextBlock Text="Dashboard"
-                               FontSize="14" Foreground="LightBlue" Margin="0,2,0,0"/>
+                               FontSize="14" Foreground="{StaticResource PrimaryLightBrush}" Margin="0,2,0,0"/>
                 </StackPanel>
             </StackPanel>
 
             <TextBlock Grid.Column="2" Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='dddd, MMMM dd, yyyy'}"
                        xmlns:sys="clr-namespace:System;assembly=mscorlib"
-                       FontSize="12" Foreground="LightGray" VerticalAlignment="Center" Margin="0,0,20,0"/>
+                       FontSize="12" Foreground="{StaticResource TextOnPrimaryBrush}" Opacity="0.9" VerticalAlignment="Center" Margin="0,0,20,0"/>
         </Grid>
 
         <!-- Dashboard Content -->
@@ -44,7 +44,7 @@
                 <!-- Welcome Section -->
                 <TextBlock Grid.Row="0" Text="Welcome to IEMS Dashboard"
                            FontSize="28" FontWeight="Bold" Margin="0,10,0,30"
-                           HorizontalAlignment="Center" Foreground="#2C3E50"/>
+                           HorizontalAlignment="Center" Foreground="{StaticResource TextPrimaryBrush}"/>
 
                 <!-- Dashboard Cards -->
                 <Grid Grid.Row="1">
@@ -58,10 +58,9 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- Students Management Card -->
-                    <Border Grid.Row="0" Grid.Column="0" Background="White" CornerRadius="10"
-                            Margin="10" Padding="20" BorderBrush="#E0E0E0" BorderThickness="1">
+                    <Border Grid.Row="0" Grid.Column="0" Style="{StaticResource CardStyle}">
                         <Border.Effect>
-                            <DropShadowEffect Color="Gray" ShadowDepth="3" BlurRadius="8" Opacity="0.3"/>
+                            <DropShadowEffect Color="#000000" ShadowDepth="2" BlurRadius="6" Opacity="0.1"/>
                         </Border.Effect>
                         <StackPanel>
                             <Grid>
@@ -70,34 +69,31 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <Border Grid.Column="0" Background="#3498DB" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
+                                <Border Grid.Column="0" Background="{StaticResource PrimaryBrush}" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
                                     <TextBlock Text="👥" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
 
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock Text="Students Management" FontSize="20" FontWeight="Bold" Foreground="#2C3E50"/>
-                                    <TextBlock Text="Manage students, classes and academic records" FontSize="12" Foreground="Gray" Margin="0,5,0,0"/>
+                                    <TextBlock Text="Students Management" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="Manage students, classes and academic records" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,5,0,0"/>
                                 </StackPanel>
                             </Grid>
 
                             <UniformGrid Columns="2" Margin="0,20,0,0">
                                 <Button x:Name="btnStudentsModule" Content="View Students"
-                                        Background="#3498DB" Foreground="White" BorderThickness="0"
                                         Height="35" Margin="5" Click="BtnStudentsModule_Click"
-                                        Style="{DynamicResource ModernButtonStyle}"/>
+                                        Style="{StaticResource PrimaryButtonStyle}"/>
                                 <Button x:Name="btnClassesModule" Content="View Classes"
-                                        Background="#2ECC71" Foreground="White" BorderThickness="0"
                                         Height="35" Margin="5" Click="BtnClassesModule_Click"
-                                        Style="{DynamicResource ModernButtonStyle}"/>
+                                        Style="{StaticResource SecondaryButtonStyle}"/>
                             </UniformGrid>
                         </StackPanel>
                     </Border>
 
                     <!-- Transport Management Card -->
-                    <Border Grid.Row="0" Grid.Column="1" Background="White" CornerRadius="10"
-                            Margin="10" Padding="20" BorderBrush="#E0E0E0" BorderThickness="1">
+                    <Border Grid.Row="0" Grid.Column="1" Style="{StaticResource CardStyle}">
                         <Border.Effect>
-                            <DropShadowEffect Color="Gray" ShadowDepth="3" BlurRadius="8" Opacity="0.3"/>
+                            <DropShadowEffect Color="#000000" ShadowDepth="2" BlurRadius="6" Opacity="0.1"/>
                         </Border.Effect>
                         <StackPanel>
                             <Grid>
@@ -106,34 +102,31 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <Border Grid.Column="0" Background="#E67E22" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
+                                <Border Grid.Column="0" Background="{StaticResource SecondaryBrush}" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
                                     <TextBlock Text="🚌" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
 
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock Text="Transport Management" FontSize="20" FontWeight="Bold" Foreground="#2C3E50"/>
-                                    <TextBlock Text="Manage buses, routes and student transport" FontSize="12" Foreground="Gray" Margin="0,5,0,0"/>
+                                    <TextBlock Text="Transport Management" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="Manage buses, routes and student transport" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,5,0,0"/>
                                 </StackPanel>
                             </Grid>
 
                             <UniformGrid Columns="2" Margin="0,20,0,0">
                                 <Button x:Name="btnBusesModule" Content="Buses"
-                                        Background="#E67E22" Foreground="White" BorderThickness="0"
                                         Height="35" Margin="5" Click="BtnBusesModule_Click"
-                                        Style="{DynamicResource ModernButtonStyle}"/>
+                                        Style="{StaticResource SecondaryButtonStyle}"/>
                                 <Button x:Name="btnRoutesModule" Content="Routes"
-                                        Background="#D35400" Foreground="White" BorderThickness="0"
                                         Height="35" Margin="5" Click="BtnRoutesModule_Click"
-                                        Style="{DynamicResource ModernButtonStyle}"/>
+                                        Style="{StaticResource SecondaryButtonStyle}"/>
                             </UniformGrid>
                         </StackPanel>
                     </Border>
 
                     <!-- Staff Management Card -->
-                    <Border Grid.Row="1" Grid.Column="0" Background="White" CornerRadius="10"
-                            Margin="10" Padding="20" BorderBrush="#E0E0E0" BorderThickness="1">
+                    <Border Grid.Row="1" Grid.Column="0" Style="{StaticResource CardStyle}">
                         <Border.Effect>
-                            <DropShadowEffect Color="Gray" ShadowDepth="3" BlurRadius="8" Opacity="0.3"/>
+                            <DropShadowEffect Color="#000000" ShadowDepth="2" BlurRadius="6" Opacity="0.1"/>
                         </Border.Effect>
                         <StackPanel>
                             <Grid>
@@ -142,34 +135,31 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <Border Grid.Column="0" Background="#9B59B6" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
+                                <Border Grid.Column="0" Background="{StaticResource AccentBrush}" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
                                     <TextBlock Text="👨‍🏫" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
 
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock Text="Staff Management" FontSize="20" FontWeight="Bold" Foreground="#2C3E50"/>
-                                    <TextBlock Text="Manage teachers, drivers, and support staff" FontSize="12" Foreground="Gray" Margin="0,5,0,0"/>
+                                    <TextBlock Text="Staff Management" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="Manage teachers, drivers, and support staff" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,5,0,0"/>
                                 </StackPanel>
                             </Grid>
 
                             <UniformGrid Columns="2" Margin="0,20,0,0">
                                 <Button x:Name="btnTeachersModule" Content="Teachers"
-                                        Background="#9B59B6" Foreground="White" BorderThickness="0"
                                         Height="35" Margin="5" Click="BtnTeachersModule_Click"
-                                        Style="{DynamicResource ModernButtonStyle}"/>
+                                        Style="{StaticResource SuccessButtonStyle}"/>
                                 <Button x:Name="btnSupportStaffModule" Content="Support Staff"
-                                        Background="#8E44AD" Foreground="White" BorderThickness="0"
                                         Height="35" Margin="5" Click="BtnSupportStaffModule_Click"
-                                        Style="{DynamicResource ModernButtonStyle}"/>
+                                        Style="{StaticResource SecondaryButtonStyle}"/>
                             </UniformGrid>
                         </StackPanel>
                     </Border>
 
                     <!-- Expense Management Card -->
-                    <Border Grid.Row="1" Grid.Column="1" Background="White" CornerRadius="10"
-                            Margin="10" Padding="20" BorderBrush="#E0E0E0" BorderThickness="1">
+                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource CardStyle}">
                         <Border.Effect>
-                            <DropShadowEffect Color="Gray" ShadowDepth="3" BlurRadius="8" Opacity="0.3"/>
+                            <DropShadowEffect Color="#000000" ShadowDepth="2" BlurRadius="6" Opacity="0.1"/>
                         </Border.Effect>
                         <StackPanel>
                             <Grid>
@@ -178,25 +168,23 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <Border Grid.Column="0" Background="#E74C3C" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
+                                <Border Grid.Column="0" Background="{StaticResource WarningBrush}" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
                                     <TextBlock Text="💰" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
 
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock Text="Expense Management" FontSize="20" FontWeight="Bold" Foreground="#2C3E50"/>
-                                    <TextBlock Text="Track finances, fees and expenditures" FontSize="12" Foreground="Gray" Margin="0,5,0,0"/>
+                                    <TextBlock Text="Expense Management" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="Track finances, fees and expenditures" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,5,0,0"/>
                                 </StackPanel>
                             </Grid>
 
                             <UniformGrid Columns="2" Margin="0,20,0,0">
                                 <Button x:Name="btnFeesModule" Content="Student Fees"
-                                        Background="#E74C3C" Foreground="White" BorderThickness="0"
                                         Height="35" Margin="5" Click="BtnFeesModule_Click"
-                                        Style="{DynamicResource ModernButtonStyle}"/>
+                                        Style="{StaticResource PrimaryButtonStyle}"/>
                                 <Button x:Name="btnExpensesModule" Content="Expenses"
-                                        Background="#C0392B" Foreground="White" BorderThickness="0"
                                         Height="35" Margin="5" Click="BtnExpensesModule_Click"
-                                        Style="{DynamicResource ModernButtonStyle}"/>
+                                        Style="{StaticResource SecondaryButtonStyle}"/>
                             </UniformGrid>
                         </StackPanel>
                     </Border>
@@ -205,36 +193,15 @@
         </ScrollViewer>
 
         <!-- Status Bar -->
-        <StatusBar Grid.Row="2" Height="30" Background="#34495E">
+        <StatusBar Grid.Row="2" Height="30" Background="{StaticResource SecondaryDarkBrush}">
             <StatusBarItem>
-                <TextBlock x:Name="lblStatus" Text="Dashboard Ready" Foreground="White"/>
+                <TextBlock x:Name="lblStatus" Text="Dashboard Ready" Foreground="{StaticResource TextOnPrimaryBrush}"/>
             </StatusBarItem>
         </StatusBar>
     </Grid>
 
-    <!-- Resources for Modern Button Style -->
+    <!-- Window Resources -->
     <Window.Resources>
-        <Style x:Key="ModernButtonStyle" TargetType="Button">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="5" BorderThickness="0">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Opacity" Value="0.8"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Opacity" Value="0.6"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-        </Style>
+        <!-- Local resources if needed -->
     </Window.Resources>
 </Window>

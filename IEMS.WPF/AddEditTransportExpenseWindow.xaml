@@ -11,16 +11,16 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Grid Grid.Row="0" Background="#E74C3C" Height="60">
+        <Grid Grid.Row="0" Background="{StaticResource DangerBrush}" Height="60">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
-                <Border Background="#C0392B" Width="40" Height="40" CornerRadius="20" Margin="0,0,15,0">
+                <Border Background="{StaticResource DangerDarkBrush}" Width="40" Height="40" CornerRadius="20" Margin="0,0,15,0">
                     <TextBlock Text="💰" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 </Border>
                 <StackPanel VerticalAlignment="Center">
                     <TextBlock x:Name="lblWindowTitle" Text="Add Transport Expense"
-                               FontSize="20" FontWeight="Bold" Foreground="White"/>
+                               FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextOnPrimaryBrush}"/>
                     <TextBlock Text="Enter expense details"
-                               FontSize="12" Foreground="LightGray"/>
+                               FontSize="12" Foreground="{StaticResource TextOnPrimaryBrush}" Opacity="0.8"/>
                 </StackPanel>
             </StackPanel>
         </Grid>
@@ -29,22 +29,22 @@
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="30">
             <StackPanel>
                 <!-- Validation Message -->
-                <Border x:Name="borderValidation" Background="#FFE6E6" BorderBrush="#FF6B6B"
+                <Border x:Name="borderValidation" Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource DangerBrush}"
                         BorderThickness="1" CornerRadius="5" Padding="15" Margin="0,0,0,20"
                         Visibility="Collapsed">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="⚠️" FontSize="16" Margin="0,0,10,0"/>
                         <TextBlock x:Name="lblValidationMessage" Text="Validation Error"
-                                   FontSize="14" Foreground="#CC0000" TextWrapping="Wrap"/>
+                                   FontSize="14" Foreground="{StaticResource DangerBrush}" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Border>
 
                 <!-- Vehicle Selection -->
                 <StackPanel Margin="0,0,0,20">
                     <TextBlock Text="Vehicle *" FontWeight="Bold" FontSize="14"
-                               Foreground="#2C3E50" Margin="0,0,0,8"/>
+                               Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
                     <ComboBox x:Name="cmbVehicle" Height="35" FontSize="14"
-                              BorderBrush="#BDC3C7" BorderThickness="2"
+                              BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="2"
                               DisplayMemberPath="DisplayText" SelectedValuePath="Id"/>
                 </StackPanel>
 
@@ -59,9 +59,9 @@
                     <!-- Category -->
                     <StackPanel Grid.Column="0">
                         <TextBlock Text="Category *" FontWeight="Bold" FontSize="14"
-                                   Foreground="#2C3E50" Margin="0,0,0,8"/>
+                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
                         <ComboBox x:Name="cmbCategory" Height="35" FontSize="14"
-                                  BorderBrush="#BDC3C7" BorderThickness="2"
+                                  BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="2"
                                   DisplayMemberPath="Display" SelectedValuePath="Value"
                                   SelectionChanged="CmbCategory_SelectionChanged"/>
                     </StackPanel>
@@ -69,19 +69,19 @@
                     <!-- Fuel Type -->
                     <StackPanel Grid.Column="2">
                         <TextBlock Text="Fuel Type" FontWeight="Bold" FontSize="14"
-                                   Foreground="#2C3E50" Margin="0,0,0,8"/>
+                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
                         <ComboBox x:Name="cmbFuelType" Height="35" FontSize="14"
-                                  BorderBrush="#BDC3C7" BorderThickness="2"
+                                  BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="2"
                                   DisplayMemberPath="Display" SelectedValuePath="Value"/>
                     </StackPanel>
                 </Grid>
 
                 <!-- Amount and Quantity -->
-                <Border Background="#F8F9FA" BorderBrush="#E0E0E0" BorderThickness="1"
+                <Border Background="{StaticResource SurfaceBrush}" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
                         CornerRadius="8" Padding="20" Margin="0,0,0,20">
                     <StackPanel>
                         <TextBlock Text="Amount &amp; Quantity Details" FontSize="16" FontWeight="Bold"
-                                   Foreground="#2C3E50" Margin="0,0,0,15"/>
+                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,15"/>
 
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -95,33 +95,33 @@
                             <!-- Amount -->
                             <StackPanel Grid.Column="0">
                                 <TextBlock Text="Amount (₹) *" FontWeight="Bold" FontSize="14"
-                                           Foreground="#2C3E50" Margin="0,0,0,8"/>
+                                           Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
                                 <TextBox x:Name="txtAmount" Height="35" FontSize="14"
-                                         BorderBrush="#BDC3C7" BorderThickness="2" Padding="10"
+                                         BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="2" Padding="10"
                                          TextChanged="AmountQuantity_TextChanged"/>
                             </StackPanel>
 
                             <!-- Quantity -->
                             <StackPanel Grid.Column="2">
                                 <TextBlock Text="Quantity *" FontWeight="Bold" FontSize="14"
-                                           Foreground="#2C3E50" Margin="0,0,0,8"/>
+                                           Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
                                 <TextBox x:Name="txtQuantity" Height="35" FontSize="14"
-                                         BorderBrush="#BDC3C7" BorderThickness="2" Padding="10"
+                                         BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="2" Padding="10"
                                          TextChanged="AmountQuantity_TextChanged"/>
                             </StackPanel>
 
                             <!-- Price per Unit (Calculated) -->
                             <StackPanel Grid.Column="4">
                                 <TextBlock Text="Price per Unit" FontWeight="Bold" FontSize="14"
-                                           Foreground="#2C3E50" Margin="0,0,0,8"/>
+                                           Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
                                 <TextBox x:Name="txtPricePerUnit" Height="35" FontSize="14"
-                                         BorderBrush="#BDC3C7" BorderThickness="2" Padding="10"
-                                         IsReadOnly="True" Background="#F8F9FA"/>
+                                         BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="2" Padding="10"
+                                         IsReadOnly="True" Background="{StaticResource SurfaceBrush}"/>
                             </StackPanel>
                         </Grid>
 
                         <TextBlock Text="Price per unit is automatically calculated: Amount ÷ Quantity"
-                                   FontSize="11" Foreground="Gray" Margin="0,8,0,0" TextWrapping="Wrap"/>
+                                   FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,8,0,0" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Border>
 
@@ -136,52 +136,50 @@
                     <!-- Expense Date -->
                     <StackPanel Grid.Column="0">
                         <TextBlock Text="Expense Date *" FontWeight="Bold" FontSize="14"
-                                   Foreground="#2C3E50" Margin="0,0,0,8"/>
+                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
                         <DatePicker x:Name="dpExpenseDate" Height="35" FontSize="14"
-                                    BorderBrush="#BDC3C7" BorderThickness="2"/>
+                                    BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="2"/>
                     </StackPanel>
 
                     <!-- Driver Name -->
                     <StackPanel Grid.Column="2">
                         <TextBlock Text="Driver Name" FontWeight="Bold" FontSize="14"
-                                   Foreground="#2C3E50" Margin="0,0,0,8"/>
+                                   Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
                         <TextBox x:Name="txtDriverName" Height="35" FontSize="14"
-                                 BorderBrush="#BDC3C7" BorderThickness="2" Padding="10"/>
+                                 BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="2" Padding="10"/>
                     </StackPanel>
                 </Grid>
 
                 <!-- Description -->
                 <StackPanel Margin="0,0,0,20">
                     <TextBlock Text="Description" FontWeight="Bold" FontSize="14"
-                               Foreground="#2C3E50" Margin="0,0,0,8"/>
+                               Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
                     <TextBox x:Name="txtDescription" Height="60" FontSize="14"
-                             BorderBrush="#BDC3C7" BorderThickness="2" Padding="10"
+                             BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="2" Padding="10"
                              TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
-                    <TextBlock Text="e.g., Fuel refill at City Petrol Pump" FontSize="11" Foreground="Gray" Margin="0,3,0,0"/>
+                    <TextBlock Text="e.g., Fuel refill at City Petrol Pump" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,3,0,0"/>
                 </StackPanel>
 
                 <!-- Invoice Number -->
                 <StackPanel Margin="0,0,0,0">
                     <TextBlock Text="Invoice/Bill Number" FontWeight="Bold" FontSize="14"
-                               Foreground="#2C3E50" Margin="0,0,0,8"/>
+                               Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,8"/>
                     <TextBox x:Name="txtInvoiceNumber" Height="35" FontSize="14"
-                             BorderBrush="#BDC3C7" BorderThickness="2" Padding="10"/>
-                    <TextBlock Text="e.g., INV-2024-001" FontSize="11" Foreground="Gray" Margin="0,3,0,0"/>
+                             BorderBrush="{StaticResource BorderDarkBrush}" BorderThickness="2" Padding="10"/>
+                    <TextBlock Text="e.g., INV-2024-001" FontSize="11" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,3,0,0"/>
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
 
         <!-- Action Buttons -->
-        <Border Grid.Row="2" Background="#ECF0F1" Padding="20">
+        <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" Padding="20">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Button x:Name="btnCancel" Content="Cancel"
-                        Background="#95A5A6" Foreground="White" BorderThickness="0"
                         Height="40" Width="100" Margin="0,0,10,0" Click="BtnCancel_Click"
-                        Style="{DynamicResource ModernButtonStyle}"/>
+                        Style="{StaticResource SecondaryButtonStyle}"/>
                 <Button x:Name="btnSave" Content="Save Expense"
-                        Background="#27AE60" Foreground="White" BorderThickness="0"
                         Height="40" Width="120" Click="BtnSave_Click"
-                        Style="{DynamicResource ModernButtonStyle}"/>
+                        Style="{StaticResource SuccessButtonStyle}"/>
             </StackPanel>
         </Border>
     </Grid>

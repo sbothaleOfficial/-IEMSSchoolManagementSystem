@@ -11,10 +11,10 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <StackPanel Grid.Row="0" Background="#9B59B6" Orientation="Horizontal" Height="60">
+        <StackPanel Grid.Row="0" Background="{StaticResource PrimaryBrush}" Orientation="Horizontal" Height="60">
             <TextBlock Text="👨‍🏫" FontSize="26" Margin="20,0" VerticalAlignment="Center"/>
             <TextBlock Text="Class Teachers Management System"
-                       FontSize="20" FontWeight="Bold" Foreground="White"
+                       FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextOnPrimaryBrush}"
                        VerticalAlignment="Center" Margin="10,0,0,0"/>
         </StackPanel>
 
@@ -27,18 +27,18 @@
 
             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,20">
                 <Button x:Name="btnAddTeacher" Content="Add Class Teacher" Width="120" Height="35" Margin="0,0,10,0"
-                        Click="BtnAddTeacher_Click" Background="#2ECC71" Foreground="White" BorderThickness="0"/>
+                        Click="BtnAddTeacher_Click" Style="{StaticResource SuccessButtonStyle}"/>
                 <Button x:Name="btnEditTeacher" Content="Edit Class Teacher" Width="120" Height="35" Margin="0,0,10,0"
-                        Click="BtnEditTeacher_Click" Background="#F39C12" Foreground="White" BorderThickness="0"/>
+                        Click="BtnEditTeacher_Click" Style="{StaticResource PrimaryButtonStyle}"/>
                 <Button x:Name="btnDeleteTeacher" Content="Delete Class Teacher" Width="130" Height="35" Margin="0,0,10,0"
-                        Click="BtnDeleteTeacher_Click" Background="#E74C3C" Foreground="White" BorderThickness="0"/>
+                        Click="BtnDeleteTeacher_Click" Style="{StaticResource DangerButtonStyle}"/>
                 <Button x:Name="btnRefreshTeachers" Content="Refresh" Width="100" Height="35" Margin="0,0,10,0"
-                        Click="BtnRefreshTeachers_Click" Background="#95A5A6" Foreground="White" BorderThickness="0"/>
+                        Click="BtnRefreshTeachers_Click" Style="{StaticResource SecondaryButtonStyle}"/>
             </StackPanel>
 
             <DataGrid x:Name="dgTeachers" Grid.Row="1" AutoGenerateColumns="False"
                       CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                      GridLinesVisibility="All" HeadersVisibility="Column" AlternatingRowBackground="#F8F9FA">
+                      GridLinesVisibility="All" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}">
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Employee ID" Binding="{Binding EmployeeId}" Width="120"/>
                     <DataGridTextColumn Header="First Name" Binding="{Binding FirstName}" Width="150"/>
@@ -50,9 +50,9 @@
         </Grid>
 
         <!-- Status Bar -->
-        <StatusBar Grid.Row="2" Height="25" Background="#34495E">
+        <StatusBar Grid.Row="2" Height="25" Background="{StaticResource SecondaryDarkBrush}">
             <StatusBarItem>
-                <TextBlock x:Name="lblStatus" Text="Ready" Foreground="White"/>
+                <TextBlock x:Name="lblStatus" Text="Ready" Foreground="{StaticResource TextOnPrimaryBrush}"/>
             </StatusBarItem>
         </StatusBar>
     </Grid>
