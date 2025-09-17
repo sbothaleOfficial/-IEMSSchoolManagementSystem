@@ -5,15 +5,15 @@
     <Application.Resources>
         <!-- Professional Color Palette - Modern Blue-Gray Theme -->
 
-        <!-- Primary Colors -->
-        <SolidColorBrush x:Key="PrimaryBrush" Color="#2563EB"/>
-        <SolidColorBrush x:Key="PrimaryDarkBrush" Color="#1E40AF"/>
-        <SolidColorBrush x:Key="PrimaryLightBrush" Color="#60A5FA"/>
+        <!-- Primary Colors - Professional Dark Blue (Microsoft Fluent Design) -->
+        <SolidColorBrush x:Key="PrimaryBrush" Color="#0078d4"/>
+        <SolidColorBrush x:Key="PrimaryDarkBrush" Color="#106ebe"/>
+        <SolidColorBrush x:Key="PrimaryLightBrush" Color="#deecf9"/>
 
-        <!-- Secondary Colors -->
-        <SolidColorBrush x:Key="SecondaryBrush" Color="#64748B"/>
-        <SolidColorBrush x:Key="SecondaryDarkBrush" Color="#475569"/>
-        <SolidColorBrush x:Key="SecondaryLightBrush" Color="#94A3B8"/>
+        <!-- Secondary Colors - Professional Gray -->
+        <SolidColorBrush x:Key="SecondaryBrush" Color="#605e5c"/>
+        <SolidColorBrush x:Key="SecondaryDarkBrush" Color="#323130"/>
+        <SolidColorBrush x:Key="SecondaryLightBrush" Color="#8a8886"/>
 
         <!-- Accent Colors -->
         <SolidColorBrush x:Key="AccentBrush" Color="#10B981"/>
