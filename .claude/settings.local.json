@@ -16,7 +16,8 @@
       "Bash(wmic process where:*)",
       "Bash(dotnet clean:*)",
       "Bash(cmd /c:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(./IEMS.WPF.exe)"
     ],
     "deny": [],
     "ask": []

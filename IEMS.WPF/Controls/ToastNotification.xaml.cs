@@ -30,7 +30,7 @@ namespace IEMS.WPF.Controls
         public static readonly DependencyProperty ToastIconProperty =
             DependencyProperty.Register("ToastIcon", typeof(string), typeof(ToastNotification));
 
-        private DispatcherTimer _hideTimer;
+        private DispatcherTimer? _hideTimer;
 
         public string Message
         {
