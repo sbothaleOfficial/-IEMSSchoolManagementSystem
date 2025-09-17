@@ -47,8 +47,7 @@
 
                     <DataGrid x:Name="dgStudents" Grid.Row="1" AutoGenerateColumns="False"
                               CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                              GridLinesVisibility="All" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}"
-                              RowStyle="{StaticResource ModernDataGridRowStyle}">
+                              GridLinesVisibility="All" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Serial No" Binding="{Binding SerialNo}" Width="70"/>
                             <DataGridTextColumn Header="Standard" Binding="{Binding Standard}" Width="70"/>
@@ -153,10 +152,10 @@
             </StatusBarItem>
         </StatusBar>
 
-        <!-- Loading Overlay -->
-        <controls:LoadingOverlay x:Name="loadingOverlay" IsLoading="False" LoadingMessage="Loading students..." Panel.ZIndex="999"/>
+        <!-- Loading Overlay - Temporarily Disabled -->
+        <!-- <controls:LoadingOverlay x:Name="loadingOverlay" IsLoading="False" LoadingMessage="Loading students..." Panel.ZIndex="999"/> -->
 
-        <!-- Toast Notifications -->
-        <controls:ToastNotification x:Name="toastNotification" Panel.ZIndex="1000"/>
+        <!-- Toast Notifications - Temporarily Disabled -->
+        <!-- <controls:ToastNotification x:Name="toastNotification" Panel.ZIndex="1000"/> -->
     </Grid>
 </Window>

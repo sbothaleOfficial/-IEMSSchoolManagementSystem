@@ -33,8 +33,8 @@ public partial class StudentsManagementWindow : Window
     {
         try
         {
-            loadingOverlay.IsLoading = true;
-            loadingOverlay.LoadingMessage = "Loading students...";
+            // loadingOverlay.IsLoading = true;
+            // loadingOverlay.LoadingMessage = "Loading students...";
             lblStatus.Text = "Loading students...";
 
             var students = await _studentService.GetAllStudentsAsync();
@@ -43,21 +43,21 @@ public partial class StudentsManagementWindow : Window
 
             lblStatus.Text = $"Loaded {students.Count()} students";
 
-            toastNotification.Message = $"Successfully loaded {students.Count()} students";
-            toastNotification.ToastType = ToastType.Success;
-            toastNotification.Show();
+            // toastNotification.Message = $"Successfully loaded {students.Count()} students";
+            // toastNotification.ToastType = ToastType.Success;
+            // toastNotification.Show();
         }
         catch (Exception ex)
         {
             lblStatus.Text = "Error loading students";
 
-            toastNotification.Message = $"Error loading students: {ex.Message}";
-            toastNotification.ToastType = ToastType.Error;
-            toastNotification.Show();
+            // toastNotification.Message = $"Error loading students: {ex.Message}";
+            // toastNotification.ToastType = ToastType.Error;
+            // toastNotification.Show();
         }
         finally
         {
-            loadingOverlay.IsLoading = false;
+            // loadingOverlay.IsLoading = false;
         }
     }
 
@@ -122,8 +122,8 @@ public partial class StudentsManagementWindow : Window
             {
                 try
                 {
-                    loadingOverlay.IsLoading = true;
-                    loadingOverlay.LoadingMessage = "Deleting student...";
+                    // loadingOverlay.IsLoading = true;
+                    // loadingOverlay.LoadingMessage = "Deleting student...";
 
                     await _studentService.DeleteStudentAsync(selectedStudent.Id);
                     var currentSearch = txtSearchStudents.Text;
@@ -131,22 +131,22 @@ public partial class StudentsManagementWindow : Window
                     LoadClasses(); // Refresh to update student counts in classes
                     txtSearchStudents.Text = currentSearch; // Restore search after refresh
 
-                    toastNotification.Message = $"Student {selectedStudent.FullName} deleted successfully";
-                    toastNotification.ToastType = ToastType.Success;
-                    toastNotification.Show();
+                    // toastNotification.Message = $"Student {selectedStudent.FullName} deleted successfully";
+                    // toastNotification.ToastType = ToastType.Success;
+                    // toastNotification.Show();
                     FilterStudents();
                     lblStatus.Text = "Student deleted successfully";
                 }
                 catch (Exception ex)
                 {
-                    toastNotification.Message = $"Error deleting student: {ex.Message}";
-                    toastNotification.ToastType = ToastType.Error;
-                    toastNotification.Show();
+                    // toastNotification.Message = $"Error deleting student: {ex.Message}";
+                    // toastNotification.ToastType = ToastType.Error;
+                    // toastNotification.Show();
                     lblStatus.Text = "Error deleting student";
                 }
                 finally
                 {
-                    loadingOverlay.IsLoading = false;
+                    // loadingOverlay.IsLoading = false;
                 }
             }
         }
