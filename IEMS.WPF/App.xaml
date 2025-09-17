@@ -5,31 +5,31 @@
     <Application.Resources>
         <!-- Professional Color Palette - Modern Blue-Gray Theme -->
 
-        <!-- Primary Colors - Professional Dark Blue (Microsoft Fluent Design) -->
+        <!-- Primary Colors - Microsoft Fluent Design Light Theme -->
         <SolidColorBrush x:Key="PrimaryBrush" Color="#0078d4"/>
         <SolidColorBrush x:Key="PrimaryDarkBrush" Color="#106ebe"/>
-        <SolidColorBrush x:Key="PrimaryLightBrush" Color="#deecf9"/>
+        <SolidColorBrush x:Key="PrimaryLightBrush" Color="#eff6fc"/>
 
-        <!-- Secondary Colors - Professional Gray -->
+        <!-- Secondary Colors - Microsoft Fluent Design Neutrals -->
         <SolidColorBrush x:Key="SecondaryBrush" Color="#605e5c"/>
         <SolidColorBrush x:Key="SecondaryDarkBrush" Color="#323130"/>
-        <SolidColorBrush x:Key="SecondaryLightBrush" Color="#8a8886"/>
+        <SolidColorBrush x:Key="SecondaryLightBrush" Color="#f3f2f1"/>
 
         <!-- Accent Colors -->
         <SolidColorBrush x:Key="AccentBrush" Color="#10B981"/>
         <SolidColorBrush x:Key="AccentDarkBrush" Color="#059669"/>
         <SolidColorBrush x:Key="AccentLightBrush" Color="#34D399"/>
 
-        <!-- Background Colors -->
-        <SolidColorBrush x:Key="BackgroundBrush" Color="#FFFFFF"/>
-        <SolidColorBrush x:Key="SurfaceBrush" Color="#F8FAFC"/>
-        <SolidColorBrush x:Key="CardBrush" Color="#FFFFFF"/>
+        <!-- Background Colors - Microsoft Fluent Design Light -->
+        <SolidColorBrush x:Key="BackgroundBrush" Color="#ffffff"/>
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#faf9f8"/>
+        <SolidColorBrush x:Key="CardBrush" Color="#ffffff"/>
 
-        <!-- Text Colors -->
-        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#1E293B"/>
-        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#64748B"/>
-        <SolidColorBrush x:Key="TextMutedBrush" Color="#94A3B8"/>
-        <SolidColorBrush x:Key="TextOnPrimaryBrush" Color="#FFFFFF"/>
+        <!-- Text Colors - Microsoft Fluent Design -->
+        <SolidColorBrush x:Key="TextPrimaryBrush" Color="#323130"/>
+        <SolidColorBrush x:Key="TextSecondaryBrush" Color="#605e5c"/>
+        <SolidColorBrush x:Key="TextMutedBrush" Color="#8a8886"/>
+        <SolidColorBrush x:Key="TextOnPrimaryBrush" Color="#ffffff"/>
 
         <!-- Semantic Colors -->
         <SolidColorBrush x:Key="DangerBrush" Color="#EF4444"/>
@@ -39,9 +39,9 @@
         <SolidColorBrush x:Key="SuccessBrush" Color="#10B981"/>
         <SolidColorBrush x:Key="InfoBrush" Color="#3B82F6"/>
 
-        <!-- Border Colors -->
-        <SolidColorBrush x:Key="BorderBrush" Color="#E2E8F0"/>
-        <SolidColorBrush x:Key="BorderDarkBrush" Color="#CBD5E1"/>
+        <!-- Border Colors - Microsoft Fluent Design -->
+        <SolidColorBrush x:Key="BorderBrush" Color="#edebe9"/>
+        <SolidColorBrush x:Key="BorderDarkBrush" Color="#d2d0ce"/>
 
         <!-- Modern Button Style -->
         <Style x:Key="ModernButtonStyle" TargetType="Button">
