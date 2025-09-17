@@ -151,13 +151,99 @@ public class ApplicationDbContext : DbContext
     private static void SeedData(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Teacher>().HasData(
-            new Teacher { Id = 1, FirstName = "John", LastName = "Smith", EmployeeId = "T001" },
-            new Teacher { Id = 2, FirstName = "Sarah", LastName = "Johnson", EmployeeId = "T002" }
+            new Teacher
+            {
+                Id = 1,
+                EmployeeId = "T001",
+                FirstName = "Priya",
+                LastName = "Sharma",
+                PhoneNumber = "9876543201",
+                Address = "123 Teachers Colony, Mumbai, Maharashtra",
+                JoiningDate = new DateTime(2020, 6, 15),
+                MonthlySalary = 55000,
+                Email = "priya.sharma@iemsschool.edu.in",
+                BankAccountNumber = "SBI1234567890",
+                AadharNumber = "1234-5678-9012",
+                PANNumber = "ABCDE1234F",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Teacher
+            {
+                Id = 2,
+                EmployeeId = "T002",
+                FirstName = "Rajesh",
+                LastName = "Patel",
+                PhoneNumber = "9876543202",
+                Address = "456 Gandhi Nagar, Pune, Maharashtra",
+                JoiningDate = new DateTime(2019, 4, 10),
+                MonthlySalary = 62000,
+                Email = "rajesh.patel@iemsschool.edu.in",
+                BankAccountNumber = "HDFC9876543210",
+                AadharNumber = "2345-6789-0123",
+                PANNumber = "FGHIJ5678K",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Teacher
+            {
+                Id = 3,
+                EmployeeId = "T003",
+                FirstName = "Anita",
+                LastName = "Kulkarni",
+                PhoneNumber = "9876543203",
+                Address = "789 Shivaji Park, Nashik, Maharashtra",
+                JoiningDate = new DateTime(2021, 8, 25),
+                MonthlySalary = 48000,
+                Email = "anita.kulkarni@iemsschool.edu.in",
+                BankAccountNumber = "ICICI5432109876",
+                AadharNumber = "3456-7890-1234",
+                PANNumber = "LMNOP9012Q",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Teacher
+            {
+                Id = 4,
+                EmployeeId = "T004",
+                FirstName = "Suresh",
+                LastName = "Gupta",
+                PhoneNumber = "9876543204",
+                Address = "101 Nehru Colony, Nagpur, Maharashtra",
+                JoiningDate = new DateTime(2018, 3, 12),
+                MonthlySalary = 68000,
+                Email = "suresh.gupta@iemsschool.edu.in",
+                BankAccountNumber = "AXIS6789012345",
+                AadharNumber = "4567-8901-2345",
+                PANNumber = "RSTUV3456W",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new Teacher
+            {
+                Id = 5,
+                EmployeeId = "T005",
+                FirstName = "Kavita",
+                LastName = "Singh",
+                PhoneNumber = "9876543205",
+                Address = "202 Laxmi Nagar, Aurangabad, Maharashtra",
+                JoiningDate = new DateTime(2022, 1, 18),
+                MonthlySalary = 45000,
+                Email = null,
+                BankAccountNumber = null,
+                AadharNumber = "5678-9012-3456",
+                PANNumber = null,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }
         );
 
         modelBuilder.Entity<Class>().HasData(
             new Class { Id = 1, Name = "Grade 10", Section = "A", TeacherId = 1 },
-            new Class { Id = 2, Name = "Grade 10", Section = "B", TeacherId = 2 }
+            new Class { Id = 2, Name = "Grade 10", Section = "B", TeacherId = 2 },
+            new Class { Id = 3, Name = "Grade 9", Section = "A", TeacherId = 3 },
+            new Class { Id = 4, Name = "Grade 9", Section = "B", TeacherId = 4 },
+            new Class { Id = 5, Name = "Grade 8", Section = "A", TeacherId = 5 }
         );
 
         modelBuilder.Entity<Student>().HasData(
