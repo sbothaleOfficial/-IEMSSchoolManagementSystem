@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
+using IEMS.WPF.Controls;
 
 namespace IEMS.WPF;
 
@@ -32,16 +33,31 @@ public partial class StudentsManagementWindow : Window
     {
         try
         {
+            loadingOverlay.IsLoading = true;
+            loadingOverlay.LoadingMessage = "Loading students...";
             lblStatus.Text = "Loading students...";
+
             var students = await _studentService.GetAllStudentsAsync();
             _allStudents = students.ToList();
             dgStudents.ItemsSource = _allStudents;
+
             lblStatus.Text = $"Loaded {students.Count()} students";
+
+            toastNotification.Message = $"Successfully loaded {students.Count()} students";
+            toastNotification.ToastType = ToastType.Success;
+            toastNotification.Show();
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error loading students: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             lblStatus.Text = "Error loading students";
+
+            toastNotification.Message = $"Error loading students: {ex.Message}";
+            toastNotification.ToastType = ToastType.Error;
+            toastNotification.Show();
+        }
+        finally
+        {
+            loadingOverlay.IsLoading = false;
         }
     }
 
@@ -106,17 +122,31 @@ public partial class StudentsManagementWindow : Window
             {
                 try
                 {
+                    loadingOverlay.IsLoading = true;
+                    loadingOverlay.LoadingMessage = "Deleting student...";
+
                     await _studentService.DeleteStudentAsync(selectedStudent.Id);
                     var currentSearch = txtSearchStudents.Text;
                     LoadStudents();
                     LoadClasses(); // Refresh to update student counts in classes
                     txtSearchStudents.Text = currentSearch; // Restore search after refresh
+
+                    toastNotification.Message = $"Student {selectedStudent.FullName} deleted successfully";
+                    toastNotification.ToastType = ToastType.Success;
+                    toastNotification.Show();
                     FilterStudents();
                     lblStatus.Text = "Student deleted successfully";
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error deleting student: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    toastNotification.Message = $"Error deleting student: {ex.Message}";
+                    toastNotification.ToastType = ToastType.Error;
+                    toastNotification.Show();
+                    lblStatus.Text = "Error deleting student";
+                }
+                finally
+                {
+                    loadingOverlay.IsLoading = false;
                 }
             }
         }

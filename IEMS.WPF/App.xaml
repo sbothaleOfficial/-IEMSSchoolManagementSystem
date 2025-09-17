@@ -77,35 +77,35 @@
         </Style>
 
         <!-- Primary Button Style -->
-        <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">
+        <Style x:Key="PrimaryButtonStyle" TargetType="Button" BasedOn="{StaticResource EnhancedButtonStyle}">
             <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource TextOnPrimaryBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
         </Style>
 
         <!-- Secondary Button Style -->
-        <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource EnhancedButtonStyle}">
             <Setter Property="Background" Value="{StaticResource SecondaryBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource TextOnPrimaryBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
         </Style>
 
         <!-- Success Button Style -->
-        <Style x:Key="SuccessButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">
+        <Style x:Key="SuccessButtonStyle" TargetType="Button" BasedOn="{StaticResource EnhancedButtonStyle}">
             <Setter Property="Background" Value="{StaticResource AccentBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource TextOnPrimaryBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
         </Style>
 
         <!-- Danger Button Style -->
-        <Style x:Key="DangerButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">
+        <Style x:Key="DangerButtonStyle" TargetType="Button" BasedOn="{StaticResource EnhancedButtonStyle}">
             <Setter Property="Background" Value="{StaticResource DangerBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource TextOnPrimaryBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
         </Style>
 
         <!-- Warning Button Style -->
-        <Style x:Key="WarningButtonStyle" TargetType="Button" BasedOn="{StaticResource ModernButtonStyle}">
+        <Style x:Key="WarningButtonStyle" TargetType="Button" BasedOn="{StaticResource EnhancedButtonStyle}">
             <Setter Property="Background" Value="{StaticResource WarningBrush}"/>
             <Setter Property="Foreground" Value="{StaticResource TextOnPrimaryBrush}"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -124,6 +124,83 @@
                     <DropShadowEffect Color="#000000" ShadowDepth="2" BlurRadius="6" Opacity="0.1"/>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <!-- Loading Spinner Style -->
+        <Style x:Key="LoadingSpinnerStyle" TargetType="Grid">
+            <Setter Property="Background" Value="#80000000"/>
+            <Setter Property="Visibility" Value="Collapsed"/>
+        </Style>
+
+        <!-- Loading Spinner Animation -->
+        <Storyboard x:Key="SpinnerRotation" RepeatBehavior="Forever">
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
+                           From="0" To="360" Duration="0:0:1.5"/>
+        </Storyboard>
+
+        <!-- Enhanced Button Styles with Hover Effects -->
+        <Style x:Key="EnhancedButtonStyle" TargetType="Button">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}"
+                                CornerRadius="6" BorderThickness="{TemplateBinding BorderThickness}"
+                                BorderBrush="{TemplateBinding BorderBrush}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                            Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.9"/>
+                                <Setter TargetName="border" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <TranslateTransform Y="-1"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Opacity" Value="0.8"/>
+                                <Setter TargetName="border" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <TranslateTransform Y="1"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Opacity" Value="0.5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- DataGrid Row Hover Style -->
+        <Style x:Key="ModernDataGridRowStyle" TargetType="DataGridRow">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Trigger.EnterActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                              To="#f0f7ff" Duration="0:0:0.15"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.EnterActions>
+                    <Trigger.ExitActions>
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <ColorAnimation Storyboard.TargetProperty="Background.Color"
+                                              Duration="0:0:0.15"/>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </Trigger.ExitActions>
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </Application.Resources>
 </Application>
