@@ -34,7 +34,7 @@
         </Grid>
 
         <!-- Dashboard Content -->
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="20">
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="20" Background="{StaticResource SurfaceBrush}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -102,7 +102,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <Border Grid.Column="0" Background="{StaticResource SecondaryBrush}" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
+                                <Border Grid.Column="0" Background="{StaticResource PrimaryBrush}" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
                                     <TextBlock Text="🚌" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
 
@@ -115,7 +115,7 @@
                             <UniformGrid Columns="2" Margin="0,20,0,0">
                                 <Button x:Name="btnBusesModule" Content="Buses"
                                         Height="35" Margin="5" Click="BtnBusesModule_Click"
-                                        Style="{StaticResource SecondaryButtonStyle}"/>
+                                        Style="{StaticResource PrimaryButtonStyle}"/>
                                 <Button x:Name="btnRoutesModule" Content="Routes"
                                         Height="35" Margin="5" Click="BtnRoutesModule_Click"
                                         Style="{StaticResource SecondaryButtonStyle}"/>
@@ -135,7 +135,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <Border Grid.Column="0" Background="{StaticResource AccentBrush}" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
+                                <Border Grid.Column="0" Background="{StaticResource PrimaryBrush}" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
                                     <TextBlock Text="👨‍🏫" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
 
@@ -148,7 +148,7 @@
                             <UniformGrid Columns="2" Margin="0,20,0,0">
                                 <Button x:Name="btnTeachersModule" Content="Teachers"
                                         Height="35" Margin="5" Click="BtnTeachersModule_Click"
-                                        Style="{StaticResource SuccessButtonStyle}"/>
+                                        Style="{StaticResource PrimaryButtonStyle}"/>
                                 <Button x:Name="btnSupportStaffModule" Content="Support Staff"
                                         Height="35" Margin="5" Click="BtnSupportStaffModule_Click"
                                         Style="{StaticResource SecondaryButtonStyle}"/>
@@ -168,7 +168,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <Border Grid.Column="0" Background="{StaticResource WarningBrush}" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
+                                <Border Grid.Column="0" Background="{StaticResource PrimaryBrush}" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
                                     <TextBlock Text="💰" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
 
