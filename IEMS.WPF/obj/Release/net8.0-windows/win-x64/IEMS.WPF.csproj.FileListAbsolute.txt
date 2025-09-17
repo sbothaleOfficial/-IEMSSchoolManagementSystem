@@ -165,3 +165,4 @@ C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-w
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\Controls\LoadingOverlay.g.cs
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\Controls\ToastNotification.g.cs
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\IEMS.WPF_MarkupCompile.lref
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\win-x64\GeneratedInternalTypeHelper.g.cs

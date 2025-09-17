@@ -43,6 +43,9 @@
         <SolidColorBrush x:Key="BorderBrush" Color="#edebe9"/>
         <SolidColorBrush x:Key="BorderDarkBrush" Color="#d2d0ce"/>
 
+        <!-- Converters -->
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
         <!-- Modern Button Style -->
         <Style x:Key="ModernButtonStyle" TargetType="Button">
             <Setter Property="FontWeight" Value="SemiBold"/>

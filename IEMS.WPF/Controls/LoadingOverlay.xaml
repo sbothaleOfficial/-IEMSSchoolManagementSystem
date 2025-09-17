@@ -4,8 +4,10 @@
              x:Name="LoadingOverlayControl">
     <Grid Background="#80000000" Visibility="{Binding IsLoading, ElementName=LoadingOverlayControl, Converter={StaticResource BooleanToVisibilityConverter}}">
         <Border Background="{StaticResource CardBrush}" CornerRadius="10" Padding="30"
-                HorizontalAlignment="Center" VerticalAlignment="Center"
-                Effect="{StaticResource {x:Static SystemParameters.DropShadowKey}}">
+                HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Border.Effect>
+                <DropShadowEffect Color="Black" Direction="315" ShadowDepth="5" Opacity="0.3" BlurRadius="10"/>
+            </Border.Effect>
             <StackPanel Orientation="Horizontal">
                 <Border Width="24" Height="24" Margin="0,0,15,0">
                     <Border.RenderTransform>

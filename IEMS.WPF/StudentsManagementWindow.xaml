@@ -152,10 +152,10 @@
             </StatusBarItem>
         </StatusBar>
 
-        <!-- Loading Overlay - Temporarily Disabled -->
-        <!-- <controls:LoadingOverlay x:Name="loadingOverlay" IsLoading="False" LoadingMessage="Loading students..." Panel.ZIndex="999"/> -->
+        <!-- Loading Overlay -->
+        <controls:LoadingOverlay x:Name="loadingOverlay" IsLoading="False" LoadingMessage="Loading students..." Panel.ZIndex="999"/>
 
-        <!-- Toast Notifications - Temporarily Disabled -->
-        <!-- <controls:ToastNotification x:Name="toastNotification" Panel.ZIndex="1000"/> -->
+        <!-- Toast Notifications -->
+        <controls:ToastNotification x:Name="toastNotification" Panel.ZIndex="1000"/>
     </Grid>
 </Window>
