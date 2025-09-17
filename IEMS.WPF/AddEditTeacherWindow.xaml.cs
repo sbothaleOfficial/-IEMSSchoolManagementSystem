@@ -27,6 +27,19 @@ public partial class AddEditTeacherWindow : Window
             txtEmployeeId.Text = _teacherToEdit.EmployeeId;
             txtFirstName.Text = _teacherToEdit.FirstName;
             txtLastName.Text = _teacherToEdit.LastName;
+            txtPhoneNumber.Text = _teacherToEdit.PhoneNumber;
+            txtAddress.Text = _teacherToEdit.Address;
+            dpJoiningDate.SelectedDate = _teacherToEdit.JoiningDate;
+            txtMonthlySalary.Text = _teacherToEdit.MonthlySalary.ToString("F2");
+
+            txtEmail.Text = _teacherToEdit.Email ?? "";
+            txtBankAccount.Text = _teacherToEdit.BankAccountNumber ?? "";
+            txtAadharNumber.Text = _teacherToEdit.AadharNumber ?? "";
+            txtPANNumber.Text = _teacherToEdit.PANNumber ?? "";
+        }
+        else
+        {
+            dpJoiningDate.SelectedDate = DateTime.Today;
         }
     }
 
@@ -42,7 +55,15 @@ public partial class AddEditTeacherWindow : Window
                 Id = _teacherToEdit?.Id ?? 0,
                 EmployeeId = txtEmployeeId.Text.Trim(),
                 FirstName = txtFirstName.Text.Trim(),
-                LastName = txtLastName.Text.Trim()
+                LastName = txtLastName.Text.Trim(),
+                PhoneNumber = txtPhoneNumber.Text.Trim(),
+                Address = txtAddress.Text.Trim(),
+                JoiningDate = dpJoiningDate.SelectedDate ?? DateTime.Today,
+                MonthlySalary = decimal.TryParse(txtMonthlySalary.Text.Trim(), out var salary) ? salary : 0,
+                Email = string.IsNullOrWhiteSpace(txtEmail.Text) ? null : txtEmail.Text.Trim(),
+                BankAccountNumber = string.IsNullOrWhiteSpace(txtBankAccount.Text) ? null : txtBankAccount.Text.Trim(),
+                AadharNumber = string.IsNullOrWhiteSpace(txtAadharNumber.Text) ? null : txtAadharNumber.Text.Trim(),
+                PANNumber = string.IsNullOrWhiteSpace(txtPANNumber.Text) ? null : txtPANNumber.Text.Trim()
             };
 
             // Check for unique employee ID
@@ -102,6 +123,56 @@ public partial class AddEditTeacherWindow : Window
             return false;
         }
 
+        if (string.IsNullOrWhiteSpace(txtPhoneNumber.Text))
+        {
+            MessageBox.Show("Phone number is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtPhoneNumber.Focus();
+            return false;
+        }
+
+        if (string.IsNullOrWhiteSpace(txtAddress.Text))
+        {
+            MessageBox.Show("Address is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtAddress.Focus();
+            return false;
+        }
+
+        if (!dpJoiningDate.SelectedDate.HasValue)
+        {
+            MessageBox.Show("Joining date is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            dpJoiningDate.Focus();
+            return false;
+        }
+
+        if (!decimal.TryParse(txtMonthlySalary.Text.Trim(), out var salary) || salary < 0)
+        {
+            MessageBox.Show("Please enter a valid monthly salary.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtMonthlySalary.Focus();
+            txtMonthlySalary.SelectAll();
+            return false;
+        }
+
+        // Optional field validations
+        if (!string.IsNullOrWhiteSpace(txtEmail.Text) && !IsValidEmail(txtEmail.Text.Trim()))
+        {
+            MessageBox.Show("Please enter a valid email address.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtEmail.Focus();
+            return false;
+        }
+
         return true;
+    }
+
+    private bool IsValidEmail(string email)
+    {
+        try
+        {
+            var addr = new System.Net.Mail.MailAddress(email);
+            return addr.Address == email;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

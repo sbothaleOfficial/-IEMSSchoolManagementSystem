@@ -17,7 +17,8 @@
       "Bash(dotnet clean:*)",
       "Bash(cmd /c:*)",
       "Bash(git commit:*)",
-      "Bash(./IEMS.WPF.exe)"
+      "Bash(./IEMS.WPF.exe)",
+      "Bash(del school.db)"
     ],
     "deny": [],
     "ask": []
