@@ -1,26 +1,22 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git init:*)",
-      "Bash(mkdir:*)",
-      "Bash(dotnet build:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)",
       "Bash(dotnet run:*)",
-      "Bash(dotnet --list-sdks)",
-      "Bash(dotnet --list-runtimes)",
+      "Bash(grep:*)",
+      "Bash(git add:*)",
+      "Bash(sed:*)",
+      "Read(//c//**)",
+      "Bash(cat:*)",
+      "Bash(dotnet build:*)",
       "Bash(taskkill:*)",
+      "WebSearch",
       "Bash(dotnet publish:*)",
-      "Bash(cmd.exe /c \"start publish\\IEMS.WPF.exe\")",
-      "Bash(csc:*)",
-      "Bash(tasklist)",
-      "Bash(explorer.exe publish:*)",
-      "Bash(powershell:*)",
-      "Bash(timeout:*)",
-      "Bash(publish_newIEMS.WPF.exe)",
-      "Bash(publish_new/IEMS.WPF.exe)",
       "Bash(publish_latest/IEMS.WPF.exe)",
-      "Bash(git tag:*)"
+      "Read(//c/Users/SP/Desktop/**)",
+      "Bash(wmic process where:*)",
+      "Bash(dotnet clean:*)",
+      "Bash(cmd /c:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [],
     "ask": []

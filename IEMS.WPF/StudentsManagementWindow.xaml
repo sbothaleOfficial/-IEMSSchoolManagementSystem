@@ -28,11 +28,11 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,10">
-                        <Button x:Name="btnAddStudent" Content="Add Student" Width="100" Height="35" Margin="0,0,10,0"
+                        <Button x:Name="btnAddStudent" Content="Add Student" Width="120" Height="35" Margin="0,0,10,0"
                                 Click="BtnAddStudent_Click" Style="{StaticResource SuccessButtonStyle}"/>
-                        <Button x:Name="btnEditStudent" Content="Edit Student" Width="100" Height="35" Margin="0,0,10,0"
+                        <Button x:Name="btnEditStudent" Content="Edit Student" Width="120" Height="35" Margin="0,0,10,0"
                                 Click="BtnEditStudent_Click" Style="{StaticResource PrimaryButtonStyle}"/>
-                        <Button x:Name="btnDeleteStudent" Content="Delete Student" Width="100" Height="35" Margin="0,0,10,0"
+                        <Button x:Name="btnDeleteStudent" Content="Delete Student" Width="130" Height="35" Margin="0,0,10,0"
                                 Click="BtnDeleteStudent_Click" Style="{StaticResource DangerButtonStyle}"/>
                         <Button x:Name="btnRefreshStudents" Content="Refresh" Width="100" Height="35" Margin="0,0,10,0"
                                 Click="BtnRefreshStudents_Click" Style="{StaticResource SecondaryButtonStyle}"/>
@@ -77,11 +77,11 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,10">
-                        <Button x:Name="btnAddClass" Content="Add Class" Width="100" Height="35" Margin="0,0,10,0"
+                        <Button x:Name="btnAddClass" Content="Add Class" Width="120" Height="35" Margin="0,0,10,0"
                                 Click="BtnAddClass_Click" Style="{StaticResource SuccessButtonStyle}"/>
-                        <Button x:Name="btnEditClass" Content="Edit Class" Width="100" Height="35" Margin="0,0,10,0"
+                        <Button x:Name="btnEditClass" Content="Edit Class" Width="120" Height="35" Margin="0,0,10,0"
                                 Click="BtnEditClass_Click" Style="{StaticResource PrimaryButtonStyle}"/>
-                        <Button x:Name="btnDeleteClass" Content="Delete Class" Width="100" Height="35" Margin="0,0,10,0"
+                        <Button x:Name="btnDeleteClass" Content="Delete Class" Width="130" Height="35" Margin="0,0,10,0"
                                 Click="BtnDeleteClass_Click" Style="{StaticResource DangerButtonStyle}"/>
                         <Button x:Name="btnRefreshClasses" Content="Refresh" Width="100" Height="35" Margin="0,0,10,0"
                                 Click="BtnRefreshClasses_Click" Style="{StaticResource SecondaryButtonStyle}"/>
@@ -111,9 +111,9 @@
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,10">
                         <Button x:Name="btnAddFeePayment" Content="Record Payment" Width="120" Height="35" Margin="0,0,10,0"
                                 Click="BtnAddFeePayment_Click" Style="{StaticResource SuccessButtonStyle}"/>
-                        <Button x:Name="btnViewReceipt" Content="View Receipt" Width="100" Height="35" Margin="0,0,10,0"
+                        <Button x:Name="btnViewReceipt" Content="View Receipt" Width="120" Height="35" Margin="0,0,10,0"
                                 Click="BtnViewReceipt_Click" Style="{StaticResource PrimaryButtonStyle}"/>
-                        <Button x:Name="btnPrintReceipt" Content="Print Receipt" Width="100" Height="35" Margin="0,0,10,0"
+                        <Button x:Name="btnPrintReceipt" Content="Print Receipt" Width="120" Height="35" Margin="0,0,10,0"
                                 Click="BtnPrintReceipt_Click" Background="#9B59B6" Foreground="White" BorderThickness="0"/>
                         <Button x:Name="btnRefreshFeePayments" Content="Refresh" Width="100" Height="35" Margin="0,0,10,0"
                                 Click="BtnRefreshFeePayments_Click" Style="{StaticResource SecondaryButtonStyle}"/>

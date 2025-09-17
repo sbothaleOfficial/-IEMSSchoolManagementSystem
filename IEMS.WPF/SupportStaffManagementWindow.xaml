@@ -28,15 +28,15 @@
 
             <!-- Action Buttons -->
             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,20">
-                <Button x:Name="btnAddStaff" Content="Add Staff" Width="100" Height="35" Margin="0,0,10,0"
+                <Button x:Name="btnAddStaff" Content="Add Staff" Width="120" Height="35" Margin="0,0,10,0"
                         Click="BtnAddStaff_Click" Style="{StaticResource SuccessButtonStyle}"/>
-                <Button x:Name="btnEditStaff" Content="Edit Staff" Width="100" Height="35" Margin="0,0,10,0"
+                <Button x:Name="btnEditStaff" Content="Edit Staff" Width="120" Height="35" Margin="0,0,10,0"
                         Click="BtnEditStaff_Click" Style="{StaticResource PrimaryButtonStyle}"/>
-                <Button x:Name="btnDeleteStaff" Content="Delete Staff" Width="100" Height="35" Margin="0,0,10,0"
+                <Button x:Name="btnDeleteStaff" Content="Delete Staff" Width="130" Height="35" Margin="0,0,10,0"
                         Click="BtnDeleteStaff_Click" Style="{StaticResource DangerButtonStyle}"/>
                 <Button x:Name="btnRefresh" Content="Refresh" Width="100" Height="35" Margin="0,0,10,0"
                         Click="BtnRefresh_Click" Style="{StaticResource SecondaryButtonStyle}"/>
-                <Button x:Name="btnClearSearch" Content="Clear Search" Width="120" Height="35" Margin="0,0,10,0"
+                <Button x:Name="btnClearSearch" Content="Clear Search" Width="130" Height="35" Margin="0,0,10,0"
                         Click="BtnClearSearch_Click" Style="{StaticResource SecondaryButtonStyle}"/>
                 <Separator Width="20"/>
                 <TextBlock Text="Search:" VerticalAlignment="Center" Margin="10,0,5,0"/>

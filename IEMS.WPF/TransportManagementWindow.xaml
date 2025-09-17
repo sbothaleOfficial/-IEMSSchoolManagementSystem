@@ -32,10 +32,10 @@
 
             <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
                 <Button x:Name="btnRefresh" Content="🔄 Refresh"
-                        Height="35" Width="80" Margin="5" Click="BtnRefresh_Click"
+                        Height="35" Width="100" Margin="5" Click="BtnRefresh_Click"
                         Style="{StaticResource WarningButtonStyle}"/>
                 <Button x:Name="btnClose" Content="✖ Close"
-                        Height="35" Width="70" Margin="5" Click="BtnClose_Click"
+                        Height="35" Width="90" Margin="5" Click="BtnClose_Click"
                         Style="{StaticResource DangerButtonStyle}"/>
             </StackPanel>
         </Grid>
@@ -53,16 +53,16 @@
                     <!-- Vehicle Controls -->
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
                         <Button x:Name="btnAddVehicle" Content="➕ Add Vehicle"
-                                Height="35" Width="120" Margin="0,0,10,0" Click="BtnAddVehicle_Click"
+                                Height="35" Width="130" Margin="0,0,10,0" Click="BtnAddVehicle_Click"
                                 Style="{StaticResource SuccessButtonStyle}"/>
                         <Button x:Name="btnEditVehicle" Content="✏️ Edit Vehicle"
-                                Height="35" Width="120" Margin="0,0,10,0" Click="BtnEditVehicle_Click"
+                                Height="35" Width="130" Margin="0,0,10,0" Click="BtnEditVehicle_Click"
                                 Style="{StaticResource PrimaryButtonStyle}"/>
                         <Button x:Name="btnDeleteVehicle" Content="🗑️ Delete Vehicle"
-                                Height="35" Width="130" Margin="0,0,10,0" Click="BtnDeleteVehicle_Click"
+                                Height="35" Width="140" Margin="0,0,10,0" Click="BtnDeleteVehicle_Click"
                                 Style="{StaticResource DangerButtonStyle}"/>
                         <Button x:Name="btnViewExpenses" Content="📊 View Expenses"
-                                Height="35" Width="130" Margin="0,0,10,0" Click="BtnViewExpenses_Click"
+                                Height="35" Width="140" Margin="0,0,10,0" Click="BtnViewExpenses_Click"
                                 Style="{StaticResource SecondaryButtonStyle}"/>
                     </StackPanel>
 
@@ -102,13 +102,13 @@
                     <!-- Expense Controls -->
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
                         <Button x:Name="btnAddExpense" Content="➕ Add Expense"
-                                Height="35" Width="120" Margin="0,0,10,0" Click="BtnAddExpense_Click"
+                                Height="35" Width="130" Margin="0,0,10,0" Click="BtnAddExpense_Click"
                                 Style="{StaticResource SuccessButtonStyle}"/>
                         <Button x:Name="btnEditExpense" Content="✏️ Edit Expense"
-                                Height="35" Width="120" Margin="0,0,10,0" Click="BtnEditExpense_Click"
+                                Height="35" Width="130" Margin="0,0,10,0" Click="BtnEditExpense_Click"
                                 Style="{StaticResource PrimaryButtonStyle}"/>
                         <Button x:Name="btnDeleteExpense" Content="🗑️ Delete Expense"
-                                Height="35" Width="130" Margin="0,0,10,0" Click="BtnDeleteExpense_Click"
+                                Height="35" Width="150" Margin="0,0,10,0" Click="BtnDeleteExpense_Click"
                                 Style="{StaticResource DangerButtonStyle}"/>
                     </StackPanel>
 
@@ -133,7 +133,7 @@
                                         SelectedDateChanged="DateFilter_Changed"/>
 
                             <Button x:Name="btnClearFilter" Content="Clear Filter"
-                                    Height="30" Width="80" Click="BtnClearFilter_Click"
+                                    Height="30" Width="100" Click="BtnClearFilter_Click"
                                     Style="{StaticResource SecondaryButtonStyle}"/>
                         </StackPanel>
                     </Border>
