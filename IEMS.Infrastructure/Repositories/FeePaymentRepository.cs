@@ -121,9 +121,11 @@ public class FeePaymentRepository : IFeePaymentRepository
 
     public async Task<decimal> GetTotalPaidAmountByStudentAsync(int studentId, FeeType feeType)
     {
-        return await _context.FeePayments
+        var payments = await _context.FeePayments
             .Where(fp => fp.StudentId == studentId && fp.FeeType == feeType)
-            .SumAsync(fp => fp.AmountPaid);
+            .ToListAsync();
+
+        return payments.Sum(fp => fp.AmountPaid);
     }
 
     public async Task<decimal> GetPendingAmountByStudentAsync(int studentId, FeeType feeType)
