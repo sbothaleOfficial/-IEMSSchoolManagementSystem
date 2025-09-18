@@ -26,4 +26,11 @@ public class Student
 
     public virtual Class? Class { get; set; }
     public virtual ICollection<FeePayment> FeePayments { get; set; } = new List<FeePayment>();
+
+    public string FullName => $"{FirstName} {Surname}".Trim();
+    public string ClassWithDivision => !string.IsNullOrEmpty(ClassDivision)
+        ? $"{Standard} ({ClassDivision})"
+        : Standard;
+    public string FormattedDateOfBirth => DateOfBirth.ToString("dd/MM/yyyy");
+    public string FormattedAdmissionDate => AdmissionDate.ToString("dd/MM/yyyy");
 }

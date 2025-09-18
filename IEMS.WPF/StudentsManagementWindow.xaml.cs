@@ -27,6 +27,7 @@ public partial class StudentsManagementWindow : Window
         LoadStudents();
         LoadClasses();
         LoadFeePayments();
+        LoadBonafideStudents();
     }
 
     private async void LoadStudents()
@@ -430,5 +431,98 @@ public partial class StudentsManagementWindow : Window
 
         dgFeePayments.ItemsSource = filteredPayments;
         lblStatus.Text = $"Found {filteredPayments.Count} fee payments matching '{txtSearchFeePayments.Text}'";
+    }
+
+    // Bonafide Certificate Event Handlers
+    private async void BtnGenerateBonafide_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (dgBonafideStudents.SelectedItem is StudentDto selectedStudentDto)
+            {
+                // Get the full student entity from the service
+                var student = await _studentService.GetStudentEntityByIdAsync(selectedStudentDto.Id);
+                if (student != null)
+                {
+                    var bonafideWindow = new BonafideCertificateWindow(student);
+                    bonafideWindow.ShowDialog();
+                }
+                else
+                {
+                    toastNotification.Message = "Student not found!";
+                    toastNotification.ToastType = ToastType.Error;
+                    toastNotification.Show();
+                }
+            }
+            else
+            {
+                toastNotification.Message = "Please select a student to generate Bonafide certificate.";
+                toastNotification.ToastType = ToastType.Warning;
+                toastNotification.Show();
+            }
+        }
+        catch (Exception ex)
+        {
+            toastNotification.Message = $"Error generating certificate: {ex.Message}";
+            toastNotification.ToastType = ToastType.Error;
+            toastNotification.Show();
+        }
+    }
+
+    private void BtnRefreshBonafide_Click(object sender, RoutedEventArgs e)
+    {
+        LoadBonafideStudents();
+    }
+
+    private void LoadBonafideStudents()
+    {
+        try
+        {
+            // Use the same student data as the main students tab
+            dgBonafideStudents.ItemsSource = _allStudents;
+            lblStatus.Text = $"Loaded {_allStudents.Count} students for Bonafide certificates";
+        }
+        catch (Exception ex)
+        {
+            toastNotification.Message = $"Error loading students: {ex.Message}";
+            toastNotification.ToastType = ToastType.Error;
+            toastNotification.Show();
+        }
+    }
+
+    // Bonafide Search Functionality
+    private void TxtSearchBonafide_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        FilterBonafideStudents();
+    }
+
+    private void FilterBonafideStudents()
+    {
+        if (_allStudents == null || !_allStudents.Any())
+            return;
+
+        var searchText = txtSearchBonafide.Text.Trim().ToLower();
+
+        if (string.IsNullOrEmpty(searchText))
+        {
+            // Show all students if search is empty
+            dgBonafideStudents.ItemsSource = _allStudents;
+            lblStatus.Text = $"Showing all {_allStudents.Count} students";
+            return;
+        }
+
+        // Filter students based on multiple criteria
+        var filteredStudents = _allStudents.Where(student =>
+            student.FirstName.ToLower().Contains(searchText) ||
+            student.Surname.ToLower().Contains(searchText) ||
+            student.FatherName.ToLower().Contains(searchText) ||
+            student.MotherName.ToLower().Contains(searchText) ||
+            student.StudentNumber.ToLower().Contains(searchText) ||
+            student.Standard.ToLower().Contains(searchText) ||
+            student.ClassDivision.ToLower().Contains(searchText)
+        ).ToList();
+
+        dgBonafideStudents.ItemsSource = filteredStudents;
+        lblStatus.Text = $"Found {filteredStudents.Count} students matching '{txtSearchBonafide.Text}'";
     }
 }

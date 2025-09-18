@@ -23,7 +23,10 @@ public class StudentDto
     public int ClassId { get; set; }
     public string ClassName { get; set; } = string.Empty;
 
-    public string FullName => $"{FirstName} {Surname}";
+    public string FullName => $"{FirstName} {Surname}".Trim();
+    public string ClassWithDivision => !string.IsNullOrEmpty(ClassDivision)
+        ? $"{Standard} ({ClassDivision})"
+        : Standard;
     public string FormattedDateOfBirth => DateOfBirth.ToString("dd/MM/yyyy");
     public string FormattedAdmissionDate => AdmissionDate.ToString("dd/MM/yyyy");
 }

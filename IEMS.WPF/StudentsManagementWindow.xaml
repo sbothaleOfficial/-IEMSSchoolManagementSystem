@@ -143,6 +143,44 @@
                     </DataGrid>
                 </Grid>
             </TabItem>
+
+            <TabItem Header="📜 Bonafide" FontSize="14">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,10">
+                        <Button x:Name="btnGenerateBonafide" Content="Generate Certificate" Width="150" Height="35" Margin="0,0,10,0"
+                                Click="BtnGenerateBonafide_Click" Style="{StaticResource SuccessButtonStyle}"/>
+                        <Button x:Name="btnRefreshBonafide" Content="Refresh" Width="100" Height="35" Margin="0,0,10,0"
+                                Click="BtnRefreshBonafide_Click" Style="{StaticResource SecondaryButtonStyle}"/>
+                        <Separator Width="20"/>
+                        <TextBlock Text="Search:" VerticalAlignment="Center" Margin="10,0,5,0" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <TextBox x:Name="txtSearchBonafide" Width="200" Height="25" VerticalAlignment="Center"
+                                 TextChanged="TxtSearchBonafide_TextChanged"
+                                 ToolTip="Search by student name, student number, or class"/>
+                    </StackPanel>
+
+                    <DataGrid x:Name="dgBonafideStudents" Grid.Row="1" AutoGenerateColumns="False"
+                              CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                              GridLinesVisibility="All" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Student No" Binding="{Binding StudentNumber}" Width="100"/>
+                            <DataGridTextColumn Header="Full Name" Binding="{Binding FullName}" Width="200"/>
+                            <DataGridTextColumn Header="Father's Name" Binding="{Binding FatherName}" Width="150"/>
+                            <DataGridTextColumn Header="Mother's Name" Binding="{Binding MotherName}" Width="150"/>
+                            <DataGridTextColumn Header="Class" Binding="{Binding ClassWithDivision}" Width="100"/>
+                            <DataGridTextColumn Header="Date of Birth" Binding="{Binding FormattedDateOfBirth}" Width="100"/>
+                            <DataGridTextColumn Header="Admission Date" Binding="{Binding FormattedAdmissionDate}" Width="110"/>
+                            <DataGridTextColumn Header="Caste" Binding="{Binding CasteCategory}" Width="100"/>
+                            <DataGridTextColumn Header="Religion" Binding="{Binding Religion}" Width="100"/>
+                            <DataGridTextColumn Header="Gender" Binding="{Binding Gender}" Width="80"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
         </TabControl>
 
         <!-- Status Bar -->

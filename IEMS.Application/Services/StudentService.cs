@@ -142,4 +142,9 @@ public class StudentService
     {
         await _studentRepository.DeleteAsync(id);
     }
+
+    public async Task<Student?> GetStudentEntityByIdAsync(int id)
+    {
+        return await _studentRepository.GetByIdAsync(id);
+    }
 }
