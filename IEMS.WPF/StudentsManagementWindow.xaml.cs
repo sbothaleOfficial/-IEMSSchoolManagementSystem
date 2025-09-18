@@ -297,7 +297,8 @@ public partial class StudentsManagementWindow : Window
             student.ParentMobileNumber.ToLower().Contains(searchText) ||
             student.Standard.ToLower().Contains(searchText) ||
             student.ClassDivision.ToLower().Contains(searchText) ||
-            student.Address.ToLower().Contains(searchText)
+            student.Address.ToLower().Contains(searchText) ||
+            student.CityVillage.ToLower().Contains(searchText)
         ).ToList();
 
         dgStudents.ItemsSource = filteredStudents;
@@ -582,6 +583,9 @@ public partial class StudentsManagementWindow : Window
 
                     // Generate caste category statistics
                     LoadCasteWiseStatistics();
+
+                    // Generate city/village statistics
+                    LoadCityVillageWiseStatistics();
                 });
             });
         }
@@ -646,5 +650,22 @@ public partial class StudentsManagementWindow : Window
             .ToList();
 
         dgCasteStats.ItemsSource = casteStats;
+    }
+
+    private void LoadCityVillageWiseStatistics()
+    {
+        var cityVillageStats = _allStudents
+            .GroupBy(s => s.CityVillage)
+            .Select(g => new
+            {
+                CityVillage = string.IsNullOrEmpty(g.Key) ? "Not Specified" : g.Key,
+                Count = g.Count(),
+                MaleCount = g.Count(s => s.Gender.Equals("Male", StringComparison.OrdinalIgnoreCase)),
+                FemaleCount = g.Count(s => s.Gender.Equals("Female", StringComparison.OrdinalIgnoreCase))
+            })
+            .OrderByDescending(x => x.Count)
+            .ToList();
+
+        dgCityVillageStats.ItemsSource = cityVillageStats;
     }
 }

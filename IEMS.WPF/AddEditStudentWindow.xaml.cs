@@ -63,6 +63,7 @@ public partial class AddEditStudentWindow : Window
             chkBPL.IsChecked = _studentToEdit.IsBPL;
             chkSemiEnglish.IsChecked = _studentToEdit.IsSemiEnglish;
             txtAddress.Text = _studentToEdit.Address;
+            txtCityVillage.Text = _studentToEdit.CityVillage;
             txtParentMobile.Text = _studentToEdit.ParentMobileNumber;
             cmbClass.SelectedValue = _studentToEdit.ClassId;
         }
@@ -102,6 +103,7 @@ public partial class AddEditStudentWindow : Window
                 IsBPL = chkBPL.IsChecked ?? false,
                 IsSemiEnglish = chkSemiEnglish.IsChecked ?? false,
                 Address = txtAddress.Text.Trim(),
+                CityVillage = txtCityVillage.Text.Trim(),
                 ParentMobileNumber = txtParentMobile.Text.Trim(),
                 ClassId = (int)cmbClass.SelectedValue
             };

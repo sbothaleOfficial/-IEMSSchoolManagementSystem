@@ -42,6 +42,7 @@ public class StudentService
                 IsBPL = student.IsBPL,
                 IsSemiEnglish = student.IsSemiEnglish,
                 Address = student.Address,
+                CityVillage = student.CityVillage,
                 ParentMobileNumber = student.ParentMobileNumber,
                 ClassId = student.ClassId,
                 ClassName = classEntity?.Name ?? "Unknown"
@@ -76,6 +77,7 @@ public class StudentService
             IsBPL = student.IsBPL,
             IsSemiEnglish = student.IsSemiEnglish,
             Address = student.Address,
+            CityVillage = student.CityVillage,
             ParentMobileNumber = student.ParentMobileNumber,
             ClassId = student.ClassId,
             ClassName = classEntity?.Name ?? "Unknown"
@@ -102,6 +104,7 @@ public class StudentService
             IsBPL = studentDto.IsBPL,
             IsSemiEnglish = studentDto.IsSemiEnglish,
             Address = studentDto.Address,
+            CityVillage = studentDto.CityVillage,
             ParentMobileNumber = studentDto.ParentMobileNumber,
             ClassId = studentDto.ClassId
         };
@@ -130,6 +133,7 @@ public class StudentService
             student.IsBPL = studentDto.IsBPL;
             student.IsSemiEnglish = studentDto.IsSemiEnglish;
             student.Address = studentDto.Address;
+            student.CityVillage = studentDto.CityVillage;
             student.ParentMobileNumber = studentDto.ParentMobileNumber;
             student.ClassId = studentDto.ClassId;
             student.UpdatedAt = DateTime.UtcNow;

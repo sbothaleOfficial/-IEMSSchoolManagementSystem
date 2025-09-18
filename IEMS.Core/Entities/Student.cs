@@ -19,6 +19,7 @@ public class Student
     public bool IsBPL { get; set; }
     public bool IsSemiEnglish { get; set; }
     public string Address { get; set; } = string.Empty;
+    public string CityVillage { get; set; } = string.Empty;
     public string ParentMobileNumber { get; set; } = string.Empty;
     public int ClassId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
