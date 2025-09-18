@@ -59,11 +59,11 @@
                             <DataGridTextColumn Header="Gender" Binding="{Binding Gender}" Width="70"/>
                             <DataGridTextColumn Header="Mother's Name" Binding="{Binding MotherName}" Width="120"/>
                             <DataGridTextColumn Header="Student No" Binding="{Binding StudentNumber}" Width="90"/>
-                            <DataGridTextColumn Header="Admission Date" Binding="{Binding FormattedAdmissionDate}" Width="90"/>
-                            <DataGridTextColumn Header="Caste Category" Binding="{Binding CasteCategory}" Width="90"/>
+                            <DataGridTextColumn Header="Admission Date" Binding="{Binding FormattedAdmissionDate}" Width="110"/>
+                            <DataGridTextColumn Header="Caste Category" Binding="{Binding CasteCategory}" Width="110"/>
                             <DataGridTextColumn Header="Religion" Binding="{Binding Religion}" Width="80"/>
                             <DataGridTextColumn Header="BPL" Binding="{Binding IsBPL}" Width="50"/>
-                            <DataGridTextColumn Header="Semi-English" Binding="{Binding IsSemiEnglish}" Width="90"/>
+                            <DataGridTextColumn Header="Semi-English" Binding="{Binding IsSemiEnglish}" Width="100"/>
                             <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="150"/>
                             <DataGridTextColumn Header="Mobile" Binding="{Binding ParentMobileNumber}" Width="100"/>
                         </DataGrid.Columns>
