@@ -28,11 +28,13 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- School Logo Placeholder -->
-                        <Border Grid.Column="0" Background="#E8F4FD" Width="120" Height="120"
-                                CornerRadius="60" VerticalAlignment="Center" Margin="0,0,20,0">
-                            <TextBlock Text="🏫" FontSize="48" HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"/>
+                        <!-- School Logo -->
+                        <Border Grid.Column="0" Width="120" Height="120"
+                                HorizontalAlignment="Left" VerticalAlignment="Center"
+                                Margin="0,0,20,0" BorderBrush="Black" BorderThickness="1">
+                            <Viewbox Stretch="Uniform">
+                                <Image Source="Exact_color_logo.png" Stretch="Uniform"/>
+                            </Viewbox>
                         </Border>
 
                         <!-- School Details -->
@@ -40,7 +42,7 @@
                             <TextBlock Text="INSPIRE ENGLISH MEDIUM SCHOOL, MARDI"
                                        FontSize="24" FontWeight="Bold" HorizontalAlignment="Center"
                                        TextWrapping="Wrap"/>
-                            <TextBlock Text="Tah. Maregaon, Dist. Yavatmal (M.S.) – 445303"
+                            <TextBlock Text="Tah. Maregaon, Dist. Yavatmal (Maharashtra) – 445303"
                                        FontSize="14" HorizontalAlignment="Center" Margin="0,5"/>
                             <Grid HorizontalAlignment="Center" Margin="0,10">
                                 <Grid.ColumnDefinitions>

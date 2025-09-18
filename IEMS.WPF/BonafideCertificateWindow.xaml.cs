@@ -190,27 +190,31 @@ namespace IEMS.WPF
 
             // School Header
             var headerGrid = new Grid { Margin = new Thickness(0, 0, 0, 30) };
-            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(120) });
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(160) });
             headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
 
-            // Logo placeholder
+            // School Logo with border
             var logoBorder = new Border
             {
-                Background = new SolidColorBrush(Color.FromRgb(232, 244, 253)),
                 Width = 120,
                 Height = 120,
-                CornerRadius = new CornerRadius(60),
+                HorizontalAlignment = HorizontalAlignment.Left,
                 VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(0, 0, 20, 0)
+                Margin = new Thickness(10, 0, 30, 0),
+                BorderBrush = Brushes.Black,
+                BorderThickness = new Thickness(1)
             };
-            var logoText = new TextBlock
+            var logoViewbox = new System.Windows.Controls.Viewbox
             {
-                Text = "🏫",
-                FontSize = 48,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
+                Stretch = Stretch.Uniform
             };
-            logoBorder.Child = logoText;
+            var logoImage = new System.Windows.Controls.Image
+            {
+                Source = new System.Windows.Media.Imaging.BitmapImage(new Uri("pack://application:,,,/IEMS.WPF;component/Exact_color_logo.png")),
+                Stretch = Stretch.Uniform
+            };
+            logoViewbox.Child = logoImage;
+            logoBorder.Child = logoViewbox;
             Grid.SetColumn(logoBorder, 0);
             headerGrid.Children.Add(logoBorder);
 
@@ -226,7 +230,7 @@ namespace IEMS.WPF
             });
             schoolDetailsPanel.Children.Add(new TextBlock
             {
-                Text = "Tah. Maregaon, Dist. Yavatmal (M.S.) – 445303",
+                Text = "Tah. Maregaon, Dist. Yavatmal (Maharashtra) – 445303",
                 FontSize = 14,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Margin = new Thickness(0, 5, 0, 0)

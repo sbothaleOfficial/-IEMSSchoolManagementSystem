@@ -11,7 +11,7 @@
         </Grid.RowDefinitions>
 
         <!-- Header Section -->
-        <Grid Grid.Row="0" Background="{StaticResource PrimaryBrush}" Height="80">
+        <Grid Grid.Row="0" Background="{StaticResource PrimaryBrush}" Height="100">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -19,12 +19,26 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
-                <Image Source="../School_logo.png" Width="60" Height="60" Margin="0,0,15,0"/>
+                <Image Source="Exact_color_logo.png" Width="95" Height="95" Margin="0,0,15,0"
+                       RenderOptions.BitmapScalingMode="HighQuality"
+                       RenderOptions.EdgeMode="Aliased"
+                       Stretch="Uniform"/>
                 <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="IEMS School Management System"
-                               FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextOnPrimaryBrush}"/>
-                    <TextBlock Text="Dashboard"
-                               FontSize="14" Foreground="{StaticResource PrimaryLightBrush}" Margin="0,2,0,0"/>
+                    <TextBlock Text="Inspire English Medium School, Mardi"
+                               FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextOnPrimaryBrush}"/>
+                    <TextBlock Text="Tah. Maregaon, Dist. Yavatmal (Maharashtra) – 445303"
+                               FontSize="12" Foreground="{StaticResource PrimaryLightBrush}" Margin="0,2,0,2"/>
+                    <Grid Margin="0,2,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="U-Dise Code : 27140806704"
+                                   FontSize="11" Foreground="{StaticResource PrimaryLightBrush}"/>
+                        <TextBlock Grid.Column="2" Text="School Reg. No. MH-15381/16"
+                                   FontSize="11" Foreground="{StaticResource PrimaryLightBrush}"/>
+                    </Grid>
                 </StackPanel>
             </StackPanel>
 
