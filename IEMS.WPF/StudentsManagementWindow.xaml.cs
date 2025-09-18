@@ -15,6 +15,7 @@ public partial class StudentsManagementWindow : Window
     private readonly FeeStructureService _feeStructureService;
     private List<StudentDto> _allStudents = new List<StudentDto>();
     private List<FeePaymentDto> _allFeePayments = new List<FeePaymentDto>();
+    private List<ClassDto> _allClasses = new List<ClassDto>();
 
     public StudentsManagementWindow(StudentService studentService, ClassService classService, TeacherService teacherService, FeePaymentService feePaymentService, FeeStructureService feeStructureService)
     {
@@ -28,6 +29,7 @@ public partial class StudentsManagementWindow : Window
         LoadClasses();
         LoadFeePayments();
         LoadBonafideStudents();
+        LoadDashboardData();
     }
 
     private async void LoadStudents()
@@ -47,6 +49,9 @@ public partial class StudentsManagementWindow : Window
             toastNotification.Message = $"Successfully loaded {students.Count()} students";
             toastNotification.ToastType = ToastType.Success;
             toastNotification.Show();
+
+            // Refresh dashboard after loading students
+            LoadDashboardData();
         }
         catch (Exception ex)
         {
@@ -68,8 +73,12 @@ public partial class StudentsManagementWindow : Window
         {
             lblStatus.Text = "Loading classes...";
             var classes = await _classService.GetAllClassesAsync();
-            dgClasses.ItemsSource = classes;
+            _allClasses = classes.ToList();
+            dgClasses.ItemsSource = _allClasses;
             lblStatus.Text = $"Loaded {classes.Count()} classes";
+
+            // Refresh dashboard after loading classes
+            LoadDashboardData();
         }
         catch (Exception ex)
         {
@@ -89,6 +98,7 @@ public partial class StudentsManagementWindow : Window
             LoadClasses(); // Refresh to update student counts in classes
             txtSearchStudents.Text = currentSearch; // Restore search after refresh
             FilterStudents();
+            LoadDashboardData(); // Refresh dashboard
         }
     }
 
@@ -104,6 +114,7 @@ public partial class StudentsManagementWindow : Window
                 LoadClasses(); // Refresh to update student counts in classes
                 txtSearchStudents.Text = currentSearch; // Restore search after refresh
                 FilterStudents();
+                LoadDashboardData(); // Refresh dashboard
             }
         }
         else
@@ -136,6 +147,7 @@ public partial class StudentsManagementWindow : Window
                     toastNotification.ToastType = ToastType.Success;
                     toastNotification.Show();
                     FilterStudents();
+                    LoadDashboardData(); // Refresh dashboard
                     lblStatus.Text = "Student deleted successfully";
                 }
                 catch (Exception ex)
@@ -161,6 +173,7 @@ public partial class StudentsManagementWindow : Window
     {
         LoadStudents();
         txtSearchStudents.Text = ""; // Clear search when refreshing
+        LoadDashboardData(); // Refresh dashboard
     }
 
     // Class Management Events
@@ -170,6 +183,7 @@ public partial class StudentsManagementWindow : Window
         if (addWindow.ShowDialog() == true)
         {
             LoadClasses();
+            LoadDashboardData(); // Refresh dashboard
         }
     }
 
@@ -181,6 +195,7 @@ public partial class StudentsManagementWindow : Window
             if (editWindow.ShowDialog() == true)
             {
                 LoadClasses();
+                LoadDashboardData(); // Refresh dashboard
             }
         }
         else
@@ -202,6 +217,7 @@ public partial class StudentsManagementWindow : Window
                 {
                     await _classService.DeleteClassAsync(selectedClass.Id);
                     LoadClasses();
+                    LoadDashboardData(); // Refresh dashboard
                     lblStatus.Text = "Class deleted successfully";
                 }
                 catch (Exception ex)
@@ -219,6 +235,7 @@ public partial class StudentsManagementWindow : Window
     private void BtnRefreshClasses_Click(object sender, RoutedEventArgs e)
     {
         LoadClasses();
+        LoadDashboardData(); // Refresh dashboard
     }
 
     private async void BtnViewClassStudents_Click(object sender, RoutedEventArgs e)
@@ -524,5 +541,110 @@ public partial class StudentsManagementWindow : Window
 
         dgBonafideStudents.ItemsSource = filteredStudents;
         lblStatus.Text = $"Found {filteredStudents.Count} students matching '{txtSearchBonafide.Text}'";
+    }
+
+    // Dashboard Data Loading and Statistics Methods
+    private async void LoadDashboardData()
+    {
+        if (_allStudents == null || !_allStudents.Any() || _allClasses == null || !_allClasses.Any())
+            return;
+
+        try
+        {
+            await Task.Run(() =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    // Calculate overall statistics
+                    var totalStudents = _allStudents.Count;
+                    var maleStudents = _allStudents.Count(s => s.Gender.Equals("Male", StringComparison.OrdinalIgnoreCase));
+                    var femaleStudents = _allStudents.Count(s => s.Gender.Equals("Female", StringComparison.OrdinalIgnoreCase));
+                    var totalClasses = _allClasses.Count;
+
+                    // Update dashboard cards
+                    lblTotalStudents.Text = totalStudents.ToString();
+                    lblMaleStudents.Text = maleStudents.ToString();
+                    lblFemaleStudents.Text = femaleStudents.ToString();
+                    lblTotalClasses.Text = totalClasses.ToString();
+
+                    // Calculate additional statistics
+                    var bplStudents = _allStudents.Count(s => s.IsBPL);
+                    var semiEnglishStudents = _allStudents.Count(s => s.IsSemiEnglish);
+
+                    lblBPLStudents.Text = bplStudents.ToString();
+                    lblSemiEnglishStudents.Text = semiEnglishStudents.ToString();
+
+                    // Generate class-wise statistics
+                    LoadClassWiseStatistics();
+
+                    // Generate religion-wise statistics
+                    LoadReligionWiseStatistics();
+
+                    // Generate caste category statistics
+                    LoadCasteWiseStatistics();
+                });
+            });
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error loading dashboard data: {ex.Message}", "Dashboard Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private void LoadClassWiseStatistics()
+    {
+        var classStats = new List<dynamic>();
+
+        foreach (var classDto in _allClasses.OrderBy(c => c.Name))
+        {
+            var studentsInClass = _allStudents.Where(s => s.ClassId == classDto.Id).ToList();
+            var totalStudents = studentsInClass.Count;
+            var maleStudents = studentsInClass.Count(s => s.Gender.Equals("Male", StringComparison.OrdinalIgnoreCase));
+            var femaleStudents = studentsInClass.Count(s => s.Gender.Equals("Female", StringComparison.OrdinalIgnoreCase));
+
+            classStats.Add(new
+            {
+                ClassName = classDto.DisplayName,
+                TotalStudents = totalStudents,
+                MaleStudents = maleStudents,
+                FemaleStudents = femaleStudents
+            });
+        }
+
+        dgClassStats.ItemsSource = classStats;
+    }
+
+    private void LoadReligionWiseStatistics()
+    {
+        var religionStats = _allStudents
+            .GroupBy(s => s.Religion)
+            .Select(g => new
+            {
+                Religion = string.IsNullOrEmpty(g.Key) ? "Not Specified" : g.Key,
+                Count = g.Count(),
+                MaleCount = g.Count(s => s.Gender.Equals("Male", StringComparison.OrdinalIgnoreCase)),
+                FemaleCount = g.Count(s => s.Gender.Equals("Female", StringComparison.OrdinalIgnoreCase))
+            })
+            .OrderByDescending(x => x.Count)
+            .ToList();
+
+        dgReligionStats.ItemsSource = religionStats;
+    }
+
+    private void LoadCasteWiseStatistics()
+    {
+        var casteStats = _allStudents
+            .GroupBy(s => s.CasteCategory)
+            .Select(g => new
+            {
+                Category = string.IsNullOrEmpty(g.Key) ? "Not Specified" : g.Key,
+                Count = g.Count(),
+                MaleCount = g.Count(s => s.Gender.Equals("Male", StringComparison.OrdinalIgnoreCase)),
+                FemaleCount = g.Count(s => s.Gender.Equals("Female", StringComparison.OrdinalIgnoreCase))
+            })
+            .OrderByDescending(x => x.Count)
+            .ToList();
+
+        dgCasteStats.ItemsSource = casteStats;
     }
 }
