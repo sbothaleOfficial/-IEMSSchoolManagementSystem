@@ -37,6 +37,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.CasteCategory).HasMaxLength(30);
             entity.Property(e => e.Religion).HasMaxLength(30);
             entity.Property(e => e.Address).HasMaxLength(200);
+            entity.Property(e => e.CityVillage).HasMaxLength(100);
             entity.Property(e => e.ParentMobileNumber).HasMaxLength(15);
             entity.HasIndex(e => e.StudentNumber).IsUnique();
             entity.HasIndex(e => e.SerialNo).IsUnique();
@@ -258,7 +259,7 @@ public class ApplicationDbContext : DbContext
                 MotherName = "Mary Brown", StudentNumber = "S001",
                 AdmissionDate = new DateTime(2023, 6, 1), CasteCategory = "General",
                 Religion = "Christian", IsBPL = false, IsSemiEnglish = true,
-                Address = "123 Main St, City", ParentMobileNumber = "9876543210", ClassId = 1
+                Address = "123 Main St, City", CityVillage = "Mumbai", ParentMobileNumber = "9876543210", ClassId = 1
             },
             new Student
             {
@@ -268,7 +269,7 @@ public class ApplicationDbContext : DbContext
                 MotherName = "Susan Wilson", StudentNumber = "S002",
                 AdmissionDate = new DateTime(2023, 6, 1), CasteCategory = "OBC",
                 Religion = "Hindu", IsBPL = true, IsSemiEnglish = false,
-                Address = "456 Oak Ave, City", ParentMobileNumber = "9876543211", ClassId = 1
+                Address = "456 Oak Ave, City", CityVillage = "Pune", ParentMobileNumber = "9876543211", ClassId = 1
             },
             new Student
             {
@@ -278,7 +279,7 @@ public class ApplicationDbContext : DbContext
                 MotherName = "Jennifer Davis", StudentNumber = "S003",
                 AdmissionDate = new DateTime(2023, 6, 1), CasteCategory = "SC",
                 Religion = "Hindu", IsBPL = true, IsSemiEnglish = true,
-                Address = "789 Pine Rd, City", ParentMobileNumber = "9876543212", ClassId = 2
+                Address = "789 Pine Rd, City", CityVillage = "Nashik", ParentMobileNumber = "9876543212", ClassId = 2
             }
         );
 
