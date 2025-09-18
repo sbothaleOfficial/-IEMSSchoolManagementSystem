@@ -29,6 +29,14 @@ public class TeacherService
                 FirstName = teacher.FirstName,
                 LastName = teacher.LastName,
                 EmployeeId = teacher.EmployeeId,
+                PhoneNumber = teacher.PhoneNumber,
+                Address = teacher.Address,
+                JoiningDate = teacher.JoiningDate,
+                MonthlySalary = teacher.MonthlySalary,
+                Email = teacher.Email,
+                BankAccountNumber = teacher.BankAccountNumber,
+                AadharNumber = teacher.AadharNumber,
+                PANNumber = teacher.PANNumber,
                 ClassCount = classes.Count()
             });
         }
@@ -48,6 +56,14 @@ public class TeacherService
             FirstName = teacher.FirstName,
             LastName = teacher.LastName,
             EmployeeId = teacher.EmployeeId,
+            PhoneNumber = teacher.PhoneNumber,
+            Address = teacher.Address,
+            JoiningDate = teacher.JoiningDate,
+            MonthlySalary = teacher.MonthlySalary,
+            Email = teacher.Email,
+            BankAccountNumber = teacher.BankAccountNumber,
+            AadharNumber = teacher.AadharNumber,
+            PANNumber = teacher.PANNumber,
             ClassCount = classes.Count()
         };
     }

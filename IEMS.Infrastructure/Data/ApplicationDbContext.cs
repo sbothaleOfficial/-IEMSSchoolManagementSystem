@@ -54,6 +54,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.FirstName).IsRequired().HasMaxLength(50);
             entity.Property(e => e.LastName).IsRequired().HasMaxLength(50);
             entity.Property(e => e.EmployeeId).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.MonthlySalary).HasColumnType("decimal(18,2)");
             entity.HasIndex(e => e.EmployeeId).IsUnique();
         });
 

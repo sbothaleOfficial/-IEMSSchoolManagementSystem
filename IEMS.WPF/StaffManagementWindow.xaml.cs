@@ -2,6 +2,8 @@ using System.Windows;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Documents;
 
 namespace IEMS.WPF;
 
@@ -13,6 +15,8 @@ public partial class StaffManagementWindow : Window
 
     private List<TeacherDto> _allTeachers = new List<TeacherDto>();
     private List<StaffDto> _allStaff = new List<StaffDto>();
+    private bool _teachersLoaded = false;
+    private bool _staffLoaded = false;
 
     public StaffManagementWindow(TeacherService teacherService, ClassService classService, StaffService staffService)
     {
@@ -41,8 +45,10 @@ public partial class StaffManagementWindow : Window
         try
         {
             _allTeachers = (await _teacherService.GetAllTeachersAsync()).ToList();
+            _teachersLoaded = true;
             ApplyTeacherSearch();
             lblStatus.Text = $"Loaded {_allTeachers.Count} teachers";
+            CheckAndInitializePayslip();
         }
         catch (Exception ex)
         {
@@ -158,8 +164,10 @@ public partial class StaffManagementWindow : Window
         try
         {
             _allStaff = (await _staffService.GetAllStaffAsync()).ToList();
+            _staffLoaded = true;
             ApplyStaffSearch();
             lblStatus.Text = $"Loaded {_allStaff.Count} staff members";
+            CheckAndInitializePayslip();
         }
         catch (Exception ex)
         {
@@ -313,10 +321,7 @@ public partial class StaffManagementWindow : Window
         try
         {
             await LoadOverallStatistics();
-            await LoadTeacherClassStatistics();
             await LoadPositionStatistics();
-            await LoadSalaryRangeStatistics();
-            await LoadRecentJoinersStatistics();
             await LoadPayrollSummary();
         }
         catch (Exception ex)
@@ -334,35 +339,33 @@ public partial class StaffManagementWindow : Window
         var allSalaries = _allTeachers.Select(t => t.MonthlySalary)
                                      .Concat(_allStaff.Select(s => s.MonthlySalary))
                                      .Where(s => s > 0);
-        var averageSalary = allSalaries.Any() ? allSalaries.Average() : 0;
+        var totalMonthlySalary = allSalaries.Sum();
+
+        // Calculate total spent till today based on joining dates
+        var totalSpentTillToday = 0m;
+        var currentDate = DateTime.Now;
+
+        foreach (var teacher in _allTeachers)
+        {
+            var monthsWorked = ((currentDate.Year - teacher.JoiningDate.Year) * 12) + currentDate.Month - teacher.JoiningDate.Month;
+            if (currentDate.Day < teacher.JoiningDate.Day) monthsWorked--; // Adjust for partial month
+            totalSpentTillToday += teacher.MonthlySalary * Math.Max(0, monthsWorked);
+        }
+
+        foreach (var staff in _allStaff)
+        {
+            var monthsWorked = ((currentDate.Year - staff.JoiningDate.Year) * 12) + currentDate.Month - staff.JoiningDate.Month;
+            if (currentDate.Day < staff.JoiningDate.Day) monthsWorked--; // Adjust for partial month
+            totalSpentTillToday += staff.MonthlySalary * Math.Max(0, monthsWorked);
+        }
 
         lblTotalTeachers.Text = totalTeachers.ToString();
         lblTotalSupportStaff.Text = totalSupportStaff.ToString();
         lblTotalStaff.Text = totalStaff.ToString();
-        lblAverageSalary.Text = $"₹{averageSalary:N0}";
+        lblTotalMonthlySalary.Text = $"₹{totalMonthlySalary:N0}";
+        lblTotalSpentTillToday.Text = $"₹{totalSpentTillToday:N0}";
     }
 
-    private async Task LoadTeacherClassStatistics()
-    {
-        var teacherClassStats = new List<object>();
-
-        foreach (var teacher in _allTeachers)
-        {
-            var classes = await _classService.GetClassesByTeacherIdAsync(teacher.Id);
-            var classNames = string.Join(", ", classes.Select(c => c.DisplayName));
-
-            teacherClassStats.Add(new
-            {
-                TeacherName = teacher.FullName,
-                EmployeeId = teacher.EmployeeId,
-                ClassCount = classes.Count(),
-                ClassNames = string.IsNullOrEmpty(classNames) ? "No classes assigned" : classNames,
-                FormattedSalary = $"₹{teacher.MonthlySalary:N0}"
-            });
-        }
-
-        dgTeacherClassStats.ItemsSource = teacherClassStats.OrderByDescending(t => ((dynamic)t).ClassCount).ToList();
-    }
 
     private async Task LoadPositionStatistics()
     {
@@ -390,78 +393,7 @@ public partial class StaffManagementWindow : Window
         dgPositionStats.ItemsSource = positionStats;
     }
 
-    private async Task LoadSalaryRangeStatistics()
-    {
-        var allStaffWithSalaries = _allTeachers.Select(t => new { Name = t.FullName, Salary = t.MonthlySalary })
-                                              .Concat(_allStaff.Select(s => new { Name = s.FullName, Salary = s.MonthlySalary }))
-                                              .ToList();
 
-        var salaryRanges = new[]
-        {
-            new { Range = "Below ₹20,000", Min = 0, Max = 20000 },
-            new { Range = "₹20,000 - ₹40,000", Min = 20000, Max = 40000 },
-            new { Range = "₹40,000 - ₹60,000", Min = 40000, Max = 60000 },
-            new { Range = "₹60,000 - ₹80,000", Min = 60000, Max = 80000 },
-            new { Range = "Above ₹80,000", Min = 80000, Max = int.MaxValue }
-        };
-
-        var salaryRangeStats = salaryRanges
-            .Select(range =>
-            {
-                var staffInRange = allStaffWithSalaries
-                    .Where(s => s.Salary >= range.Min && s.Salary < range.Max)
-                    .ToList();
-
-                return new
-                {
-                    SalaryRange = range.Range,
-                    Count = staffInRange.Count,
-                    Percentage = $"{(staffInRange.Count * 100.0 / allStaffWithSalaries.Count):F1}%",
-                    StaffNames = string.Join(", ", staffInRange.Select(s => s.Name).Take(3)) +
-                               (staffInRange.Count > 3 ? $" and {staffInRange.Count - 3} more..." : "")
-                };
-            })
-            .Where(x => x.Count > 0)
-            .ToList();
-
-        dgSalaryRangeStats.ItemsSource = salaryRangeStats;
-    }
-
-    private async Task LoadRecentJoinersStatistics()
-    {
-        var twoYearsAgo = DateTime.Now.AddYears(-2);
-
-        var recentTeachers = _allTeachers
-            .Where(t => t.JoiningDate >= twoYearsAgo)
-            .Select(t => new
-            {
-                Name = t.FullName,
-                Position = "Teacher",
-                JoiningDate = t.JoiningDate,
-                FormattedJoiningDate = t.JoiningDate.ToString("dd/MM/yyyy"),
-                DaysSinceJoined = $"{(DateTime.Now - t.JoiningDate).Days} days",
-                FormattedSalary = $"₹{t.MonthlySalary:N0}"
-            });
-
-        var recentStaff = _allStaff
-            .Where(s => s.JoiningDate >= twoYearsAgo)
-            .Select(s => new
-            {
-                Name = s.FullName,
-                Position = s.Position,
-                JoiningDate = s.JoiningDate,
-                FormattedJoiningDate = s.JoiningDate.ToString("dd/MM/yyyy"),
-                DaysSinceJoined = $"{(DateTime.Now - s.JoiningDate).Days} days",
-                FormattedSalary = $"₹{s.MonthlySalary:N0}"
-            });
-
-        var recentJoiners = recentTeachers
-            .Concat(recentStaff)
-            .OrderByDescending(x => x.JoiningDate)
-            .ToList();
-
-        dgRecentJoiners.ItemsSource = recentJoiners;
-    }
 
     private async Task LoadPayrollSummary()
     {
@@ -478,5 +410,557 @@ public partial class StaffManagementWindow : Window
     private void UpdateDashboard()
     {
         LoadDashboardData();
+    }
+
+    // Helper method to check if both teachers and staff are loaded
+    private void CheckAndInitializePayslip()
+    {
+        if (_teachersLoaded && _staffLoaded)
+        {
+            try
+            {
+                InitializePayslipTab();
+            }
+            catch (Exception ex)
+            {
+                // If payslip initialization fails, just log it but don't crash the app
+                lblStatus.Text = $"Payslip initialization skipped: {ex.Message}";
+            }
+        }
+    }
+
+    // Payslip Generation Methods
+    private void InitializePayslipTab()
+    {
+        try
+        {
+            LoadPayslipEmployees();
+            InitializePayslipYears();
+            SetDefaultPayslipDate();
+            ClearPayslipForm();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error initializing payslip tab: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void LoadPayslipEmployees()
+    {
+        try
+        {
+            // Check if payslip controls exist
+            if (cmbEmployee == null)
+            {
+                throw new InvalidOperationException("Payslip controls not yet initialized");
+            }
+
+            var allEmployees = new List<object>();
+
+            // Add teachers as employees
+            if (_allTeachers != null)
+            {
+                foreach (var teacher in _allTeachers)
+                {
+                    allEmployees.Add(new
+                    {
+                        Id = $"T_{teacher.Id}",
+                        FullName = teacher.FullName,
+                        EmployeeId = teacher.EmployeeId,
+                        Position = "Teacher",
+                        MonthlySalary = teacher.MonthlySalary,
+                        JoiningDate = teacher.JoiningDate
+                    });
+                }
+            }
+
+            // Add staff as employees
+            if (_allStaff != null)
+            {
+                foreach (var staff in _allStaff)
+                {
+                    allEmployees.Add(new
+                    {
+                        Id = $"S_{staff.Id}",
+                        FullName = staff.FullName,
+                        EmployeeId = staff.EmployeeId,
+                        Position = staff.Position,
+                        MonthlySalary = staff.MonthlySalary,
+                        JoiningDate = staff.JoiningDate
+                    });
+                }
+            }
+
+            cmbEmployee.ItemsSource = allEmployees;
+
+            // Enhanced debug: Show how many employees were loaded with salary details
+            if (lblStatus != null)
+            {
+                var debugInfo = $"Payslip ready: {allEmployees.Count} employees loaded ({_allTeachers?.Count ?? 0} teachers, {_allStaff?.Count ?? 0} staff)";
+
+                // Debug ALL employees and their salaries using reflection
+                if (allEmployees.Count > 0)
+                {
+                    debugInfo += "\nEmployee details:";
+                    foreach (var emp in allEmployees)
+                    {
+                        var empType = emp.GetType();
+                        var fullNameProp = empType.GetProperty("FullName");
+                        var salaryProp = empType.GetProperty("MonthlySalary");
+                        var employeeIdProp = empType.GetProperty("EmployeeId");
+
+                        var fullName = fullNameProp?.GetValue(emp)?.ToString() ?? "Unknown";
+                        var salary = salaryProp?.GetValue(emp) ?? 0;
+                        var employeeId = employeeIdProp?.GetValue(emp)?.ToString() ?? "Unknown";
+
+                        debugInfo += $"\n- {fullName} ({employeeId}): ₹{salary}";
+                    }
+                }
+
+                // Also debug the raw teacher data from database
+                if (_allTeachers != null && _allTeachers.Count > 0)
+                {
+                    debugInfo += "\n\nRaw Teacher data from DB:";
+                    foreach (var teacher in _allTeachers)
+                    {
+                        debugInfo += $"\n- {teacher.FullName} ({teacher.EmployeeId}): ₹{teacher.MonthlySalary}";
+                    }
+                }
+
+                // Debug the raw staff data from database
+                if (_allStaff != null && _allStaff.Count > 0)
+                {
+                    debugInfo += "\n\nRaw Staff data from DB:";
+                    foreach (var staff in _allStaff)
+                    {
+                        debugInfo += $"\n- {staff.FullName} ({staff.EmployeeId}): ₹{staff.MonthlySalary}";
+                    }
+                }
+
+                lblStatus.Text = debugInfo;
+
+                // Debug info removed for normal operation
+            }
+        }
+        catch (Exception ex)
+        {
+            if (lblStatus != null)
+            {
+                lblStatus.Text = $"Error loading payslip employees: {ex.Message}";
+            }
+        }
+    }
+
+    private void InitializePayslipYears()
+    {
+        if (cmbYear == null) return;
+
+        var years = new List<int>();
+        var currentYear = DateTime.Now.Year;
+
+        for (int year = currentYear - 2; year <= currentYear + 1; year++)
+        {
+            years.Add(year);
+        }
+
+        cmbYear.ItemsSource = years;
+        cmbYear.SelectedItem = currentYear;
+    }
+
+    private void SetDefaultPayslipDate()
+    {
+        try
+        {
+            if (cmbMonth == null) return;
+            var currentMonth = DateTime.Now.Month;
+            cmbMonth.SelectedIndex = currentMonth - 1; // Months are 0-indexed in ComboBox
+        }
+        catch (Exception ex)
+        {
+            // Safely ignore initialization issues
+            if (lblStatus != null)
+                lblStatus.Text = $"Payslip date initialization skipped: {ex.Message}";
+        }
+    }
+
+    private void ClearPayslipForm()
+    {
+        try
+        {
+            if (txtBasicSalary != null) txtBasicSalary.Text = "₹0";
+            if (txtAdvanceSalary != null) txtAdvanceSalary.Text = "0";
+            if (txtLoanDeduction != null) txtLoanDeduction.Text = "0";
+            if (lblNetSalary != null) lblNetSalary.Text = "₹0";
+            ClearPayslipPreview();
+        }
+        catch (Exception ex)
+        {
+            // Safely ignore initialization issues
+            if (lblStatus != null)
+                lblStatus.Text = $"Payslip form clear skipped: {ex.Message}";
+        }
+    }
+
+    private void ClearPayslipPreview()
+    {
+        try
+        {
+            // Use FindName to locate Run elements for clearing
+            var empName = this.FindName("PayslipEmployeeName") as Run;
+            var empId = this.FindName("PayslipEmployeeId") as Run;
+            var empPosition = this.FindName("PayslipPosition") as Run;
+            var empPeriod = this.FindName("PayslipPeriod") as Run;
+            var empGenDate = this.FindName("PayslipGeneratedDate") as Run;
+            var empJoinDate = this.FindName("PayslipJoiningDate") as Run;
+
+            var basicSalaryElement = this.FindName("PayslipBasicSalary") as TextBlock;
+            var advanceSalaryElement = this.FindName("PayslipAdvanceSalary") as TextBlock;
+            var loanDeductionElement = this.FindName("PayslipLoanDeduction") as TextBlock;
+            var totalDeductionsElement = this.FindName("PayslipTotalDeductions") as TextBlock;
+            var netSalaryElement = this.FindName("PayslipNetSalary") as TextBlock;
+
+            // Clear Run elements
+            if (empName != null) empName.Text = "";
+            if (empId != null) empId.Text = "";
+            if (empPosition != null) empPosition.Text = "";
+            if (empPeriod != null) empPeriod.Text = "";
+            if (empGenDate != null) empGenDate.Text = DateTime.Now.ToString("dd/MM/yyyy");
+            if (empJoinDate != null) empJoinDate.Text = "";
+
+            // Clear TextBlock elements
+            if (basicSalaryElement != null) basicSalaryElement.Text = "₹0";
+            if (advanceSalaryElement != null) advanceSalaryElement.Text = "₹0";
+            if (loanDeductionElement != null) loanDeductionElement.Text = "₹0";
+            if (totalDeductionsElement != null) totalDeductionsElement.Text = "₹0";
+            if (netSalaryElement != null) netSalaryElement.Text = "₹0";
+
+            System.Diagnostics.Debug.WriteLine("ClearPayslipPreview: All elements cleared successfully");
+        }
+        catch (Exception ex)
+        {
+            // Safely ignore initialization issues
+            if (lblStatus != null)
+                lblStatus.Text = $"Payslip preview clear skipped: {ex.Message}";
+            System.Diagnostics.Debug.WriteLine($"ClearPayslipPreview Error: {ex.Message}");
+        }
+    }
+
+    private void CmbEmployee_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        try
+        {
+            // Ensure all controls are available
+            if (txtBasicSalary == null || lblStatus == null)
+            {
+                return; // Skip if controls not initialized yet
+            }
+
+            if (cmbEmployee?.SelectedItem != null)
+            {
+                // Use reflection to safely access anonymous object properties
+                var selectedEmployee = cmbEmployee.SelectedItem;
+                var employeeType = selectedEmployee.GetType();
+
+                // Get employee properties using reflection for safer access
+                var fullNameProp = employeeType.GetProperty("FullName");
+                var salaryProp = employeeType.GetProperty("MonthlySalary");
+                var employeeIdProp = employeeType.GetProperty("EmployeeId");
+                var positionProp = employeeType.GetProperty("Position");
+
+                var employeeName = fullNameProp?.GetValue(selectedEmployee)?.ToString() ?? "Unknown";
+                var salary = (decimal)(salaryProp?.GetValue(selectedEmployee) ?? 0m);
+                var employeeId = employeeIdProp?.GetValue(selectedEmployee)?.ToString() ?? "Unknown";
+                var position = positionProp?.GetValue(selectedEmployee)?.ToString() ?? "Unknown";
+
+                // Update basic salary field
+                txtBasicSalary.Text = $"₹{salary:N0}";
+
+                // Force recalculation
+                CalculateNetSalary();
+
+                // Enhanced status confirmation with debugging
+                if (lblStatus != null)
+                    lblStatus.Text = $"✓ Selected: {employeeName} (ID: {employeeId}, Position: {position}, Salary: ₹{salary:N0})";
+
+                // Also populate other fields for convenience
+                if (txtAdvanceSalary != null && string.IsNullOrEmpty(txtAdvanceSalary.Text))
+                    txtAdvanceSalary.Text = "0";
+                if (txtLoanDeduction != null && string.IsNullOrEmpty(txtLoanDeduction.Text))
+                    txtLoanDeduction.Text = "0";
+
+                // Auto-generate preview if month/year are selected
+                if (cmbMonth?.SelectedItem != null && cmbYear?.SelectedItem != null)
+                {
+                    GeneratePayslipPreview();
+                }
+            }
+            else
+            {
+                // Clear fields when no employee selected
+                txtBasicSalary.Text = "₹0";
+                if (txtAdvanceSalary != null) txtAdvanceSalary.Text = "0";
+                if (txtLoanDeduction != null) txtLoanDeduction.Text = "0";
+                CalculateNetSalary();
+                if (lblStatus != null) lblStatus.Text = "No employee selected";
+            }
+        }
+        catch (Exception ex)
+        {
+            var errorMsg = $"Error loading employee details: {ex.Message}";
+            if (lblStatus != null) lblStatus.Text = errorMsg;
+            MessageBox.Show(errorMsg, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void CalculateNetSalary()
+    {
+        try
+        {
+            // Null checks for all UI controls
+            if (txtBasicSalary == null || txtAdvanceSalary == null || txtLoanDeduction == null || lblNetSalary == null)
+                return;
+
+            if (decimal.TryParse(txtBasicSalary.Text.Replace("₹", "").Replace(",", ""), out decimal basicSalary) &&
+                decimal.TryParse(txtAdvanceSalary.Text, out decimal advance) &&
+                decimal.TryParse(txtLoanDeduction.Text, out decimal loan))
+            {
+                var netSalary = basicSalary - advance - loan;
+                lblNetSalary.Text = $"₹{netSalary:N0}";
+            }
+        }
+        catch (Exception ex)
+        {
+            // Safely handle errors during calculation
+            if (lblNetSalary != null)
+                lblNetSalary.Text = "₹0";
+        }
+    }
+
+    private void BtnGeneratePayslip_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (cmbEmployee.SelectedItem == null)
+            {
+                MessageBox.Show("Please select an employee.", "No Employee Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (cmbMonth.SelectedItem == null || cmbYear.SelectedItem == null)
+            {
+                MessageBox.Show("Please select month and year.", "Incomplete Date", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            GeneratePayslipPreview();
+            lblStatus.Text = "Payslip generated successfully";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error generating payslip: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void GeneratePayslipPreview()
+    {
+        try
+        {
+            // Use reflection to safely access anonymous object properties
+            var selectedEmployee = cmbEmployee.SelectedItem;
+            var employeeType = selectedEmployee.GetType();
+
+            // Get employee properties using reflection
+            var fullNameProp = employeeType.GetProperty("FullName");
+            var employeeIdProp = employeeType.GetProperty("EmployeeId");
+            var positionProp = employeeType.GetProperty("Position");
+            var joiningDateProp = employeeType.GetProperty("JoiningDate");
+
+            var employeeName = fullNameProp?.GetValue(selectedEmployee)?.ToString() ?? "Unknown";
+            var employeeId = employeeIdProp?.GetValue(selectedEmployee)?.ToString() ?? "Unknown";
+            var position = positionProp?.GetValue(selectedEmployee)?.ToString() ?? "Unknown";
+            var joiningDate = (DateTime)(joiningDateProp?.GetValue(selectedEmployee) ?? DateTime.Now);
+            var selectedMonth = ((ComboBoxItem)cmbMonth.SelectedItem).Content.ToString();
+            var selectedYear = cmbYear.SelectedItem.ToString();
+
+            // Parse salary values
+            decimal.TryParse(txtBasicSalary.Text.Replace("₹", "").Replace(",", ""), out decimal basicSalary);
+            decimal.TryParse(txtAdvanceSalary.Text, out decimal advance);
+            decimal.TryParse(txtLoanDeduction.Text, out decimal loan);
+
+            var totalDeductions = advance + loan;
+            var netSalary = basicSalary - totalDeductions;
+
+            // Update payslip preview using FindName method
+            try
+            {
+                // Use FindName to locate Run elements
+                var empName = this.FindName("PayslipEmployeeName") as Run;
+                var empId = this.FindName("PayslipEmployeeId") as Run;
+                var empPosition = this.FindName("PayslipPosition") as Run;
+                var empPeriod = this.FindName("PayslipPeriod") as Run;
+                var empGenDate = this.FindName("PayslipGeneratedDate") as Run;
+                var empJoinDate = this.FindName("PayslipJoiningDate") as Run;
+
+                var basicSalaryElement = this.FindName("PayslipBasicSalary") as TextBlock;
+                var advanceSalaryElement = this.FindName("PayslipAdvanceSalary") as TextBlock;
+                var loanDeductionElement = this.FindName("PayslipLoanDeduction") as TextBlock;
+                var totalDeductionsElement = this.FindName("PayslipTotalDeductions") as TextBlock;
+                var netSalaryElement = this.FindName("PayslipNetSalary") as TextBlock;
+
+                // Update Run elements
+                if (empName != null)
+                {
+                    empName.Text = employeeName;
+                    System.Diagnostics.Debug.WriteLine($"Set Employee Name via FindName: {employeeName}");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("Employee Name Run element not found via FindName!");
+                }
+
+                if (empId != null)
+                {
+                    empId.Text = employeeId;
+                    System.Diagnostics.Debug.WriteLine($"Set Employee ID via FindName: {employeeId}");
+                }
+
+                if (empPosition != null)
+                {
+                    empPosition.Text = position;
+                    System.Diagnostics.Debug.WriteLine($"Set Position via FindName: {position}");
+                }
+
+                if (empPeriod != null) empPeriod.Text = $"{selectedMonth} {selectedYear}";
+                if (empGenDate != null) empGenDate.Text = DateTime.Now.ToString("dd/MM/yyyy");
+                if (empJoinDate != null) empJoinDate.Text = joiningDate.ToString("dd/MM/yyyy");
+
+                // Update TextBlock elements (salary breakdown)
+                if (basicSalaryElement != null) basicSalaryElement.Text = $"₹{basicSalary:N0}";
+                if (advanceSalaryElement != null) advanceSalaryElement.Text = advance > 0 ? $"₹{advance:N0}" : "₹0";
+                if (loanDeductionElement != null) loanDeductionElement.Text = loan > 0 ? $"₹{loan:N0}" : "₹0";
+                if (totalDeductionsElement != null) totalDeductionsElement.Text = $"₹{totalDeductions:N0}";
+                if (netSalaryElement != null) netSalaryElement.Text = $"₹{netSalary:N0}";
+
+                // Force UI update
+                PayslipBorder.UpdateLayout();
+
+                System.Diagnostics.Debug.WriteLine($"Payslip updated successfully for {employeeName}");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Error updating payslip elements: {ex.Message}");
+                MessageBox.Show($"Debug: Error updating payslip elements: {ex.Message}", "Debug Info", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error updating payslip preview: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void BtnPrintPayslip_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            // Check if payslip has been generated using FindName
+            var empName = this.FindName("PayslipEmployeeName") as Run;
+            if (empName == null || string.IsNullOrEmpty(empName.Text))
+            {
+                MessageBox.Show("Please generate a payslip first.", "No Payslip", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var printDialog = new PrintDialog();
+            if (printDialog.ShowDialog() == true)
+            {
+                // Force layout update to ensure all content is rendered
+                PayslipBorder.UpdateLayout();
+                PayslipBorder.Measure(new Size(794, double.PositiveInfinity));
+                PayslipBorder.Arrange(new Rect(0, 0, 794, PayslipBorder.DesiredSize.Height));
+
+                // Create a visual for printing
+                var visual = PayslipBorder;
+                var transform = visual.LayoutTransform;
+
+                // Configure for A4 paper size (8.27 × 11.69 inches at standard DPI)
+                double pageWidth = printDialog.PrintableAreaWidth;
+                double pageHeight = printDialog.PrintableAreaHeight;
+                double visualWidth = PayslipBorder.ActualWidth > 0 ? PayslipBorder.ActualWidth : 794;
+                double visualHeight = PayslipBorder.ActualHeight > 0 ? PayslipBorder.ActualHeight : PayslipBorder.DesiredSize.Height;
+
+                // Calculate scale to fit A4 page
+                var scaleX = pageWidth / visualWidth;
+                var scaleY = pageHeight / visualHeight;
+                var scale = Math.Min(scaleX, scaleY);
+
+                // Apply scale transform
+                visual.LayoutTransform = new ScaleTransform(scale, scale);
+
+                // Print the visual
+                printDialog.PrintVisual(visual, "Employee Payslip");
+
+                // Restore original transform
+                visual.LayoutTransform = transform;
+
+                lblStatus.Text = "Payslip printed successfully";
+                MessageBox.Show("Payslip printed successfully!", "Print Complete", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error printing payslip: {ex.Message}", "Print Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void BtnClearPayslip_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (cmbEmployee != null) cmbEmployee.SelectedItem = null;
+            ClearPayslipForm();
+            if (lblStatus != null) lblStatus.Text = "Payslip form cleared";
+        }
+        catch (Exception ex)
+        {
+            if (lblStatus != null)
+                lblStatus.Text = $"Error clearing payslip: {ex.Message}";
+        }
+    }
+
+    // Add event handlers for real-time calculation
+    private void TxtBasicSalary_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        try
+        {
+            CalculateNetSalary();
+        }
+        catch (Exception ex)
+        {
+            // Safely ignore calculation errors during initialization
+        }
+    }
+
+    private void TxtAdvanceSalary_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        try
+        {
+            CalculateNetSalary();
+        }
+        catch (Exception ex)
+        {
+            // Safely ignore calculation errors during initialization
+        }
+    }
+
+    private void TxtLoanDeduction_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        try
+        {
+            CalculateNetSalary();
+        }
+        catch (Exception ex)
+        {
+            // Safely ignore calculation errors during initialization
+        }
     }
 }

@@ -160,14 +160,279 @@
                 </Grid>
             </TabItem>
 
+            <!-- Payslip Generation Tab -->
+            <TabItem Header="📄 Payslip Generation" FontSize="16" Padding="15,10">
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header -->
+                    <TextBlock Grid.Row="0" Text="Employee Payslip Generator"
+                               FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"
+                               Foreground="#2C3E50" Margin="0,0,0,20"/>
+
+                    <!-- Payslip Form and Preview -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="300"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Left Panel - Employee Selection and Salary Details -->
+                        <Border Grid.Column="0" Background="#F8F9FA" Padding="20" Margin="0,0,20,0">
+                            <StackPanel>
+                                <TextBlock Text="Employee Selection" FontSize="16" FontWeight="Bold" Margin="0,0,0,15"/>
+
+                                <!-- Employee Selection -->
+                                <TextBlock Text="Select Employee:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <ComboBox x:Name="cmbEmployee" Height="35" Margin="0,0,0,15"
+                                          DisplayMemberPath="FullName" SelectedValuePath="Id"
+                                          SelectionChanged="CmbEmployee_SelectionChanged"/>
+
+                                <!-- Month/Year Selection -->
+                                <TextBlock Text="Payslip Month:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <Grid Margin="0,0,0,15">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox x:Name="cmbMonth" Grid.Column="0" Height="35" Margin="0,0,5,0">
+                                        <ComboBoxItem Content="January" Tag="1"/>
+                                        <ComboBoxItem Content="February" Tag="2"/>
+                                        <ComboBoxItem Content="March" Tag="3"/>
+                                        <ComboBoxItem Content="April" Tag="4"/>
+                                        <ComboBoxItem Content="May" Tag="5"/>
+                                        <ComboBoxItem Content="June" Tag="6"/>
+                                        <ComboBoxItem Content="July" Tag="7"/>
+                                        <ComboBoxItem Content="August" Tag="8"/>
+                                        <ComboBoxItem Content="September" Tag="9"/>
+                                        <ComboBoxItem Content="October" Tag="10"/>
+                                        <ComboBoxItem Content="November" Tag="11"/>
+                                        <ComboBoxItem Content="December" Tag="12"/>
+                                    </ComboBox>
+                                    <ComboBox x:Name="cmbYear" Grid.Column="1" Height="35" Margin="5,0,0,0"/>
+                                </Grid>
+
+                                <!-- Salary Details -->
+                                <TextBlock Text="Salary Details" FontSize="16" FontWeight="Bold" Margin="0,15,0,15"/>
+
+                                <TextBlock Text="Basic Salary:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtBasicSalary" Height="35" Margin="0,0,0,10"
+                                         VerticalContentAlignment="Center" Text="₹0"
+                                         TextChanged="TxtBasicSalary_TextChanged"/>
+
+                                <TextBlock Text="Advance Salary:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtAdvanceSalary" Height="35" Margin="0,0,0,10"
+                                         VerticalContentAlignment="Center" Text="0"
+                                         TextChanged="TxtAdvanceSalary_TextChanged"/>
+
+                                <TextBlock Text="Loan Deduction:" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtLoanDeduction" Height="35" Margin="0,0,0,15"
+                                         VerticalContentAlignment="Center" Text="0"
+                                         TextChanged="TxtLoanDeduction_TextChanged"/>
+
+                                <!-- Net Salary Display -->
+                                <Border Background="#E8F5E8" Padding="10" Margin="0,0,0,15">
+                                    <StackPanel>
+                                        <TextBlock Text="Net Salary:" FontWeight="Bold" FontSize="14"/>
+                                        <TextBlock x:Name="lblNetSalary" Text="₹0" FontSize="18" FontWeight="Bold"
+                                                   Foreground="#27AE60"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Generate Button -->
+                                <Button x:Name="btnGeneratePayslip" Content="Generate Payslip" Height="40"
+                                        Background="#3498DB" Foreground="White" FontWeight="Bold"
+                                        Click="BtnGeneratePayslip_Click"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Right Panel - Payslip Preview (A4 Size: 794x1122 pixels at 96 DPI) -->
+                        <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                            <Border x:Name="PayslipBorder" Background="White" BorderBrush="#34495E"
+                                    BorderThickness="2" Padding="40" Width="794">
+                                <StackPanel x:Name="PayslipContent">
+                                    <!-- School Header -->
+                                    <Grid Margin="0,0,0,20">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- School Logo -->
+                                        <Border Grid.Column="0" Width="80" Height="80"
+                                                HorizontalAlignment="Left" VerticalAlignment="Center"
+                                                Margin="0,0,15,0" BorderBrush="Black" BorderThickness="1">
+                                            <Viewbox Stretch="Uniform">
+                                                <Image Source="Exact_color_logo.png" Stretch="Uniform"/>
+                                            </Viewbox>
+                                        </Border>
+
+                                        <!-- School Details -->
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="INSPIRE ENGLISH MEDIUM SCHOOL, MARDI"
+                                                       FontSize="18" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                            <TextBlock Text="Tah. Maregaon, Dist. Yavatmal (Maharashtra) – 445303"
+                                                       FontSize="12" HorizontalAlignment="Center" Margin="0,3"/>
+                                            <TextBlock Text="U-Dise Code : 27140806704 | School Reg. No. MH-15381/16"
+                                                       FontSize="10" HorizontalAlignment="Center" Margin="0,3"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- Separator Line -->
+                                    <Border Height="2" Background="#34495E" Margin="0,0,0,15"/>
+
+                                    <!-- Payslip Title -->
+                                    <TextBlock Text="SALARY SLIP" FontSize="20" FontWeight="Bold"
+                                               HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+                                    <!-- Employee and Payslip Details -->
+                                    <Grid Margin="0,0,0,25">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Left Side - Employee Details -->
+                                        <StackPanel Grid.Column="0" HorizontalAlignment="Left">
+                                            <TextBlock FontSize="13" Margin="0,3">
+                                                <Run Text="Employee Name: "/>
+                                                <Run x:Name="PayslipEmployeeName" FontWeight="Bold"/>
+                                            </TextBlock>
+                                            <TextBlock FontSize="13" Margin="0,3">
+                                                <Run Text="Employee ID: "/>
+                                                <Run x:Name="PayslipEmployeeId" FontWeight="Bold"/>
+                                            </TextBlock>
+                                            <TextBlock FontSize="13" Margin="0,3">
+                                                <Run Text="Position: "/>
+                                                <Run x:Name="PayslipPosition" FontWeight="Bold"/>
+                                            </TextBlock>
+                                        </StackPanel>
+
+                                        <!-- Right Side - Dates -->
+                                        <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                            <TextBlock FontSize="13" Margin="0,3" HorizontalAlignment="Right">
+                                                <Run Text="Pay Period: "/>
+                                                <Run x:Name="PayslipPeriod" FontWeight="Bold"/>
+                                            </TextBlock>
+                                            <TextBlock FontSize="13" Margin="0,3" HorizontalAlignment="Right">
+                                                <Run Text="Generated Date: "/>
+                                                <Run x:Name="PayslipGeneratedDate" FontWeight="Bold"/>
+                                            </TextBlock>
+                                            <TextBlock FontSize="13" Margin="0,3" HorizontalAlignment="Right">
+                                                <Run Text="Joining Date: "/>
+                                                <Run x:Name="PayslipJoiningDate" FontWeight="Bold"/>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <!-- Salary Breakdown Table -->
+                                    <Border BorderBrush="#34495E" BorderThickness="1" Margin="0,0,0,20">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                                <RowDefinition Height="Auto"/>
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+
+                                            <!-- Header -->
+                                            <Border Grid.Row="0" Grid.ColumnSpan="2" Background="#34495E" Padding="10">
+                                                <TextBlock Text="SALARY BREAKDOWN" FontWeight="Bold" FontSize="14"
+                                                           Foreground="White" HorizontalAlignment="Center"/>
+                                            </Border>
+
+                                            <!-- Basic Salary -->
+                                            <Border Grid.Row="1" Grid.Column="0" BorderBrush="#BDC3C7" BorderThickness="0,0,1,1" Padding="10">
+                                                <TextBlock Text="Basic Salary" FontSize="12"/>
+                                            </Border>
+                                            <Border Grid.Row="1" Grid.Column="1" BorderBrush="#BDC3C7" BorderThickness="0,0,0,1" Padding="10">
+                                                <TextBlock x:Name="PayslipBasicSalary" Text="₹0" FontSize="12" FontWeight="Bold"/>
+                                            </Border>
+
+                                            <!-- Advance Salary -->
+                                            <Border Grid.Row="2" Grid.Column="0" BorderBrush="#BDC3C7" BorderThickness="0,0,1,1" Padding="10">
+                                                <TextBlock Text="Less: Advance Salary" FontSize="12" Foreground="#E74C3C"/>
+                                            </Border>
+                                            <Border Grid.Row="2" Grid.Column="1" BorderBrush="#BDC3C7" BorderThickness="0,0,0,1" Padding="10">
+                                                <TextBlock x:Name="PayslipAdvanceSalary" Text="₹0" FontSize="12" FontWeight="Bold" Foreground="#E74C3C"/>
+                                            </Border>
+
+                                            <!-- Loan Deduction -->
+                                            <Border Grid.Row="3" Grid.Column="0" BorderBrush="#BDC3C7" BorderThickness="0,0,1,1" Padding="10">
+                                                <TextBlock Text="Less: Loan Deduction" FontSize="12" Foreground="#E74C3C"/>
+                                            </Border>
+                                            <Border Grid.Row="3" Grid.Column="1" BorderBrush="#BDC3C7" BorderThickness="0,0,0,1" Padding="10">
+                                                <TextBlock x:Name="PayslipLoanDeduction" Text="₹0" FontSize="12" FontWeight="Bold" Foreground="#E74C3C"/>
+                                            </Border>
+
+                                            <!-- Total Deductions -->
+                                            <Border Grid.Row="4" Grid.Column="0" BorderBrush="#BDC3C7" BorderThickness="0,0,1,1" Padding="10" Background="#F8F9FA">
+                                                <TextBlock Text="Total Deductions" FontSize="12" FontWeight="SemiBold"/>
+                                            </Border>
+                                            <Border Grid.Row="4" Grid.Column="1" BorderBrush="#BDC3C7" BorderThickness="0,0,0,1" Padding="10" Background="#F8F9FA">
+                                                <TextBlock x:Name="PayslipTotalDeductions" Text="₹0" FontSize="12" FontWeight="Bold"/>
+                                            </Border>
+
+                                            <!-- Net Salary -->
+                                            <Border Grid.Row="5" Grid.Column="0" BorderBrush="#34495E" BorderThickness="0,0,1,0" Padding="10" Background="#E8F5E8">
+                                                <TextBlock Text="NET SALARY" FontSize="14" FontWeight="Bold"/>
+                                            </Border>
+                                            <Border Grid.Row="5" Grid.Column="1" Padding="10" Background="#E8F5E8">
+                                                <TextBlock x:Name="PayslipNetSalary" Text="₹0" FontSize="14" FontWeight="Bold" Foreground="#27AE60"/>
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Footer -->
+                                    <Grid Margin="0,30,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Generated by: Admin" FontSize="10" Margin="0,0,0,30"/>
+                                            <TextBlock Text="This is a computer generated payslip" FontSize="8" FontStyle="Italic"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                            <TextBlock Text="Authorized Signature" FontSize="10" FontWeight="Bold"
+                                                       HorizontalAlignment="Right" Margin="0,40,0,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </ScrollViewer>
+                    </Grid>
+
+                    <!-- Action Buttons -->
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center"
+                                Margin="0,20,0,0">
+                        <Button x:Name="btnPrintPayslip" Content="Print Payslip" Width="120" Height="35"
+                                Margin="0,0,10,0" Background="#27AE60" Foreground="White"
+                                FontWeight="Bold" Click="BtnPrintPayslip_Click"/>
+                        <Button x:Name="btnClearPayslip" Content="Clear" Width="100" Height="35"
+                                Margin="10,0,0,0" Background="#95A5A6" Foreground="White"
+                                FontWeight="Bold" Click="BtnClearPayslip_Click"/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
             <!-- Dashboard Tab -->
             <TabItem Header="📊 Dashboard" FontSize="16" Padding="15,10">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <Grid Margin="20">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
@@ -182,6 +447,7 @@
                         <!-- Overall Statistics Cards -->
                         <Grid Grid.Row="1" Margin="0,0,0,30">
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
@@ -221,38 +487,31 @@
                                 </StackPanel>
                             </Border>
 
-                            <!-- Average Salary Card -->
-                            <Border Grid.Column="3" Style="{StaticResource CardStyle}" Margin="10,0,0,0" Background="{StaticResource WarningBrush}">
+                            <!-- Total Monthly Salary Card -->
+                            <Border Grid.Column="3" Style="{StaticResource CardStyle}" Margin="5,0" Background="{StaticResource WarningBrush}">
                                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
                                     <TextBlock Text="💰" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                                    <TextBlock x:Name="lblAverageSalary" Text="₹0" FontSize="28" FontWeight="Bold"
+                                    <TextBlock x:Name="lblTotalMonthlySalary" Text="₹0" FontSize="28" FontWeight="Bold"
                                                HorizontalAlignment="Center" Foreground="White"/>
-                                    <TextBlock Text="Avg. Salary" FontSize="12" HorizontalAlignment="Center"
+                                    <TextBlock Text="Monthly Salary" FontSize="12" HorizontalAlignment="Center"
+                                               Foreground="White" FontWeight="Medium"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Total Spent Till Today Card -->
+                            <Border Grid.Column="4" Style="{StaticResource CardStyle}" Margin="10,0,0,0" Background="{StaticResource DangerBrush}">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
+                                    <TextBlock Text="📊" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                    <TextBlock x:Name="lblTotalSpentTillToday" Text="₹0" FontSize="28" FontWeight="Bold"
+                                               HorizontalAlignment="Center" Foreground="White"/>
+                                    <TextBlock Text="Total Till Today" FontSize="12" HorizontalAlignment="Center"
                                                Foreground="White" FontWeight="Medium"/>
                                 </StackPanel>
                             </Border>
                         </Grid>
 
-                        <!-- Teachers with Classes Statistics -->
-                        <StackPanel Grid.Row="2" Margin="0,0,0,25">
-                            <TextBlock Text="🎓 Teachers &amp; Classes" FontSize="14" FontWeight="Bold"
-                                       Margin="0,0,0,10" Foreground="{StaticResource TextPrimaryBrush}"/>
-                            <DataGrid x:Name="dgTeacherClassStats" AutoGenerateColumns="False" HeadersVisibility="Column"
-                                      CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                                      GridLinesVisibility="Horizontal" BorderThickness="0" Background="Transparent"
-                                      RowBackground="Transparent" AlternatingRowBackground="#F8F9FA" MaxHeight="200">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Teacher" Binding="{Binding TeacherName}" Width="200"/>
-                                    <DataGridTextColumn Header="Employee ID" Binding="{Binding EmployeeId}" Width="120"/>
-                                    <DataGridTextColumn Header="Classes Assigned" Binding="{Binding ClassCount}" Width="130"/>
-                                    <DataGridTextColumn Header="Classes" Binding="{Binding ClassNames}" Width="300"/>
-                                    <DataGridTextColumn Header="Monthly Salary" Binding="{Binding FormattedSalary}" Width="120"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </StackPanel>
-
                         <!-- Position-wise Breakdown -->
-                        <StackPanel Grid.Row="3" Margin="0,0,0,25">
+                        <StackPanel Grid.Row="2" Margin="0,0,0,25">
                             <TextBlock Text="📋 Position-wise Breakdown" FontSize="14" FontWeight="Bold"
                                        Margin="0,0,0,10" Foreground="{StaticResource TextPrimaryBrush}"/>
                             <DataGrid x:Name="dgPositionStats" AutoGenerateColumns="False" HeadersVisibility="Column"
@@ -261,51 +520,17 @@
                                       RowBackground="Transparent" AlternatingRowBackground="#F8F9FA">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Position" Binding="{Binding Position}" Width="150"/>
-                                    <DataGridTextColumn Header="Count" Binding="{Binding Count}" Width="80"/>
-                                    <DataGridTextColumn Header="Avg. Salary" Binding="{Binding FormattedAvgSalary}" Width="120"/>
-                                    <DataGridTextColumn Header="Total Salary" Binding="{Binding FormattedTotalSalary}" Width="120"/>
-                                    <DataGridTextColumn Header="Percentage" Binding="{Binding Percentage}" Width="100"/>
+                                    <DataGridTextColumn Header="Staff Count" Binding="{Binding Count}" Width="100"/>
+                                    <DataGridTextColumn Header="Monthly Total (₹)" Binding="{Binding FormattedTotalSalary}" Width="150"/>
+                                    <DataGridTextColumn Header="Avg. Salary (₹)" Binding="{Binding FormattedAvgSalary}" Width="140"/>
+                                    <DataGridTextColumn Header="% of Staff" Binding="{Binding Percentage}" Width="100"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </StackPanel>
 
-                        <!-- Salary Range Analysis -->
-                        <StackPanel Grid.Row="4" Margin="0,0,0,25">
-                            <TextBlock Text="💰 Salary Range Analysis" FontSize="14" FontWeight="Bold"
-                                       Margin="0,0,0,10" Foreground="{StaticResource TextPrimaryBrush}"/>
-                            <DataGrid x:Name="dgSalaryRangeStats" AutoGenerateColumns="False" HeadersVisibility="Column"
-                                      CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                                      GridLinesVisibility="Horizontal" BorderThickness="0" Background="Transparent"
-                                      RowBackground="Transparent" AlternatingRowBackground="#F8F9FA">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Salary Range" Binding="{Binding SalaryRange}" Width="150"/>
-                                    <DataGridTextColumn Header="Count" Binding="{Binding Count}" Width="80"/>
-                                    <DataGridTextColumn Header="Percentage" Binding="{Binding Percentage}" Width="100"/>
-                                    <DataGridTextColumn Header="Staff Members" Binding="{Binding StaffNames}" Width="400"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </StackPanel>
-
-                        <!-- Recent Joiners -->
-                        <StackPanel Grid.Row="5" Margin="0,0,0,25">
-                            <TextBlock Text="🆕 Recent Joiners (Last 2 Years)" FontSize="14" FontWeight="Bold"
-                                       Margin="0,0,0,10" Foreground="{StaticResource TextPrimaryBrush}"/>
-                            <DataGrid x:Name="dgRecentJoiners" AutoGenerateColumns="False" HeadersVisibility="Column"
-                                      CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                                      GridLinesVisibility="Horizontal" BorderThickness="0" Background="Transparent"
-                                      RowBackground="Transparent" AlternatingRowBackground="#F8F9FA" MaxHeight="200">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="200"/>
-                                    <DataGridTextColumn Header="Position" Binding="{Binding Position}" Width="150"/>
-                                    <DataGridTextColumn Header="Joining Date" Binding="{Binding FormattedJoiningDate}" Width="120"/>
-                                    <DataGridTextColumn Header="Days Since Joined" Binding="{Binding DaysSinceJoined}" Width="150"/>
-                                    <DataGridTextColumn Header="Monthly Salary" Binding="{Binding FormattedSalary}" Width="120"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </StackPanel>
 
                         <!-- Payroll Summary -->
-                        <StackPanel Grid.Row="6" Margin="0,0,0,25">
+                        <StackPanel Grid.Row="3" Margin="0,0,0,25">
                             <TextBlock Text="💸 Monthly Payroll Summary" FontSize="14" FontWeight="Bold"
                                        Margin="0,0,0,10" Foreground="{StaticResource TextPrimaryBrush}"/>
 
