@@ -75,10 +75,13 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.FirstName).IsRequired().HasMaxLength(50);
             entity.Property(e => e.LastName).IsRequired().HasMaxLength(50);
             entity.Property(e => e.PhoneNumber).IsRequired().HasMaxLength(15);
-            entity.Property(e => e.Gender).IsRequired().HasMaxLength(10);
             entity.Property(e => e.Address).HasMaxLength(200);
             entity.Property(e => e.Position).IsRequired().HasMaxLength(50);
-            entity.Property(e => e.Salary).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.MonthlySalary).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.Email).HasMaxLength(100);
+            entity.Property(e => e.BankAccountNumber).HasMaxLength(20);
+            entity.Property(e => e.AadharNumber).HasMaxLength(12);
+            entity.Property(e => e.PANNumber).HasMaxLength(10);
             entity.HasIndex(e => e.EmployeeId).IsUnique();
         });
 
@@ -283,20 +286,26 @@ public class ApplicationDbContext : DbContext
             new Staff
             {
                 Id = 1, EmployeeId = "ST001", FirstName = "Rajesh", LastName = "Kumar",
-                PhoneNumber = "9876543213", DateOfBirth = new DateTime(1985, 3, 15), Gender = "Male",
-                Address = "101 Transport Ave, City", Position = "Driver", Salary = 25000
+                PhoneNumber = "9876543213", JoiningDate = new DateTime(2020, 3, 15),
+                Address = "101 Transport Ave, City", Position = "Driver", MonthlySalary = 25000,
+                Email = "rajesh.kumar@school.edu", BankAccountNumber = "1234567890",
+                AadharNumber = "123456789012", PANNumber = "ABCDE1234F"
             },
             new Staff
             {
                 Id = 2, EmployeeId = "ST002", FirstName = "Kamala", LastName = "Devi",
-                PhoneNumber = "9876543215", DateOfBirth = new DateTime(1978, 7, 22), Gender = "Female",
-                Address = "202 Clean St, City", Position = "Peon", Salary = 18000
+                PhoneNumber = "9876543215", JoiningDate = new DateTime(2019, 7, 22),
+                Address = "202 Clean St, City", Position = "Peon", MonthlySalary = 18000,
+                Email = "kamala.devi@school.edu", BankAccountNumber = "2345678901",
+                AadharNumber = "234567890123", PANNumber = "BCDEF2345G"
             },
             new Staff
             {
                 Id = 3, EmployeeId = "ST003", FirstName = "Suresh", LastName = "Singh",
-                PhoneNumber = "9876543217", DateOfBirth = new DateTime(1982, 11, 8), Gender = "Male",
-                Address = "303 Office Lane, City", Position = "Clerk", Salary = 22000
+                PhoneNumber = "9876543217", JoiningDate = new DateTime(2021, 11, 8),
+                Address = "303 Office Lane, City", Position = "Clerk", MonthlySalary = 22000,
+                Email = "suresh.singh@school.edu", BankAccountNumber = "3456789012",
+                AadharNumber = "345678901234", PANNumber = "CDEFG3456H"
             }
         );
 

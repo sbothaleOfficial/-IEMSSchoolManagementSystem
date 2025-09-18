@@ -7,83 +7,88 @@ namespace IEMS.WPF;
 public partial class AddEditStaffWindow : Window
 {
     private readonly StaffService _staffService;
-    private readonly StaffDto? _existingStaff;
-    private readonly bool _isEditMode;
+    private readonly StaffDto? _staffToEdit;
 
-    public AddEditStaffWindow(StaffService staffService, StaffDto? existingStaff = null)
+    public AddEditStaffWindow(StaffService staffService, StaffDto? staffToEdit = null)
     {
         InitializeComponent();
         _staffService = staffService;
-        _existingStaff = existingStaff;
-        _isEditMode = existingStaff != null;
+        _staffToEdit = staffToEdit;
 
-        InitializeForm();
+        LoadStaffData();
+
+        Title = staffToEdit == null ? "Add Staff Member" : "Edit Staff Member";
     }
 
-    private void InitializeForm()
+    private void LoadStaffData()
     {
-        if (_isEditMode && _existingStaff != null)
+        if (_staffToEdit != null)
         {
-            lblTitle.Text = "Edit Staff Member";
-            PopulateFormFields();
+            txtEmployeeId.Text = _staffToEdit.EmployeeId;
+            txtFirstName.Text = _staffToEdit.FirstName;
+            txtLastName.Text = _staffToEdit.LastName;
+            txtPhoneNumber.Text = _staffToEdit.PhoneNumber;
+            txtAddress.Text = _staffToEdit.Address;
+            dpJoiningDate.SelectedDate = _staffToEdit.JoiningDate;
+            txtMonthlySalary.Text = _staffToEdit.MonthlySalary.ToString("F2");
+            cmbPosition.Text = _staffToEdit.Position;
+
+            txtEmail.Text = _staffToEdit.Email ?? "";
+            txtBankAccount.Text = _staffToEdit.BankAccountNumber ?? "";
+            txtAadharNumber.Text = _staffToEdit.AadharNumber ?? "";
+            txtPANNumber.Text = _staffToEdit.PANNumber ?? "";
         }
         else
         {
-            lblTitle.Text = "Add New Staff Member";
-            SetDefaultValues();
+            dpJoiningDate.SelectedDate = DateTime.Today;
         }
-    }
-
-    private void SetDefaultValues()
-    {
-        dpDateOfBirth.SelectedDate = DateTime.Now.AddYears(-25);
-    }
-
-    private void PopulateFormFields()
-    {
-        if (_existingStaff == null) return;
-
-        txtEmployeeId.Text = _existingStaff.EmployeeId;
-        txtFirstName.Text = _existingStaff.FirstName;
-        txtLastName.Text = _existingStaff.LastName;
-        txtPhoneNumber.Text = _existingStaff.PhoneNumber;
-        dpDateOfBirth.SelectedDate = _existingStaff.DateOfBirth;
-
-        // Set gender
-        cmbGender.Text = _existingStaff.Gender;
-
-        txtAddress.Text = _existingStaff.Address;
-        cmbPosition.Text = _existingStaff.Position;
-        txtSalary.Text = _existingStaff.Salary.ToString("F2");
     }
 
     private async void BtnSave_Click(object sender, RoutedEventArgs e)
     {
+        if (!ValidateInput())
+            return;
+
         try
         {
-            if (!ValidateForm())
-                return;
-
-            var staffDto = CreateStaffDto();
-
-            if (_isEditMode && _existingStaff != null)
+            var staffDto = new StaffDto
             {
-                staffDto.Id = _existingStaff.Id;
-                await _staffService.UpdateStaffAsync(staffDto);
-                MessageBox.Show("Staff member updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                Id = _staffToEdit?.Id ?? 0,
+                EmployeeId = txtEmployeeId.Text.Trim(),
+                FirstName = txtFirstName.Text.Trim(),
+                LastName = txtLastName.Text.Trim(),
+                PhoneNumber = txtPhoneNumber.Text.Trim(),
+                Address = txtAddress.Text.Trim(),
+                JoiningDate = dpJoiningDate.SelectedDate ?? DateTime.Today,
+                MonthlySalary = decimal.TryParse(txtMonthlySalary.Text.Trim(), out var salary) ? salary : 0,
+                Position = cmbPosition.Text.Trim(),
+                Email = string.IsNullOrWhiteSpace(txtEmail.Text) ? null : txtEmail.Text.Trim(),
+                BankAccountNumber = string.IsNullOrWhiteSpace(txtBankAccount.Text) ? null : txtBankAccount.Text.Trim(),
+                AadharNumber = string.IsNullOrWhiteSpace(txtAadharNumber.Text) ? null : txtAadharNumber.Text.Trim(),
+                PANNumber = string.IsNullOrWhiteSpace(txtPANNumber.Text) ? null : txtPANNumber.Text.Trim()
+            };
+
+            // Check for unique employee ID
+            if (!await _staffService.IsEmployeeIdUniqueAsync(staffDto.EmployeeId, staffDto.Id == 0 ? null : staffDto.Id))
+            {
+                MessageBox.Show("Employee ID already exists. Please choose a different one.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtEmployeeId.Focus();
+                return;
             }
-            else
+
+            if (_staffToEdit == null)
             {
                 await _staffService.CreateStaffAsync(staffDto);
                 MessageBox.Show("Staff member added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
             }
+            else
+            {
+                await _staffService.UpdateStaffAsync(staffDto);
+                MessageBox.Show("Staff member updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
 
             DialogResult = true;
             Close();
-        }
-        catch (ArgumentException ex)
-        {
-            MessageBox.Show(ex.Message, "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
         catch (Exception ex)
         {
@@ -91,7 +96,13 @@ public partial class AddEditStaffWindow : Window
         }
     }
 
-    private bool ValidateForm()
+    private void BtnCancel_Click(object sender, RoutedEventArgs e)
+    {
+        DialogResult = false;
+        Close();
+    }
+
+    private bool ValidateInput()
     {
         if (string.IsNullOrWhiteSpace(txtEmployeeId.Text))
         {
@@ -114,7 +125,6 @@ public partial class AddEditStaffWindow : Window
             return false;
         }
 
-
         if (string.IsNullOrWhiteSpace(txtPhoneNumber.Text))
         {
             MessageBox.Show("Phone number is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -122,24 +132,25 @@ public partial class AddEditStaffWindow : Window
             return false;
         }
 
-        if (!dpDateOfBirth.SelectedDate.HasValue)
+        if (string.IsNullOrWhiteSpace(txtAddress.Text))
         {
-            MessageBox.Show("Date of birth is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            dpDateOfBirth.Focus();
+            MessageBox.Show("Address is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtAddress.Focus();
             return false;
         }
 
-        if (dpDateOfBirth.SelectedDate.Value > DateTime.Now.AddYears(-16))
+        if (!dpJoiningDate.SelectedDate.HasValue)
         {
-            MessageBox.Show("Staff member must be at least 16 years old.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            dpDateOfBirth.Focus();
+            MessageBox.Show("Joining date is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            dpJoiningDate.Focus();
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(cmbGender.Text))
+        if (!decimal.TryParse(txtMonthlySalary.Text.Trim(), out var salary) || salary < 0)
         {
-            MessageBox.Show("Gender is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            cmbGender.Focus();
+            MessageBox.Show("Please enter a valid monthly salary.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtMonthlySalary.Focus();
+            txtMonthlySalary.SelectAll();
             return false;
         }
 
@@ -150,35 +161,18 @@ public partial class AddEditStaffWindow : Window
             return false;
         }
 
-
-        if (!decimal.TryParse(txtSalary.Text, out decimal salary) || salary < 0)
+        // Optional field validations
+        if (!string.IsNullOrWhiteSpace(txtEmail.Text) && !IsValidEmail(txtEmail.Text.Trim()))
         {
-            MessageBox.Show("Please enter a valid salary amount.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            txtSalary.Focus();
+            MessageBox.Show("Please enter a valid email address.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtEmail.Focus();
             return false;
         }
 
         return true;
     }
 
-    private StaffDto CreateStaffDto()
-    {
-        return new StaffDto
-        {
-            Id = _isEditMode ? _existingStaff!.Id : 0,
-            EmployeeId = txtEmployeeId.Text.Trim(),
-            FirstName = txtFirstName.Text.Trim(),
-            LastName = txtLastName.Text.Trim(),
-            PhoneNumber = txtPhoneNumber.Text.Trim(),
-            DateOfBirth = dpDateOfBirth.SelectedDate!.Value,
-            Gender = cmbGender.Text.Trim(),
-            Address = txtAddress.Text.Trim(),
-            Position = cmbPosition.Text.Trim(),
-            Salary = decimal.Parse(txtSalary.Text)
-        };
-    }
-
-    private static bool IsValidEmail(string email)
+    private bool IsValidEmail(string email)
     {
         try
         {
@@ -189,11 +183,5 @@ public partial class AddEditStaffWindow : Window
         {
             return false;
         }
-    }
-
-    private void BtnCancel_Click(object sender, RoutedEventArgs e)
-    {
-        DialogResult = false;
-        Close();
     }
 }

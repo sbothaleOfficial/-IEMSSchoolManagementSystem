@@ -22,6 +22,149 @@
 
         <!-- Main Content -->
         <TabControl Grid.Row="1" Margin="10">
+            <TabItem Header="📊 Dashboard" FontSize="14">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid Margin="20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Overall Statistics Cards -->
+                        <TextBlock Grid.Row="0" Text="📊 School Overview" FontSize="18" FontWeight="Bold"
+                                   Margin="0,0,0,15" Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                        <UniformGrid Grid.Row="1" Columns="4" Margin="0,0,0,30">
+                            <!-- Total Students Card -->
+                            <Border Background="{StaticResource SuccessBrush}" CornerRadius="10" Margin="5">
+                                <StackPanel Padding="20" HorizontalAlignment="Center">
+                                    <TextBlock Text="👥" FontSize="30" HorizontalAlignment="Center" Foreground="White"/>
+                                    <TextBlock x:Name="lblTotalStudents" Text="0" FontSize="24" FontWeight="Bold"
+                                               HorizontalAlignment="Center" Foreground="White"/>
+                                    <TextBlock Text="Total Students" FontSize="12" HorizontalAlignment="Center" Foreground="White"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Total Male Students Card -->
+                            <Border Background="{StaticResource PrimaryBrush}" CornerRadius="10" Margin="5">
+                                <StackPanel Padding="20" HorizontalAlignment="Center">
+                                    <TextBlock Text="👨‍🎓" FontSize="30" HorizontalAlignment="Center" Foreground="White"/>
+                                    <TextBlock x:Name="lblMaleStudents" Text="0" FontSize="24" FontWeight="Bold"
+                                               HorizontalAlignment="Center" Foreground="White"/>
+                                    <TextBlock Text="Male Students" FontSize="12" HorizontalAlignment="Center" Foreground="White"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Total Female Students Card -->
+                            <Border Background="#E74C3C" CornerRadius="10" Margin="5">
+                                <StackPanel Padding="20" HorizontalAlignment="Center">
+                                    <TextBlock Text="👩‍🎓" FontSize="30" HorizontalAlignment="Center" Foreground="White"/>
+                                    <TextBlock x:Name="lblFemaleStudents" Text="0" FontSize="24" FontWeight="Bold"
+                                               HorizontalAlignment="Center" Foreground="White"/>
+                                    <TextBlock Text="Female Students" FontSize="12" HorizontalAlignment="Center" Foreground="White"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Total Classes Card -->
+                            <Border Background="#9B59B6" CornerRadius="10" Margin="5">
+                                <StackPanel Padding="20" HorizontalAlignment="Center">
+                                    <TextBlock Text="🏫" FontSize="30" HorizontalAlignment="Center" Foreground="White"/>
+                                    <TextBlock x:Name="lblTotalClasses" Text="0" FontSize="24" FontWeight="Bold"
+                                               HorizontalAlignment="Center" Foreground="White"/>
+                                    <TextBlock Text="Total Classes" FontSize="12" HorizontalAlignment="Center" Foreground="White"/>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+
+                        <!-- Class-wise Statistics -->
+                        <TextBlock Grid.Row="2" Text="🏫 Class-wise Breakdown" FontSize="18" FontWeight="Bold"
+                                   Margin="0,0,0,15" Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                        <Grid Grid.Row="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Class-wise Total Count -->
+                            <Border Grid.Column="0" Background="{StaticResource SurfaceBrush}" CornerRadius="10"
+                                    Margin="5" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1">
+                                <StackPanel Padding="15">
+                                    <TextBlock Text="📈 Students per Class" FontSize="14" FontWeight="Bold"
+                                               Margin="0,0,0,10" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <DataGrid x:Name="dgClassStats" AutoGenerateColumns="False" HeadersVisibility="Column"
+                                              CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                                              GridLinesVisibility="Horizontal" BorderThickness="0" Background="Transparent"
+                                              RowBackground="Transparent" AlternatingRowBackground="#F8F9FA">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Class" Binding="{Binding ClassName}" Width="80"/>
+                                            <DataGridTextColumn Header="Total" Binding="{Binding TotalStudents}" Width="60"/>
+                                            <DataGridTextColumn Header="Male" Binding="{Binding MaleStudents}" Width="60"/>
+                                            <DataGridTextColumn Header="Female" Binding="{Binding FemaleStudents}" Width="60"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Additional Statistics -->
+                            <Border Grid.Column="1" Background="{StaticResource SurfaceBrush}" CornerRadius="10"
+                                    Margin="5" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="1">
+                                <StackPanel Padding="15">
+                                    <TextBlock Text="📋 Additional Statistics" FontSize="14" FontWeight="Bold"
+                                               Margin="0,0,0,15" Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                    <!-- BPL Students -->
+                                    <StackPanel Orientation="Horizontal" Margin="0,5">
+                                        <TextBlock Text="🏠 BPL Students:" Width="120" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                        <TextBlock x:Name="lblBPLStudents" Text="0" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}"/>
+                                    </StackPanel>
+
+                                    <!-- Semi-English Students -->
+                                    <StackPanel Orientation="Horizontal" Margin="0,5">
+                                        <TextBlock Text="🌐 Semi-English:" Width="120" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                        <TextBlock x:Name="lblSemiEnglishStudents" Text="0" FontWeight="Bold" Foreground="{StaticResource PrimaryBrush}"/>
+                                    </StackPanel>
+
+                                    <!-- Religion wise breakdown -->
+                                    <Separator Margin="0,15"/>
+                                    <TextBlock Text="🕉️ Religion-wise Breakdown" FontSize="12" FontWeight="Bold"
+                                               Margin="0,0,0,10" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <DataGrid x:Name="dgReligionStats" AutoGenerateColumns="False" HeadersVisibility="Column"
+                                              CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                                              GridLinesVisibility="Horizontal" BorderThickness="0" Background="Transparent"
+                                              RowBackground="Transparent" AlternatingRowBackground="#F8F9FA">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Religion" Binding="{Binding Religion}" Width="100"/>
+                                            <DataGridTextColumn Header="Count" Binding="{Binding Count}" Width="60"/>
+                                            <DataGridTextColumn Header="Male" Binding="{Binding MaleCount}" Width="50"/>
+                                            <DataGridTextColumn Header="Female" Binding="{Binding FemaleCount}" Width="50"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+
+                                    <!-- Caste Category breakdown -->
+                                    <Separator Margin="0,15"/>
+                                    <TextBlock Text="📊 Caste Category Breakdown" FontSize="12" FontWeight="Bold"
+                                               Margin="0,0,0,10" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <DataGrid x:Name="dgCasteStats" AutoGenerateColumns="False" HeadersVisibility="Column"
+                                              CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                                              GridLinesVisibility="Horizontal" BorderThickness="0" Background="Transparent"
+                                              RowBackground="Transparent" AlternatingRowBackground="#F8F9FA">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="100"/>
+                                            <DataGridTextColumn Header="Count" Binding="{Binding Count}" Width="60"/>
+                                            <DataGridTextColumn Header="Male" Binding="{Binding MaleCount}" Width="50"/>
+                                            <DataGridTextColumn Header="Female" Binding="{Binding FemaleCount}" Width="50"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+
             <TabItem Header="📚 Students" FontSize="14">
                 <Grid>
                     <Grid.RowDefinitions>

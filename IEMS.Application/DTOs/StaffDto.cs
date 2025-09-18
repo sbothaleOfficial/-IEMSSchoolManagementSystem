@@ -7,17 +7,15 @@ public class StaffDto
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
-    public DateTime DateOfBirth { get; set; }
-    public string Gender { get; set; } = string.Empty;
     public string Address { get; set; } = string.Empty;
+    public DateTime JoiningDate { get; set; } = DateTime.UtcNow;
+    public decimal MonthlySalary { get; set; } = 0;
     public string Position { get; set; } = string.Empty;
-    public decimal Salary { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public DateTime UpdatedAt { get; set; }
 
-    // Computed properties for UI
+    public string? Email { get; set; }
+    public string? BankAccountNumber { get; set; }
+    public string? AadharNumber { get; set; }
+    public string? PANNumber { get; set; }
+
     public string FullName => $"{FirstName} {LastName}";
-    public string FormattedDateOfBirth => DateOfBirth.ToString("dd/MM/yyyy");
-    public string FormattedSalary => $"₹{Salary:N2}";
-    public int Age => DateTime.Now.Year - DateOfBirth.Year - (DateTime.Now.DayOfYear < DateOfBirth.DayOfYear ? 1 : 0);
 }

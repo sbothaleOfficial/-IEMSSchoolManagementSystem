@@ -67,14 +67,14 @@ public partial class MainWindow : Window
     {
         try
         {
-            var teachersWindow = new TeachersManagementWindow(_teacherService, _classService);
-            teachersWindow.ShowDialog();
-            lblStatus.Text = "Teachers Management module accessed";
+            var staffWindow = new StaffManagementWindow(_teacherService, _classService, _staffService);
+            staffWindow.ShowDialog();
+            lblStatus.Text = "Staff Management module accessed";
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error opening Teachers Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            lblStatus.Text = "Error opening Teachers Management";
+            MessageBox.Show($"Error opening Staff Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening Staff Management";
         }
     }
 
@@ -112,14 +112,14 @@ public partial class MainWindow : Window
     {
         try
         {
-            var supportStaffWindow = new SupportStaffManagementWindow(_staffService);
-            supportStaffWindow.ShowDialog();
-            lblStatus.Text = "Support Staff Management module accessed";
+            var staffWindow = new StaffManagementWindow(_teacherService, _classService, _staffService);
+            staffWindow.ShowDialog();
+            lblStatus.Text = "Staff Management module accessed";
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error opening Support Staff Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            lblStatus.Text = "Error opening Support Staff Management";
+            MessageBox.Show($"Error opening Staff Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening Staff Management";
         }
     }
 

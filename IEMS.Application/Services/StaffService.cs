@@ -54,13 +54,16 @@ public class StaffService
             FirstName = staffDto.FirstName,
             LastName = staffDto.LastName,
             PhoneNumber = staffDto.PhoneNumber,
-            DateOfBirth = staffDto.DateOfBirth,
-            Gender = staffDto.Gender,
             Address = staffDto.Address,
+            JoiningDate = staffDto.JoiningDate,
+            MonthlySalary = staffDto.MonthlySalary,
             Position = staffDto.Position,
-            Salary = staffDto.Salary,
-            CreatedAt = DateTime.Now,
-            UpdatedAt = DateTime.Now
+            Email = staffDto.Email,
+            BankAccountNumber = staffDto.BankAccountNumber,
+            AadharNumber = staffDto.AadharNumber,
+            PANNumber = staffDto.PANNumber,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         };
 
         await _staffRepository.AddAsync(staff);
@@ -86,12 +89,15 @@ public class StaffService
         staff.FirstName = staffDto.FirstName;
         staff.LastName = staffDto.LastName;
         staff.PhoneNumber = staffDto.PhoneNumber;
-        staff.DateOfBirth = staffDto.DateOfBirth;
-        staff.Gender = staffDto.Gender;
         staff.Address = staffDto.Address;
+        staff.JoiningDate = staffDto.JoiningDate;
+        staff.MonthlySalary = staffDto.MonthlySalary;
         staff.Position = staffDto.Position;
-        staff.Salary = staffDto.Salary;
-        staff.UpdatedAt = DateTime.Now;
+        staff.Email = staffDto.Email;
+        staff.BankAccountNumber = staffDto.BankAccountNumber;
+        staff.AadharNumber = staffDto.AadharNumber;
+        staff.PANNumber = staffDto.PANNumber;
+        staff.UpdatedAt = DateTime.UtcNow;
 
         await _staffRepository.UpdateAsync(staff);
         return MapToDto(staff);
@@ -120,6 +126,12 @@ public class StaffService
         return allStaff.Count();
     }
 
+    public async Task<bool> IsEmployeeIdUniqueAsync(string employeeId, int? excludeId = null)
+    {
+        var existingStaff = await _staffRepository.GetStaffByEmployeeIdAsync(employeeId);
+        return existingStaff == null || (excludeId.HasValue && existingStaff.Id == excludeId.Value);
+    }
+
 
     private static StaffDto MapToDto(Staff staff)
     {
@@ -130,13 +142,14 @@ public class StaffService
             FirstName = staff.FirstName,
             LastName = staff.LastName,
             PhoneNumber = staff.PhoneNumber,
-            DateOfBirth = staff.DateOfBirth,
-            Gender = staff.Gender,
             Address = staff.Address,
+            JoiningDate = staff.JoiningDate,
+            MonthlySalary = staff.MonthlySalary,
             Position = staff.Position,
-            Salary = staff.Salary,
-            CreatedAt = staff.CreatedAt,
-            UpdatedAt = staff.UpdatedAt
+            Email = staff.Email,
+            BankAccountNumber = staff.BankAccountNumber,
+            AadharNumber = staff.AadharNumber,
+            PANNumber = staff.PANNumber
         };
     }
 }

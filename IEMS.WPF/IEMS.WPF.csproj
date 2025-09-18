@@ -20,4 +20,11 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Resource Include="School_logo.png" />
+    <Resource Include="Round_logo.png" />
+    <Resource Include="New_round_logo_new_color.png" />
+    <Resource Include="Exact_color_logo.png" />
+  </ItemGroup>
+
 </Project>
