@@ -159,6 +159,187 @@
                     </DataGrid>
                 </Grid>
             </TabItem>
+
+            <!-- Dashboard Tab -->
+            <TabItem Header="📊 Dashboard" FontSize="16" Padding="15,10">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid Margin="20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header -->
+                        <TextBlock Grid.Row="0" Text="Staff Management Dashboard" FontSize="20" FontWeight="Bold"
+                                   Margin="0,0,0,20" HorizontalAlignment="Center"
+                                   Foreground="{StaticResource PrimaryBrush}"/>
+
+                        <!-- Overall Statistics Cards -->
+                        <Grid Grid.Row="1" Margin="0,0,0,30">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Total Teachers Card -->
+                            <Border Grid.Column="0" Style="{StaticResource CardStyle}" Margin="0,0,10,0" Background="{StaticResource SuccessBrush}">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
+                                    <TextBlock Text="🎓" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                    <TextBlock x:Name="lblTotalTeachers" Text="0" FontSize="28" FontWeight="Bold"
+                                               HorizontalAlignment="Center" Foreground="White"/>
+                                    <TextBlock Text="Total Teachers" FontSize="12" HorizontalAlignment="Center"
+                                               Foreground="White" FontWeight="Medium"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Total Support Staff Card -->
+                            <Border Grid.Column="1" Style="{StaticResource CardStyle}" Margin="5,0" Background="{StaticResource InfoBrush}">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
+                                    <TextBlock Text="👔" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                    <TextBlock x:Name="lblTotalSupportStaff" Text="0" FontSize="28" FontWeight="Bold"
+                                               HorizontalAlignment="Center" Foreground="White"/>
+                                    <TextBlock Text="Support Staff" FontSize="12" HorizontalAlignment="Center"
+                                               Foreground="White" FontWeight="Medium"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Total Staff Card -->
+                            <Border Grid.Column="2" Style="{StaticResource CardStyle}" Margin="5,0" Background="{StaticResource PrimaryBrush}">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
+                                    <TextBlock Text="👥" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                    <TextBlock x:Name="lblTotalStaff" Text="0" FontSize="28" FontWeight="Bold"
+                                               HorizontalAlignment="Center" Foreground="White"/>
+                                    <TextBlock Text="Total Staff" FontSize="12" HorizontalAlignment="Center"
+                                               Foreground="White" FontWeight="Medium"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Average Salary Card -->
+                            <Border Grid.Column="3" Style="{StaticResource CardStyle}" Margin="10,0,0,0" Background="{StaticResource WarningBrush}">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
+                                    <TextBlock Text="💰" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                                    <TextBlock x:Name="lblAverageSalary" Text="₹0" FontSize="28" FontWeight="Bold"
+                                               HorizontalAlignment="Center" Foreground="White"/>
+                                    <TextBlock Text="Avg. Salary" FontSize="12" HorizontalAlignment="Center"
+                                               Foreground="White" FontWeight="Medium"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+
+                        <!-- Teachers with Classes Statistics -->
+                        <StackPanel Grid.Row="2" Margin="0,0,0,25">
+                            <TextBlock Text="🎓 Teachers &amp; Classes" FontSize="14" FontWeight="Bold"
+                                       Margin="0,0,0,10" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <DataGrid x:Name="dgTeacherClassStats" AutoGenerateColumns="False" HeadersVisibility="Column"
+                                      CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                                      GridLinesVisibility="Horizontal" BorderThickness="0" Background="Transparent"
+                                      RowBackground="Transparent" AlternatingRowBackground="#F8F9FA" MaxHeight="200">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Teacher" Binding="{Binding TeacherName}" Width="200"/>
+                                    <DataGridTextColumn Header="Employee ID" Binding="{Binding EmployeeId}" Width="120"/>
+                                    <DataGridTextColumn Header="Classes Assigned" Binding="{Binding ClassCount}" Width="130"/>
+                                    <DataGridTextColumn Header="Classes" Binding="{Binding ClassNames}" Width="300"/>
+                                    <DataGridTextColumn Header="Monthly Salary" Binding="{Binding FormattedSalary}" Width="120"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+
+                        <!-- Position-wise Breakdown -->
+                        <StackPanel Grid.Row="3" Margin="0,0,0,25">
+                            <TextBlock Text="📋 Position-wise Breakdown" FontSize="14" FontWeight="Bold"
+                                       Margin="0,0,0,10" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <DataGrid x:Name="dgPositionStats" AutoGenerateColumns="False" HeadersVisibility="Column"
+                                      CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                                      GridLinesVisibility="Horizontal" BorderThickness="0" Background="Transparent"
+                                      RowBackground="Transparent" AlternatingRowBackground="#F8F9FA">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Position" Binding="{Binding Position}" Width="150"/>
+                                    <DataGridTextColumn Header="Count" Binding="{Binding Count}" Width="80"/>
+                                    <DataGridTextColumn Header="Avg. Salary" Binding="{Binding FormattedAvgSalary}" Width="120"/>
+                                    <DataGridTextColumn Header="Total Salary" Binding="{Binding FormattedTotalSalary}" Width="120"/>
+                                    <DataGridTextColumn Header="Percentage" Binding="{Binding Percentage}" Width="100"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+
+                        <!-- Salary Range Analysis -->
+                        <StackPanel Grid.Row="4" Margin="0,0,0,25">
+                            <TextBlock Text="💰 Salary Range Analysis" FontSize="14" FontWeight="Bold"
+                                       Margin="0,0,0,10" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <DataGrid x:Name="dgSalaryRangeStats" AutoGenerateColumns="False" HeadersVisibility="Column"
+                                      CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                                      GridLinesVisibility="Horizontal" BorderThickness="0" Background="Transparent"
+                                      RowBackground="Transparent" AlternatingRowBackground="#F8F9FA">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Salary Range" Binding="{Binding SalaryRange}" Width="150"/>
+                                    <DataGridTextColumn Header="Count" Binding="{Binding Count}" Width="80"/>
+                                    <DataGridTextColumn Header="Percentage" Binding="{Binding Percentage}" Width="100"/>
+                                    <DataGridTextColumn Header="Staff Members" Binding="{Binding StaffNames}" Width="400"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+
+                        <!-- Recent Joiners -->
+                        <StackPanel Grid.Row="5" Margin="0,0,0,25">
+                            <TextBlock Text="🆕 Recent Joiners (Last 2 Years)" FontSize="14" FontWeight="Bold"
+                                       Margin="0,0,0,10" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <DataGrid x:Name="dgRecentJoiners" AutoGenerateColumns="False" HeadersVisibility="Column"
+                                      CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
+                                      GridLinesVisibility="Horizontal" BorderThickness="0" Background="Transparent"
+                                      RowBackground="Transparent" AlternatingRowBackground="#F8F9FA" MaxHeight="200">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="200"/>
+                                    <DataGridTextColumn Header="Position" Binding="{Binding Position}" Width="150"/>
+                                    <DataGridTextColumn Header="Joining Date" Binding="{Binding FormattedJoiningDate}" Width="120"/>
+                                    <DataGridTextColumn Header="Days Since Joined" Binding="{Binding DaysSinceJoined}" Width="150"/>
+                                    <DataGridTextColumn Header="Monthly Salary" Binding="{Binding FormattedSalary}" Width="120"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </StackPanel>
+
+                        <!-- Payroll Summary -->
+                        <StackPanel Grid.Row="6" Margin="0,0,0,25">
+                            <TextBlock Text="💸 Monthly Payroll Summary" FontSize="14" FontWeight="Bold"
+                                       Margin="0,0,0,10" Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                            <Border Style="{StaticResource CardStyle}" Padding="20" Background="#F8F9FA">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Teachers Payroll" FontWeight="Bold" Margin="0,0,0,5"/>
+                                        <TextBlock x:Name="lblTeachersPayroll" Text="₹0" FontSize="18" FontWeight="Bold"
+                                                   Foreground="{StaticResource SuccessBrush}"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="Support Staff Payroll" FontWeight="Bold" Margin="0,0,0,5"/>
+                                        <TextBlock x:Name="lblSupportStaffPayroll" Text="₹0" FontSize="18" FontWeight="Bold"
+                                                   Foreground="{StaticResource InfoBrush}"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Total Monthly Payroll" FontWeight="Bold" Margin="0,0,0,5"/>
+                                        <TextBlock x:Name="lblTotalPayroll" Text="₹0" FontSize="18" FontWeight="Bold"
+                                                   Foreground="{StaticResource PrimaryBrush}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
         </TabControl>
 
         <!-- Status Bar -->

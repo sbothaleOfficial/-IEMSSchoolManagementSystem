@@ -24,6 +24,7 @@ public partial class StaffManagementWindow : Window
         SetupSearchControls();
         LoadTeachers();
         LoadStaff();
+        LoadDashboardData();
         lblStatus.Text = "Staff Management loaded successfully";
     }
 
@@ -81,6 +82,7 @@ public partial class StaffManagementWindow : Window
             if (addEditWindow.ShowDialog() == true)
             {
                 LoadTeachers();
+                UpdateDashboard();
                 lblStatus.Text = "Teacher added successfully";
             }
         }
@@ -100,6 +102,7 @@ public partial class StaffManagementWindow : Window
                 if (addEditWindow.ShowDialog() == true)
                 {
                     LoadTeachers();
+                    UpdateDashboard();
                     lblStatus.Text = "Teacher updated successfully";
                 }
             }
@@ -127,6 +130,7 @@ public partial class StaffManagementWindow : Window
                 {
                     await _teacherService.DeleteTeacherAsync(selectedTeacher.Id);
                     LoadTeachers();
+                    UpdateDashboard();
                     lblStatus.Text = "Teacher deleted successfully";
                     MessageBox.Show("Teacher deleted successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -204,6 +208,7 @@ public partial class StaffManagementWindow : Window
             if (addEditWindow.ShowDialog() == true)
             {
                 LoadStaff();
+                UpdateDashboard();
                 lblStatus.Text = "Staff member added successfully";
             }
         }
@@ -223,6 +228,7 @@ public partial class StaffManagementWindow : Window
                 if (addEditWindow.ShowDialog() == true)
                 {
                     LoadStaff();
+                    UpdateDashboard();
                     lblStatus.Text = "Staff member updated successfully";
                 }
             }
@@ -250,6 +256,7 @@ public partial class StaffManagementWindow : Window
                 {
                     await _staffService.DeleteStaffAsync(selectedStaff.Id);
                     LoadStaff();
+                    UpdateDashboard();
                     lblStatus.Text = "Staff member deleted successfully";
                     MessageBox.Show("Staff member deleted successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
@@ -298,5 +305,178 @@ public partial class StaffManagementWindow : Window
         txtSearchStaff.Text = string.Empty;
         cmbStaffPosition.SelectedIndex = 0; // Reset to "All Positions"
         ApplyStaffSearch();
+    }
+
+    // Dashboard Methods
+    private async void LoadDashboardData()
+    {
+        try
+        {
+            await LoadOverallStatistics();
+            await LoadTeacherClassStatistics();
+            await LoadPositionStatistics();
+            await LoadSalaryRangeStatistics();
+            await LoadRecentJoinersStatistics();
+            await LoadPayrollSummary();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error loading dashboard data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private async Task LoadOverallStatistics()
+    {
+        var totalTeachers = _allTeachers.Count;
+        var totalSupportStaff = _allStaff.Count;
+        var totalStaff = totalTeachers + totalSupportStaff;
+
+        var allSalaries = _allTeachers.Select(t => t.MonthlySalary)
+                                     .Concat(_allStaff.Select(s => s.MonthlySalary))
+                                     .Where(s => s > 0);
+        var averageSalary = allSalaries.Any() ? allSalaries.Average() : 0;
+
+        lblTotalTeachers.Text = totalTeachers.ToString();
+        lblTotalSupportStaff.Text = totalSupportStaff.ToString();
+        lblTotalStaff.Text = totalStaff.ToString();
+        lblAverageSalary.Text = $"₹{averageSalary:N0}";
+    }
+
+    private async Task LoadTeacherClassStatistics()
+    {
+        var teacherClassStats = new List<object>();
+
+        foreach (var teacher in _allTeachers)
+        {
+            var classes = await _classService.GetClassesByTeacherIdAsync(teacher.Id);
+            var classNames = string.Join(", ", classes.Select(c => c.DisplayName));
+
+            teacherClassStats.Add(new
+            {
+                TeacherName = teacher.FullName,
+                EmployeeId = teacher.EmployeeId,
+                ClassCount = classes.Count(),
+                ClassNames = string.IsNullOrEmpty(classNames) ? "No classes assigned" : classNames,
+                FormattedSalary = $"₹{teacher.MonthlySalary:N0}"
+            });
+        }
+
+        dgTeacherClassStats.ItemsSource = teacherClassStats.OrderByDescending(t => ((dynamic)t).ClassCount).ToList();
+    }
+
+    private async Task LoadPositionStatistics()
+    {
+        var allPositions = _allTeachers.Select(t => "Teacher")
+                                      .Concat(_allStaff.Select(s => s.Position))
+                                      .ToList();
+
+        var allSalariesWithPositions = _allTeachers.Select(t => new { Position = "Teacher", Salary = t.MonthlySalary })
+                                                  .Concat(_allStaff.Select(s => new { Position = s.Position, Salary = s.MonthlySalary }))
+                                                  .ToList();
+
+        var positionStats = allPositions
+            .GroupBy(p => p)
+            .Select(g => new
+            {
+                Position = g.Key,
+                Count = g.Count(),
+                FormattedAvgSalary = $"₹{allSalariesWithPositions.Where(x => x.Position == g.Key).Average(x => x.Salary):N0}",
+                FormattedTotalSalary = $"₹{allSalariesWithPositions.Where(x => x.Position == g.Key).Sum(x => x.Salary):N0}",
+                Percentage = $"{(g.Count() * 100.0 / allPositions.Count):F1}%"
+            })
+            .OrderByDescending(x => x.Count)
+            .ToList();
+
+        dgPositionStats.ItemsSource = positionStats;
+    }
+
+    private async Task LoadSalaryRangeStatistics()
+    {
+        var allStaffWithSalaries = _allTeachers.Select(t => new { Name = t.FullName, Salary = t.MonthlySalary })
+                                              .Concat(_allStaff.Select(s => new { Name = s.FullName, Salary = s.MonthlySalary }))
+                                              .ToList();
+
+        var salaryRanges = new[]
+        {
+            new { Range = "Below ₹20,000", Min = 0, Max = 20000 },
+            new { Range = "₹20,000 - ₹40,000", Min = 20000, Max = 40000 },
+            new { Range = "₹40,000 - ₹60,000", Min = 40000, Max = 60000 },
+            new { Range = "₹60,000 - ₹80,000", Min = 60000, Max = 80000 },
+            new { Range = "Above ₹80,000", Min = 80000, Max = int.MaxValue }
+        };
+
+        var salaryRangeStats = salaryRanges
+            .Select(range =>
+            {
+                var staffInRange = allStaffWithSalaries
+                    .Where(s => s.Salary >= range.Min && s.Salary < range.Max)
+                    .ToList();
+
+                return new
+                {
+                    SalaryRange = range.Range,
+                    Count = staffInRange.Count,
+                    Percentage = $"{(staffInRange.Count * 100.0 / allStaffWithSalaries.Count):F1}%",
+                    StaffNames = string.Join(", ", staffInRange.Select(s => s.Name).Take(3)) +
+                               (staffInRange.Count > 3 ? $" and {staffInRange.Count - 3} more..." : "")
+                };
+            })
+            .Where(x => x.Count > 0)
+            .ToList();
+
+        dgSalaryRangeStats.ItemsSource = salaryRangeStats;
+    }
+
+    private async Task LoadRecentJoinersStatistics()
+    {
+        var twoYearsAgo = DateTime.Now.AddYears(-2);
+
+        var recentTeachers = _allTeachers
+            .Where(t => t.JoiningDate >= twoYearsAgo)
+            .Select(t => new
+            {
+                Name = t.FullName,
+                Position = "Teacher",
+                JoiningDate = t.JoiningDate,
+                FormattedJoiningDate = t.JoiningDate.ToString("dd/MM/yyyy"),
+                DaysSinceJoined = $"{(DateTime.Now - t.JoiningDate).Days} days",
+                FormattedSalary = $"₹{t.MonthlySalary:N0}"
+            });
+
+        var recentStaff = _allStaff
+            .Where(s => s.JoiningDate >= twoYearsAgo)
+            .Select(s => new
+            {
+                Name = s.FullName,
+                Position = s.Position,
+                JoiningDate = s.JoiningDate,
+                FormattedJoiningDate = s.JoiningDate.ToString("dd/MM/yyyy"),
+                DaysSinceJoined = $"{(DateTime.Now - s.JoiningDate).Days} days",
+                FormattedSalary = $"₹{s.MonthlySalary:N0}"
+            });
+
+        var recentJoiners = recentTeachers
+            .Concat(recentStaff)
+            .OrderByDescending(x => x.JoiningDate)
+            .ToList();
+
+        dgRecentJoiners.ItemsSource = recentJoiners;
+    }
+
+    private async Task LoadPayrollSummary()
+    {
+        var teachersPayroll = _allTeachers.Sum(t => t.MonthlySalary);
+        var supportStaffPayroll = _allStaff.Sum(s => s.MonthlySalary);
+        var totalPayroll = teachersPayroll + supportStaffPayroll;
+
+        lblTeachersPayroll.Text = $"₹{teachersPayroll:N0}";
+        lblSupportStaffPayroll.Text = $"₹{supportStaffPayroll:N0}";
+        lblTotalPayroll.Text = $"₹{totalPayroll:N0}";
+    }
+
+    // Update dashboard when data changes
+    private void UpdateDashboard()
+    {
+        LoadDashboardData();
     }
 }
