@@ -340,6 +340,527 @@
                     </DataGrid>
                 </Grid>
             </TabItem>
+
+            <!-- Leaving Certificate Tab -->
+            <TabItem Header="🎓 Leaving Certificate" FontSize="14">
+                <Grid Margin="20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left Panel - Certificate Generation Form -->
+                    <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" Margin="0,0,20,0">
+                        <Border Background="White" BorderBrush="{StaticResource SecondaryBrush}" BorderThickness="1"
+                                CornerRadius="10" Padding="25">
+                            <StackPanel>
+                                <TextBlock Text="🎓 Generate Leaving Certificate" FontSize="18" FontWeight="Bold"
+                                           Margin="0,0,0,20" Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                <!-- Student Selection -->
+                                <TextBlock Text="Select Student:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <ComboBox x:Name="cmbLeavingCertStudent" Margin="0,0,0,15" Height="35"
+                                          DisplayMemberPath="FullNameWithAdmissionNumber"
+                                          SelectionChanged="CmbLeavingCertStudent_SelectionChanged"/>
+
+                                <!-- Student Details Grid -->
+                                <Grid x:Name="gridLeavingCertDetails" Visibility="Collapsed" Margin="0,0,0,20">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Student Information Display -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="1" x:Name="lblLeavingStudentName" Margin="10,5"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Father's Name:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="lblLeavingFatherName" Margin="10,5"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Admission No:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="lblLeavingAdmissionNo" Margin="10,5"/>
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Class:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="lblLeavingClass" Margin="10,5"/>
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Date of Birth:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" x:Name="lblLeavingDOB" Margin="10,5"/>
+
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Admission Date:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="1" x:Name="lblLeavingAdmissionDate" Margin="10,5"/>
+
+                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Caste:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="6" Grid.Column="1" x:Name="lblLeavingCaste" Margin="10,5"/>
+
+                                    <TextBlock Grid.Row="7" Grid.Column="0" Text="Religion:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="7" Grid.Column="1" x:Name="lblLeavingReligion" Margin="10,5"/>
+
+                                    <TextBlock Grid.Row="8" Grid.Column="0" Text="Gender:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="8" Grid.Column="1" x:Name="lblLeavingGender" Margin="10,5"/>
+                                </Grid>
+
+                                <!-- Leaving Certificate Specific Details -->
+                                <TextBlock Text="Certificate Details:" FontWeight="Bold" FontSize="14" Margin="0,20,0,10"
+                                           Foreground="{StaticResource TextPrimaryBrush}"/>
+
+                                <TextBlock Text="Date of Leaving:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <DatePicker x:Name="dpLeavingDate" Margin="0,0,0,15" Height="35"/>
+
+                                <TextBlock Text="Reason for Leaving:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <ComboBox x:Name="cmbLeavingReason" Margin="0,0,0,15" Height="35">
+                                    <ComboBoxItem Content="Completed Course"/>
+                                    <ComboBoxItem Content="Transfer to Another School"/>
+                                    <ComboBoxItem Content="Family Relocation"/>
+                                    <ComboBoxItem Content="Health Reasons"/>
+                                    <ComboBoxItem Content="Financial Reasons"/>
+                                    <ComboBoxItem Content="Personal Reasons"/>
+                                    <ComboBoxItem Content="Other"/>
+                                </ComboBox>
+
+                                <TextBlock Text="Last Class Studied:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtLastClass" Margin="0,0,0,15" Height="35"
+                                         Text="{Binding SelectedItem.ClassName, ElementName=cmbLeavingCertStudent}"/>
+
+                                <TextBlock Text="Character &amp; Conduct:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <ComboBox x:Name="cmbCharacterConduct" Margin="0,0,0,15" Height="35" SelectedIndex="0">
+                                    <ComboBoxItem Content="Excellent"/>
+                                    <ComboBoxItem Content="Very Good"/>
+                                    <ComboBoxItem Content="Good"/>
+                                    <ComboBoxItem Content="Satisfactory"/>
+                                </ComboBox>
+
+                                <TextBlock Text="Remarks (Optional):" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtLeavingRemarks" Margin="0,0,0,20" Height="60"
+                                         TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+
+                                <!-- Action Buttons -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,0">
+                                    <Button x:Name="btnGenerateLeavingCert" Content="🎓 Generate Certificate"
+                                            Background="{StaticResource SuccessBrush}" Foreground="White"
+                                            Padding="15,10" Margin="0,0,10,0" FontWeight="Bold"
+                                            Click="BtnGenerateLeavingCert_Click"/>
+                                    <Button x:Name="btnPrintLeavingCert" Content="🖨️ Print Certificate"
+                                            Background="{StaticResource InfoBrush}" Foreground="White"
+                                            Padding="15,10" Margin="10,0,0,0" FontWeight="Bold"
+                                            Click="BtnPrintLeavingCert_Click"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </ScrollViewer>
+
+                    <!-- Right Panel - Certificate Preview (A4 Size: 794x1122 pixels at 96 DPI) -->
+                    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+                        <Border x:Name="LeavingCertificateBorder" Background="White" BorderBrush="#34495E"
+                                BorderThickness="2" Padding="40" Width="794">
+                            <StackPanel>
+                                <!-- School Header Box -->
+                                <Border BorderBrush="Black" BorderThickness="1" Padding="15" Margin="0,0,0,20">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <!-- Row 1 -->
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name of Management:" FontSize="10" Margin="0,0,0,5"/>
+                                        <Border Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15"/>
+
+                                        <!-- Row 2 -->
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Name and full address of the school:" FontSize="10" Margin="0,5,0,5"/>
+                                        <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,0,0"/>
+
+                                        <!-- Row 3 -->
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Phone No.:" FontSize="10" Margin="0,5,0,5"/>
+                                        <Border Grid.Row="2" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,5,0"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="2" Text="E-mail:" FontSize="10" Margin="5,5,0,5"/>
+                                        <Border Grid.Row="2" Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,0,0"/>
+
+                                        <!-- Row 4 -->
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Serial No.:" FontSize="10" Margin="0,5,0,5"/>
+                                        <Border Grid.Row="3" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,5,0"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="2" Text="General Register Number:" FontSize="10" Margin="5,5,0,5"/>
+                                        <Border Grid.Row="3" Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,0,0"/>
+
+                                        <!-- Row 5 -->
+                                        <TextBlock Grid.Row="4" Grid.Column="0" Text="School Accreditation No.:" FontSize="10" Margin="0,5,0,5"/>
+                                        <Border Grid.Row="4" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,5,0"/>
+                                        <TextBlock Grid.Row="4" Grid.Column="2" Text="Channel:" FontSize="10" Margin="5,5,0,5"/>
+                                        <Border Grid.Row="4" Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,0,0"/>
+
+                                        <!-- Row 6 -->
+                                        <TextBlock Grid.Row="5" Grid.Column="0" Text="U-DISE Code:" FontSize="10" Margin="0,5,0,0"/>
+                                        <TextBlock Grid.Row="5" Grid.Column="1" Text="27140806704" FontSize="10" FontWeight="Bold" Margin="0,5,5,0"/>
+                                        <TextBlock Grid.Row="5" Grid.Column="2" Text="Board:" FontSize="10" Margin="5,5,0,0"/>
+                                        <TextBlock Grid.Row="5" Grid.Column="3" Text="Affiliation no.:" FontSize="10" Margin="0,5,0,0"/>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Certificate Title -->
+                                <TextBlock Text="* School Leaving Certificate *" FontSize="16" FontWeight="Bold"
+                                           HorizontalAlignment="Center" Margin="0,0,0,20"/>
+
+                                <!-- Student ID Section -->
+                                <StackPanel Margin="0,0,0,15">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Student ID:" FontSize="10" Margin="0,0,10,5"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                            <!-- Student ID Boxes -->
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid Margin="0,5,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="U.I.D. No. (Aadhaar Card No.):" FontSize="10" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                            <!-- Aadhaar Boxes -->
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid Margin="0,5,0,0">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="P.E.N.:" FontSize="10" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                            <!-- PEN Boxes -->
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- Certificate Fields -->
+                                <StackPanel Margin="0,0,0,20">
+                                    <!-- Field 1 -->
+                                    <Grid Margin="0,0,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="1) Full name of the student:" FontSize="11"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertStudentName" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Field 2 -->
+                                    <Grid Margin="0,5,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="2) Mother's name:" FontSize="11"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertMotherName" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Field 3 & 4 -->
+                                    <Grid Margin="0,5,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="3) Nationality:" FontSize="11"/>
+                                        <TextBlock Grid.Column="1" Text="Indian" FontSize="11" FontWeight="Bold"/>
+                                        <TextBlock Grid.Column="2" Text="4) Mother tongue:" FontSize="11"/>
+                                        <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertMotherTongue" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Field 5, 6, 7 -->
+                                    <Grid Margin="0,5,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="70"/>
+                                            <ColumnDefinition Width="120"/>
+                                            <ColumnDefinition Width="50"/>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="70"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="5) Religion:" FontSize="11"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertReligion" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
+                                        <TextBlock Grid.Column="2" Text="6) Caste:" FontSize="11" Margin="10,0,0,0"/>
+                                        <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertCaste" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
+                                        <TextBlock Grid.Column="4" Text="7) Subcaste:" FontSize="11" Margin="10,0,0,0"/>
+                                        <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertSubcaste" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Field 8 -->
+                                    <Grid Margin="0,5,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="100"/>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="8) Place of birth (village/city):" FontSize="11"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15"/>
+                                        <TextBlock Grid.Column="2" Text="Taluka:" FontSize="11" Margin="10,0,0,0"/>
+                                        <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15"/>
+                                        <TextBlock Grid.Column="4" Text="District:" FontSize="11" Margin="10,0,0,0"/>
+                                        <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,5,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="50"/>
+                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="State:" FontSize="11"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15"/>
+                                        <TextBlock Grid.Column="2" Text="Country:" FontSize="11" Margin="10,0,0,0"/>
+                                        <TextBlock Grid.Column="3" Text="India" FontSize="11" FontWeight="Bold"/>
+                                    </Grid>
+
+                                    <!-- Field 9 -->
+                                    <Grid Margin="0,5,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="9) Date of Birth (DD/MM/YYYY):" FontSize="11"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertDateOfBirth" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Field 10 -->
+                                    <Grid Margin="0,5,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="10) Date of Birth (in words):" FontSize="11"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertDateOfBirthWords" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Field 11 -->
+                                    <Grid Margin="0,5,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="11) Previous school and grade:" FontSize="11"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15"/>
+                                    </Grid>
+
+                                    <!-- Field 12 -->
+                                    <Grid Margin="0,5,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="50"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="12) Date of admission to this school:" FontSize="11"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertDateOfAdmission" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
+                                        <TextBlock Grid.Column="2" Text="Class:" FontSize="11" Margin="10,0,0,0"/>
+                                        <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertAdmissionClass" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Field 13 -->
+                                    <Grid Margin="0,5,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="80"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="13) Progress in studies:" FontSize="11"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15"/>
+                                        <TextBlock Grid.Column="2" Text="Behavior:" FontSize="11" Margin="10,0,0,0"/>
+                                        <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertCharacterConduct" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Field 14 -->
+                                    <Grid Margin="0,5,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="14) Date of leaving school:" FontSize="11"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertLeavingDate" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Field 15 -->
+                                    <Grid Margin="0,5,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="300"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="15) In which grade were you studying and from when (letters and numbers):" FontSize="11"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertStandard" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Field 16 -->
+                                    <Grid Margin="0,5,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="16) Reason for leaving school:" FontSize="11"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertLeavingReason" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
+                                    </Grid>
+
+                                    <!-- Field 17 -->
+                                    <Grid Margin="0,5,0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="200"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="17) Remark:" FontSize="11"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertRemarks" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- Certification Statement -->
+                                <Grid Margin="0,20,0,30">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="300"/>
+                                        <ColumnDefinition Width="80"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="It is certified that the above information is as per the General Register No." FontSize="11"/>
+                                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="5,0,5,0">
+                                        <TextBlock x:Name="CertGeneralRegisterNumber" FontSize="11" Margin="5,0,0,0"/>
+                                    </Border>
+                                    <TextBlock Grid.Column="2" Text="of the school." FontSize="11"/>
+                                </Grid>
+
+                                <!-- Date -->
+                                <Grid Margin="0,0,0,80">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="date:" FontSize="11"/>
+                                    <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Width="200" HorizontalAlignment="Left">
+                                        <TextBlock x:Name="CertIssueDate" FontSize="11" Margin="5,0,0,0"/>
+                                    </Border>
+                                </Grid>
+
+                                <!-- Signature Section -->
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                                        <Border BorderBrush="Black" BorderThickness="0,0,0,1" Width="120" Height="15" Margin="0,0,0,5"/>
+                                        <TextBlock Text="Class teacher" FontSize="11" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                                        <TextBlock Text="Checked By" FontSize="11" HorizontalAlignment="Center" Margin="0,0,0,5"/>
+                                        <Border BorderBrush="Black" BorderThickness="0,0,0,1" Width="120" Height="15" Margin="0,0,0,5"/>
+                                        <TextBlock Text="(Name and Signature)" FontSize="10" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                                        <Border BorderBrush="Black" BorderThickness="0,0,0,1" Width="120" Height="15" Margin="0,0,0,5"/>
+                                        <TextBlock Text="Headmaster/Principal" FontSize="11" HorizontalAlignment="Center"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Note -->
+                                <TextBlock Text="Note: Any unauthorized changes to the school leaving certificate will result in legal action being taken against those concerned."
+                                           FontSize="9" FontStyle="Italic" Margin="0,20,0,0" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
         </TabControl>
 
         <!-- Status Bar -->

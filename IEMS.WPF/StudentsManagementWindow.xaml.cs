@@ -29,6 +29,7 @@ public partial class StudentsManagementWindow : Window
         LoadClasses();
         LoadFeePayments();
         LoadBonafideStudents();
+        LoadLeavingCertificateStudents();
         LoadDashboardData();
     }
 
@@ -667,5 +668,282 @@ public partial class StudentsManagementWindow : Window
             .ToList();
 
         dgCityVillageStats.ItemsSource = cityVillageStats;
+    }
+
+    // Leaving Certificate Event Handlers
+    private void LoadLeavingCertificateStudents()
+    {
+        try
+        {
+            // Use the same student data as the main students tab
+            cmbLeavingCertStudent.ItemsSource = _allStudents;
+            lblStatus.Text = $"Loaded {_allStudents.Count} students for Leaving certificates";
+
+            // Populate the reason dropdown
+            var leavingReasons = new List<string>
+            {
+                "Completion of course",
+                "Transfer to another school",
+                "Family relocation",
+                "Financial reasons",
+                "Health reasons",
+                "Migration",
+                "Other"
+            };
+            cmbLeavingReason.ItemsSource = leavingReasons;
+
+            // Populate character/conduct dropdown
+            var characterOptions = new List<string>
+            {
+                "Excellent",
+                "Very Good",
+                "Good",
+                "Satisfactory"
+            };
+            cmbCharacterConduct.ItemsSource = characterOptions;
+            cmbCharacterConduct.SelectedIndex = 0; // Default to "Excellent"
+        }
+        catch (Exception ex)
+        {
+            toastNotification.Message = $"Error loading students: {ex.Message}";
+            toastNotification.ToastType = ToastType.Error;
+            toastNotification.Show();
+        }
+    }
+
+    private void CmbLeavingCertStudent_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        try
+        {
+            if (cmbLeavingCertStudent.SelectedItem is StudentDto selectedStudent)
+            {
+                // Populate the certificate preview with student data
+                PopulateLeavingCertificatePreview(selectedStudent);
+            }
+        }
+        catch (Exception ex)
+        {
+            toastNotification.Message = $"Error selecting student: {ex.Message}";
+            toastNotification.ToastType = ToastType.Error;
+            toastNotification.Show();
+        }
+    }
+
+    private void PopulateLeavingCertificatePreview(StudentDto student)
+    {
+        try
+        {
+            // Find and populate the TextBlock elements in the certificate (not Run elements)
+            if (FindName("CertStudentName") is TextBlock certStudentName)
+                certStudentName.Text = student.FullName.ToUpper();
+
+            if (FindName("CertMotherName") is TextBlock certMotherName)
+                certMotherName.Text = student.MotherName.ToUpper();
+
+            if (FindName("CertDateOfBirth") is TextBlock certDateOfBirth)
+                certDateOfBirth.Text = student.DateOfBirth.ToString("dd/MM/yyyy");
+
+            if (FindName("CertDateOfBirthWords") is TextBlock certDateOfBirthWords)
+                certDateOfBirthWords.Text = ConvertDateToWords(student.DateOfBirth);
+
+            if (FindName("CertDateOfAdmission") is TextBlock certDateOfAdmission)
+                certDateOfAdmission.Text = student.AdmissionDate.ToString("dd/MM/yyyy");
+
+            if (FindName("CertAdmissionClass") is TextBlock certAdmissionClass)
+                certAdmissionClass.Text = student.Standard;
+
+            if (FindName("CertStandard") is TextBlock certStandard)
+                certStandard.Text = $"{student.Standard} ({student.ClassDivision})";
+
+            if (FindName("CertReligion") is TextBlock certReligion)
+                certReligion.Text = student.Religion;
+
+            if (FindName("CertCaste") is TextBlock certCaste)
+                certCaste.Text = student.CasteCategory;
+
+            if (FindName("CertSubcaste") is TextBlock certSubcaste)
+                certSubcaste.Text = ""; // Not available in current StudentDto
+
+            if (FindName("CertMotherTongue") is TextBlock certMotherTongue)
+                certMotherTongue.Text = ""; // Not available in current StudentDto
+
+            if (FindName("CertGeneralRegisterNumber") is TextBlock certGeneralRegisterNumber)
+                certGeneralRegisterNumber.Text = student.StudentNumber;
+
+            // Set default leaving date to today
+            dpLeavingDate.SelectedDate = DateTime.Now;
+        }
+        catch (Exception ex)
+        {
+            toastNotification.Message = $"Error populating certificate: {ex.Message}";
+            toastNotification.ToastType = ToastType.Error;
+            toastNotification.Show();
+        }
+    }
+
+    private string ConvertDateToWords(DateTime date)
+    {
+        try
+        {
+            var months = new[] { "", "January", "February", "March", "April", "May", "June",
+                               "July", "August", "September", "October", "November", "December" };
+
+            var day = ConvertNumberToWords(date.Day);
+            var month = months[date.Month];
+            var year = ConvertNumberToWords(date.Year);
+
+            return $"{day} {month} {year}";
+        }
+        catch
+        {
+            return "";
+        }
+    }
+
+    private string ConvertNumberToWords(int number)
+    {
+        if (number == 0) return "Zero";
+
+        var ones = new[] { "", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Nine",
+                          "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen", "Sixteen",
+                          "Seventeen", "Eighteen", "Nineteen" };
+
+        var tens = new[] { "", "", "Twenty", "Thirty", "Forty", "Fifty", "Sixty", "Seventy", "Eighty", "Ninety" };
+
+        var result = "";
+
+        if (number >= 1000)
+        {
+            result += ones[number / 1000] + " Thousand ";
+            number %= 1000;
+        }
+
+        if (number >= 100)
+        {
+            result += ones[number / 100] + " Hundred ";
+            number %= 100;
+        }
+
+        if (number >= 20)
+        {
+            result += tens[number / 10] + " ";
+            number %= 10;
+        }
+
+        if (number > 0)
+        {
+            result += ones[number];
+        }
+
+        return result.Trim();
+    }
+
+    private void BtnGenerateLeavingCert_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (cmbLeavingCertStudent.SelectedItem is StudentDto selectedStudent)
+            {
+                // Validate required fields
+                if (dpLeavingDate.SelectedDate == null)
+                {
+                    toastNotification.Message = "Please select a leaving date.";
+                    toastNotification.ToastType = ToastType.Warning;
+                    toastNotification.Show();
+                    return;
+                }
+
+                if (cmbLeavingReason.SelectedItem == null)
+                {
+                    toastNotification.Message = "Please select a reason for leaving.";
+                    toastNotification.ToastType = ToastType.Warning;
+                    toastNotification.Show();
+                    return;
+                }
+
+                if (cmbCharacterConduct.SelectedItem == null)
+                {
+                    toastNotification.Message = "Please select character/conduct rating.";
+                    toastNotification.ToastType = ToastType.Warning;
+                    toastNotification.Show();
+                    return;
+                }
+
+                // Populate additional certificate fields
+                if (FindName("CertLeavingDate") is TextBlock certLeavingDate)
+                    certLeavingDate.Text = dpLeavingDate.SelectedDate.Value.ToString("dd/MM/yyyy");
+
+                if (FindName("CertLeavingReason") is TextBlock certLeavingReason)
+                    certLeavingReason.Text = cmbLeavingReason.SelectedItem.ToString();
+
+                if (FindName("CertCharacterConduct") is TextBlock certCharacterConduct)
+                    certCharacterConduct.Text = cmbCharacterConduct.SelectedItem.ToString();
+
+                if (FindName("CertRemarks") is TextBlock certRemarks)
+                    certRemarks.Text = !string.IsNullOrWhiteSpace(txtLeavingRemarks.Text) ? txtLeavingRemarks.Text : "NIL";
+
+                if (FindName("CertIssueDate") is TextBlock certIssueDate)
+                    certIssueDate.Text = DateTime.Now.ToString("dd/MM/yyyy");
+
+                toastNotification.Message = "Leaving Certificate generated successfully!";
+                toastNotification.ToastType = ToastType.Success;
+                toastNotification.Show();
+
+                lblStatus.Text = "Leaving Certificate generated";
+            }
+            else
+            {
+                toastNotification.Message = "Please select a student to generate Leaving certificate.";
+                toastNotification.ToastType = ToastType.Warning;
+                toastNotification.Show();
+            }
+        }
+        catch (Exception ex)
+        {
+            toastNotification.Message = $"Error generating certificate: {ex.Message}";
+            toastNotification.ToastType = ToastType.Error;
+            toastNotification.Show();
+        }
+    }
+
+    private void BtnPrintLeavingCert_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (cmbLeavingCertStudent.SelectedItem is StudentDto selectedStudent)
+            {
+                // First generate the certificate if not already done
+                BtnGenerateLeavingCert_Click(sender, e);
+
+                // Print the certificate
+                var printDialog = new System.Windows.Controls.PrintDialog();
+                if (printDialog.ShowDialog() == true)
+                {
+                    // Create a copy of the certificate border for printing
+                    var certificateToPrint = LeavingCertificateBorder;
+
+                    // Print with A4 size
+                    printDialog.PrintVisual(certificateToPrint, $"Leaving Certificate - {selectedStudent.FullName}");
+
+                    toastNotification.Message = "Leaving Certificate sent to printer!";
+                    toastNotification.ToastType = ToastType.Success;
+                    toastNotification.Show();
+
+                    lblStatus.Text = "Certificate printed";
+                }
+            }
+            else
+            {
+                toastNotification.Message = "Please select a student and generate certificate first.";
+                toastNotification.ToastType = ToastType.Warning;
+                toastNotification.Show();
+            }
+        }
+        catch (Exception ex)
+        {
+            toastNotification.Message = $"Error printing certificate: {ex.Message}";
+            toastNotification.ToastType = ToastType.Error;
+            toastNotification.Show();
+        }
     }
 }
