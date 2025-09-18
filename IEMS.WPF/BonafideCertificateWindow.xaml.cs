@@ -274,13 +274,15 @@ namespace IEMS.WPF
             });
 
             // Certificate content
-            var contentPanel = new StackPanel { Margin = new Thickness(20, 0, 20, 0) };
+            var contentPanel = new StackPanel { Margin = new Thickness(40, 0, 40, 0) };
             var contentText = new TextBlock
             {
                 FontSize = 16,
                 TextWrapping = TextWrapping.Wrap,
                 LineHeight = 28,
-                Margin = new Thickness(0, 0, 0, 10)
+                Margin = new Thickness(0, 0, 0, 10),
+                TextAlignment = TextAlignment.Justify,
+                HorizontalAlignment = HorizontalAlignment.Stretch
             };
 
             // Build the content text with proper formatting

@@ -64,8 +64,9 @@
                                TextDecorations="Underline"/>
 
                     <!-- Certificate Content -->
-                    <StackPanel Margin="20,0">
-                        <TextBlock FontSize="16" LineHeight="28" TextWrapping="Wrap" Margin="0,0,0,10">
+                    <StackPanel Margin="40,0">
+                        <TextBlock FontSize="16" LineHeight="28" TextWrapping="Wrap" Margin="0,0,0,10"
+                                   TextAlignment="Justify" HorizontalAlignment="Stretch">
                             <Run Text="This is to Certify that "/>
                             <Run x:Name="StudentNameWithPrefix" FontWeight="Bold"/>
                             <LineBreak/>
