@@ -185,24 +185,10 @@
 
         <!-- DataGrid Row Hover Style -->
         <Style x:Key="ModernDataGridRowStyle" TargetType="DataGridRow">
+            <Setter Property="Background" Value="Transparent"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Trigger.EnterActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <ColorAnimation Storyboard.TargetProperty="Background.Color"
-                                              To="#f0f7ff" Duration="0:0:0.15"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </Trigger.EnterActions>
-                    <Trigger.ExitActions>
-                        <BeginStoryboard>
-                            <Storyboard>
-                                <ColorAnimation Storyboard.TargetProperty="Background.Color"
-                                              Duration="0:0:0.15"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </Trigger.ExitActions>
+                    <Setter Property="Background" Value="#f0f7ff"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
