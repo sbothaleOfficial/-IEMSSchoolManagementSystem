@@ -368,7 +368,9 @@ public partial class ExpenseManagementWindow : Window
             // Calculate monthly salaries
             var teachers = await _teacherService.GetAllAsync();
             var staff = await _staffService.GetAllAsync();
-            var monthlySalaries = teachers.Sum(t => t.MonthlySalary) + staff.Sum(s => s.MonthlySalary);
+            var teachersSalaries = teachers.ToList().Sum(t => t.MonthlySalary);
+            var staffSalaries = staff.ToList().Sum(s => s.MonthlySalary);
+            var monthlySalaries = teachersSalaries + staffSalaries;
 
             var salariesTotal = rbMonthly.IsChecked == true
                 ? monthlySalaries
