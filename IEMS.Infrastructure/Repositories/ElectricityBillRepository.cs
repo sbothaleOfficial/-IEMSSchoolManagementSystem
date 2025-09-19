@@ -85,15 +85,17 @@ public class ElectricityBillRepository : IElectricityBillRepository
 
     public async Task<decimal> GetTotalAmountByYearAsync(int year)
     {
-        return await _context.ElectricityBills
+        var bills = await _context.ElectricityBills
             .Where(e => e.BillYear == year)
-            .SumAsync(e => e.Amount);
+            .ToListAsync();
+        return bills.Sum(e => e.Amount);
     }
 
     public async Task<decimal> GetTotalAmountByDateRangeAsync(DateTime fromDate, DateTime toDate)
     {
-        return await _context.ElectricityBills
+        var bills = await _context.ElectricityBills
             .Where(e => e.DueDate >= fromDate && e.DueDate <= toDate)
-            .SumAsync(e => e.Amount);
+            .ToListAsync();
+        return bills.Sum(e => e.Amount);
     }
 }

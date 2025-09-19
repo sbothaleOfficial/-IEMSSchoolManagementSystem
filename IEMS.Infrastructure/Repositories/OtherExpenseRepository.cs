@@ -82,29 +82,33 @@ public class OtherExpenseRepository : IOtherExpenseRepository
 
     public async Task<decimal> GetTotalAmountByCategoryAsync(OtherExpenseCategory category)
     {
-        return await _context.OtherExpenses
+        var expenses = await _context.OtherExpenses
             .Where(e => e.Category == category)
-            .SumAsync(e => e.Amount);
+            .ToListAsync();
+        return expenses.Sum(e => e.Amount);
     }
 
     public async Task<decimal> GetTotalAmountByYearAsync(int year)
     {
-        return await _context.OtherExpenses
+        var expenses = await _context.OtherExpenses
             .Where(e => e.ExpenseDate.Year == year)
-            .SumAsync(e => e.Amount);
+            .ToListAsync();
+        return expenses.Sum(e => e.Amount);
     }
 
     public async Task<decimal> GetTotalAmountByDateRangeAsync(DateTime fromDate, DateTime toDate)
     {
-        return await _context.OtherExpenses
+        var expenses = await _context.OtherExpenses
             .Where(e => e.ExpenseDate >= fromDate && e.ExpenseDate <= toDate)
-            .SumAsync(e => e.Amount);
+            .ToListAsync();
+        return expenses.Sum(e => e.Amount);
     }
 
     public async Task<decimal> GetTotalAmountByMonthYearAsync(int month, int year)
     {
-        return await _context.OtherExpenses
+        var expenses = await _context.OtherExpenses
             .Where(e => e.ExpenseDate.Month == month && e.ExpenseDate.Year == year)
-            .SumAsync(e => e.Amount);
+            .ToListAsync();
+        return expenses.Sum(e => e.Amount);
     }
 }

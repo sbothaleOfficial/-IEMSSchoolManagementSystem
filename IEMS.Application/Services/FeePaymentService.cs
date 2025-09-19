@@ -155,7 +155,7 @@ public class FeePaymentService
     public async Task<decimal> GetTotalAmountByDateRangeAsync(DateTime fromDate, DateTime toDate)
     {
         var feePayments = await _feePaymentRepository.GetByDateRangeAsync(fromDate, toDate);
-        return feePayments.Sum(f => f.AmountPaid);
+        return feePayments.ToList().Sum(f => f.AmountPaid);
     }
 
     private static FeePaymentDto MapToDto(FeePayment feePayment)
