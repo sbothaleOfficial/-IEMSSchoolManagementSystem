@@ -416,14 +416,10 @@
                                     <TextBlock Grid.Row="9" Grid.Column="0" Text="Caste:" FontWeight="Bold" Margin="0,5"/>
                                     <TextBlock Grid.Row="9" Grid.Column="1" x:Name="lblLeavingCaste" Margin="10,5"/>
 
-                                    <TextBlock Grid.Row="10" Grid.Column="0" Text="Subcaste:" FontWeight="Bold" Margin="0,5"/>
-                                    <TextBlock Grid.Row="10" Grid.Column="1" x:Name="lblLeavingSubcaste" Margin="10,5"/>
 
-                                    <TextBlock Grid.Row="11" Grid.Column="0" Text="Mother Tongue:" FontWeight="Bold" Margin="0,5"/>
-                                    <TextBlock Grid.Row="11" Grid.Column="1" x:Name="lblLeavingMotherTongue" Margin="10,5"/>
+                                    <TextBlock Grid.Row="10" Grid.Column="0" Text="Mother Tongue:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="10" Grid.Column="1" x:Name="lblLeavingMotherTongue" Margin="10,5"/>
 
-                                    <TextBlock Grid.Row="12" Grid.Column="0" Text="Place of Birth:" FontWeight="Bold" Margin="0,5"/>
-                                    <TextBlock Grid.Row="12" Grid.Column="1" x:Name="lblLeavingPlaceOfBirth" Margin="10,5"/>
                                 </Grid>
 
                                 <!-- Leaving Certificate Specific Details -->
@@ -448,6 +444,48 @@
                                 </ComboBox>
                                 <TextBox x:Name="txtCustomMotherTongue" Margin="0,0,0,15" Height="35"
                                          Visibility="Collapsed" Tag="Enter mother tongue..."/>
+
+                                <TextBlock Text="Place of Birth:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtPlaceOfBirth" Margin="0,0,0,15" Height="35" Tag="Enter place of birth..."/>
+
+                                <TextBlock Text="Subcaste:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtSubcaste" Margin="0,0,0,15" Height="35" Tag="Enter subcaste..."/>
+
+                                <TextBlock Text="Serial No.:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtSerialNoOverride" Margin="0,0,0,15" Height="35" Tag="Override serial number if needed..."/>
+
+                                <TextBlock Text="Student ID:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtStudentId" Margin="0,0,0,15" Height="35" Tag="Enter student ID..."/>
+
+                                <TextBlock Text="U.I.D. No. (Aadhaar Card No.):" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtAadhaarNumber" Margin="0,0,0,15" Height="35" Tag="Enter Aadhaar number..."/>
+
+                                <TextBlock Text="Phone No. (Optional):" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtPhoneNumber" Margin="0,0,0,15" Height="35" Tag="Enter phone number..."/>
+
+                                <TextBlock Text="Email (Optional):" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtEmail" Margin="0,0,0,15" Height="35" Tag="Enter email address..."/>
+
+                                <TextBlock Text="General Register Number:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtGeneralRegisterNumber" Margin="0,0,0,15" Height="35" Tag="Enter general register number..."/>
+
+                                <TextBlock Text="State:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtState" Margin="0,0,0,15" Height="35" Text="Maharashtra"/>
+
+                                <TextBlock Text="Academic Session:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtAcademicSession" Margin="0,0,0,15" Height="35" Tag="e.g., 2025-26"/>
+
+                                <TextBlock Text="Place of Birth (Village/City):" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtBirthPlace" Margin="0,0,0,15" Height="35" Tag="Enter birth place..."/>
+
+                                <TextBlock Text="Taluka:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtTaluka" Margin="0,0,0,15" Height="35" Tag="Enter taluka..."/>
+
+                                <TextBlock Text="District:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtDistrict" Margin="0,0,0,15" Height="35" Tag="Enter district..."/>
+
+                                <TextBlock Text="State (Birth):" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtBirthState" Margin="0,0,0,15" Height="35" Text="Maharashtra"/>
 
                                 <TextBlock Text="Reason for Leaving:" FontWeight="Bold" Margin="0,0,0,5"/>
                                 <ComboBox x:Name="cmbLeavingReason" Margin="0,0,0,15" Height="35">
@@ -539,15 +577,23 @@
 
                                         <!-- Row 3 -->
                                         <TextBlock Grid.Row="2" Grid.Column="0" Text="Phone No.:" FontSize="10" Margin="0,5,0,5"/>
-                                        <Border Grid.Row="2" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,5,0"/>
+                                        <Border Grid.Row="2" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,5,0">
+                                            <TextBlock x:Name="CertHeaderPhone" FontSize="10" Margin="5,0,0,0"/>
+                                        </Border>
                                         <TextBlock Grid.Row="2" Grid.Column="2" Text="E-mail:" FontSize="10" Margin="5,5,0,5"/>
-                                        <Border Grid.Row="2" Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,0,0"/>
+                                        <Border Grid.Row="2" Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,0,0">
+                                            <TextBlock x:Name="CertHeaderEmail" FontSize="10" Margin="5,0,0,0"/>
+                                        </Border>
 
                                         <!-- Row 4 -->
                                         <TextBlock Grid.Row="3" Grid.Column="0" Text="Serial No.:" FontSize="10" Margin="0,5,0,5"/>
-                                        <Border Grid.Row="3" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,5,0"/>
+                                        <Border Grid.Row="3" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,5,0">
+                                            <TextBlock x:Name="CertHeaderSerialNo" FontSize="10" Margin="5,0,0,0"/>
+                                        </Border>
                                         <TextBlock Grid.Row="3" Grid.Column="2" Text="General Register Number:" FontSize="10" Margin="5,5,0,5"/>
-                                        <Border Grid.Row="3" Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,0,0"/>
+                                        <Border Grid.Row="3" Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,0,0">
+                                            <TextBlock x:Name="CertHeaderGeneralRegister" FontSize="10" Margin="5,0,0,0"/>
+                                        </Border>
 
                                         <!-- Row 5 -->
                                         <TextBlock Grid.Row="4" Grid.Column="0" Text="School Accreditation No.:" FontSize="10" Margin="0,5,0,5"/>
@@ -580,17 +626,9 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="Student ID:" FontSize="10" Margin="0,0,10,5"/>
                                         <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                            <!-- Student ID Boxes -->
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <!-- Student ID Display -->
+                                            <TextBlock x:Name="CertStudentId" FontSize="10" FontWeight="Bold"
+                                                       VerticalAlignment="Center" MinWidth="100"/>
                                         </StackPanel>
                                     </Grid>
 
@@ -601,19 +639,9 @@
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="U.I.D. No. (Aadhaar Card No.):" FontSize="10" Margin="0,0,10,0"/>
                                         <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                            <!-- Aadhaar Boxes -->
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
-                                            <Border BorderBrush="Black" BorderThickness="1" Width="15" Height="15" Margin="1,0"/>
+                                            <!-- UID/Aadhaar Display -->
+                                            <TextBlock x:Name="CertAadhaarNumber" FontSize="10" FontWeight="Bold"
+                                                       VerticalAlignment="Center" MinWidth="150"/>
                                         </StackPanel>
                                     </Grid>
 
@@ -716,11 +744,17 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="8) Place of birth (village/city):" FontSize="11"/>
-                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertBirthPlace" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
                                         <TextBlock Grid.Column="2" Text="Taluka:" FontSize="11" Margin="10,0,0,0"/>
-                                        <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15"/>
+                                        <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertTaluka" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
                                         <TextBlock Grid.Column="4" Text="District:" FontSize="11" Margin="10,0,0,0"/>
-                                        <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15"/>
+                                        <Border Grid.Column="5" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertDistrict" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
                                     </Grid>
 
                                     <Grid Margin="0,5,0,5">
@@ -731,7 +765,9 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="State:" FontSize="11"/>
-                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertBirthStateDisplay" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
                                         <TextBlock Grid.Column="2" Text="Country:" FontSize="11" Margin="10,0,0,0"/>
                                         <TextBlock Grid.Column="3" Text="India" FontSize="11" FontWeight="Bold"/>
                                     </Grid>
@@ -767,7 +803,9 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="11) Previous school and grade:" FontSize="11"/>
-                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertPreviousSchool" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
                                     </Grid>
 
                                     <!-- Field 12 -->
