@@ -560,7 +560,7 @@
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="150"/>
+                                            <ColumnDefinition Width="200"/>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="100"/>
                                             <ColumnDefinition Width="*"/>
@@ -901,7 +901,7 @@
                                 <!-- Certification Statement -->
                                 <Grid Margin="0,20,0,30">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="300"/>
+                                        <ColumnDefinition Width="380"/>
                                         <ColumnDefinition Width="80"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
