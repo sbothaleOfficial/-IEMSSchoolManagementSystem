@@ -1040,7 +1040,8 @@ public partial class StudentsManagementWindow : Window
     {
         try
         {
-            if (cmbMotherTongue.SelectedItem is ComboBoxItem selectedItem)
+            // Add null checks to prevent initialization issues
+            if (cmbMotherTongue?.SelectedItem is ComboBoxItem selectedItem && txtCustomMotherTongue != null)
             {
                 var selectedValue = selectedItem.Content.ToString();
                 if (selectedValue == "Other")

@@ -382,35 +382,48 @@
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
                                         <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
                                     </Grid.RowDefinitions>
 
                                     <!-- Student Information Display -->
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Student Name:" FontWeight="Bold" Margin="0,5"/>
                                     <TextBlock Grid.Row="0" Grid.Column="1" x:Name="lblLeavingStudentName" Margin="10,5"/>
 
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Father's Name:" FontWeight="Bold" Margin="0,5"/>
-                                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="lblLeavingFatherName" Margin="10,5"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Mother's Name:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="1" x:Name="lblLeavingMotherName" Margin="10,5"/>
 
-                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Admission No:" FontWeight="Bold" Margin="0,5"/>
-                                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="lblLeavingAdmissionNo" Margin="10,5"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Father's Name:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="1" x:Name="lblLeavingFatherName" Margin="10,5"/>
 
-                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Class:" FontWeight="Bold" Margin="0,5"/>
-                                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="lblLeavingClass" Margin="10,5"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Admission No:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="3" Grid.Column="1" x:Name="lblLeavingAdmissionNo" Margin="10,5"/>
 
-                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Date of Birth:" FontWeight="Bold" Margin="0,5"/>
-                                    <TextBlock Grid.Row="4" Grid.Column="1" x:Name="lblLeavingDOB" Margin="10,5"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Student ID:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="1" x:Name="lblLeavingStudentId" Margin="10,5"/>
 
-                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Admission Date:" FontWeight="Bold" Margin="0,5"/>
-                                    <TextBlock Grid.Row="5" Grid.Column="1" x:Name="lblLeavingAdmissionDate" Margin="10,5"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Class:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="5" Grid.Column="1" x:Name="lblLeavingClass" Margin="10,5"/>
 
-                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Caste:" FontWeight="Bold" Margin="0,5"/>
-                                    <TextBlock Grid.Row="6" Grid.Column="1" x:Name="lblLeavingCaste" Margin="10,5"/>
+                                    <TextBlock Grid.Row="6" Grid.Column="0" Text="Date of Birth:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="6" Grid.Column="1" x:Name="lblLeavingDOB" Margin="10,5"/>
 
-                                    <TextBlock Grid.Row="7" Grid.Column="0" Text="Religion:" FontWeight="Bold" Margin="0,5"/>
-                                    <TextBlock Grid.Row="7" Grid.Column="1" x:Name="lblLeavingReligion" Margin="10,5"/>
+                                    <TextBlock Grid.Row="7" Grid.Column="0" Text="Admission Date:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="7" Grid.Column="1" x:Name="lblLeavingAdmissionDate" Margin="10,5"/>
 
-                                    <TextBlock Grid.Row="8" Grid.Column="0" Text="Gender:" FontWeight="Bold" Margin="0,5"/>
-                                    <TextBlock Grid.Row="8" Grid.Column="1" x:Name="lblLeavingGender" Margin="10,5"/>
+                                    <TextBlock Grid.Row="8" Grid.Column="0" Text="Religion:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="8" Grid.Column="1" x:Name="lblLeavingReligion" Margin="10,5"/>
+
+                                    <TextBlock Grid.Row="9" Grid.Column="0" Text="Caste:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="9" Grid.Column="1" x:Name="lblLeavingCaste" Margin="10,5"/>
+
+                                    <TextBlock Grid.Row="10" Grid.Column="0" Text="Subcaste:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="10" Grid.Column="1" x:Name="lblLeavingSubcaste" Margin="10,5"/>
+
+                                    <TextBlock Grid.Row="11" Grid.Column="0" Text="Mother Tongue:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="11" Grid.Column="1" x:Name="lblLeavingMotherTongue" Margin="10,5"/>
+
+                                    <TextBlock Grid.Row="12" Grid.Column="0" Text="Place of Birth:" FontWeight="Bold" Margin="0,5"/>
+                                    <TextBlock Grid.Row="12" Grid.Column="1" x:Name="lblLeavingPlaceOfBirth" Margin="10,5"/>
                                 </Grid>
 
                                 <!-- Leaving Certificate Specific Details -->
@@ -419,6 +432,22 @@
 
                                 <TextBlock Text="Date of Leaving:" FontWeight="Bold" Margin="0,0,0,5"/>
                                 <DatePicker x:Name="dpLeavingDate" Margin="0,0,0,15" Height="35"/>
+
+                                <TextBlock Text="Medium of Instruction:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <ComboBox x:Name="cmbMedium" Margin="0,0,0,15" Height="35" SelectedIndex="0">
+                                    <ComboBoxItem Content="English"/>
+                                    <ComboBoxItem Content="Semi-English"/>
+                                    <ComboBoxItem Content="Marathi"/>
+                                </ComboBox>
+
+                                <TextBlock Text="Mother Tongue:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <ComboBox x:Name="cmbMotherTongue" Margin="0,0,0,5" Height="35" SelectionChanged="CmbMotherTongue_SelectionChanged">
+                                    <ComboBoxItem Content="Marathi"/>
+                                    <ComboBoxItem Content="Hindi"/>
+                                    <ComboBoxItem Content="Other"/>
+                                </ComboBox>
+                                <TextBox x:Name="txtCustomMotherTongue" Margin="0,0,0,15" Height="35"
+                                         Visibility="Collapsed" Tag="Enter mother tongue..."/>
 
                                 <TextBlock Text="Reason for Leaving:" FontWeight="Bold" Margin="0,0,0,5"/>
                                 <ComboBox x:Name="cmbLeavingReason" Margin="0,0,0,15" Height="35">
@@ -431,17 +460,27 @@
                                     <ComboBoxItem Content="Other"/>
                                 </ComboBox>
 
-                                <TextBlock Text="Last Class Studied:" FontWeight="Bold" Margin="0,0,0,5"/>
-                                <TextBox x:Name="txtLastClass" Margin="0,0,0,15" Height="35"
-                                         Text="{Binding SelectedItem.ClassName, ElementName=cmbLeavingCertStudent}"/>
+                                <TextBlock Text="Progress in Studies:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <ComboBox x:Name="cmbProgressInStudies" Margin="0,0,0,15" Height="35" SelectedIndex="0">
+                                    <ComboBoxItem Content="Excellent"/>
+                                    <ComboBoxItem Content="Very Good"/>
+                                    <ComboBoxItem Content="Good"/>
+                                    <ComboBoxItem Content="Satisfactory"/>
+                                </ComboBox>
 
-                                <TextBlock Text="Character &amp; Conduct:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBlock Text="Behavior:" FontWeight="Bold" Margin="0,0,0,5"/>
                                 <ComboBox x:Name="cmbCharacterConduct" Margin="0,0,0,15" Height="35" SelectedIndex="0">
                                     <ComboBoxItem Content="Excellent"/>
                                     <ComboBoxItem Content="Very Good"/>
                                     <ComboBoxItem Content="Good"/>
                                     <ComboBoxItem Content="Satisfactory"/>
                                 </ComboBox>
+
+                                <TextBlock Text="Last Class Studied:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtLastClass" Margin="0,0,0,15" Height="35"/>
+
+                                <TextBlock Text="Previous School and Grade (Optional):" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBox x:Name="txtPreviousSchool" Margin="0,0,0,15" Height="35"/>
 
                                 <TextBlock Text="Remarks (Optional):" FontWeight="Bold" Margin="0,0,0,5"/>
                                 <TextBox x:Name="txtLeavingRemarks" Margin="0,0,0,20" Height="60"
@@ -487,11 +526,16 @@
 
                                         <!-- Row 1 -->
                                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Name of Management:" FontSize="10" Margin="0,0,0,5"/>
-                                        <Border Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15"/>
+                                        <Border Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock Text="Mahalakmi Bahuddeshiy Sanstha, Chikhalgaon" FontSize="10" Margin="5,0,0,0"/>
+                                        </Border>
 
                                         <!-- Row 2 -->
                                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Name and full address of the school:" FontSize="10" Margin="0,5,0,5"/>
-                                        <Border Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,0,0"/>
+                                        <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Margin="0,5,0,0">
+                                            <TextBlock Text="Inspire English Medium School, Mardi" FontSize="10" Margin="5,0,0,0"/>
+                                            <TextBlock Text="Tah. Maregaon, Dist. Yavatmal (Maharashtra) – 445303" FontSize="10" Margin="5,0,0,0"/>
+                                        </StackPanel>
 
                                         <!-- Row 3 -->
                                         <TextBlock Grid.Row="2" Grid.Column="0" Text="Phone No.:" FontSize="10" Margin="0,5,0,5"/>
@@ -507,15 +551,19 @@
 
                                         <!-- Row 5 -->
                                         <TextBlock Grid.Row="4" Grid.Column="0" Text="School Accreditation No.:" FontSize="10" Margin="0,5,0,5"/>
-                                        <Border Grid.Row="4" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,5,0"/>
-                                        <TextBlock Grid.Row="4" Grid.Column="2" Text="Channel:" FontSize="10" Margin="5,5,0,5"/>
-                                        <Border Grid.Row="4" Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,0,0"/>
+                                        <Border Grid.Row="4" Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,5,0">
+                                            <TextBlock Text="115381/2016" FontSize="10" Margin="5,0,0,0"/>
+                                        </Border>
+                                        <TextBlock Grid.Row="4" Grid.Column="2" Text="Medium:" FontSize="10" Margin="5,5,0,5"/>
+                                        <Border Grid.Row="4" Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15" Margin="0,5,0,0">
+                                            <TextBlock x:Name="CertMedium" FontSize="10" Margin="5,0,0,0"/>
+                                        </Border>
 
                                         <!-- Row 6 -->
                                         <TextBlock Grid.Row="5" Grid.Column="0" Text="U-DISE Code:" FontSize="10" Margin="0,5,0,0"/>
                                         <TextBlock Grid.Row="5" Grid.Column="1" Text="27140806704" FontSize="10" FontWeight="Bold" Margin="0,5,5,0"/>
                                         <TextBlock Grid.Row="5" Grid.Column="2" Text="Board:" FontSize="10" Margin="5,5,0,0"/>
-                                        <TextBlock Grid.Row="5" Grid.Column="3" Text="Affiliation no.:" FontSize="10" Margin="0,5,0,0"/>
+                                        <TextBlock Grid.Row="5" Grid.Column="3" Text="State" FontSize="10" FontWeight="Bold" Margin="0,5,0,0"/>
                                     </Grid>
                                 </Border>
 
@@ -749,7 +797,9 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="13) Progress in studies:" FontSize="11"/>
-                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
+                                            <TextBlock x:Name="CertProgressInStudies" FontSize="11" Margin="5,0,0,0"/>
+                                        </Border>
                                         <TextBlock Grid.Column="2" Text="Behavior:" FontSize="11" Margin="10,0,0,0"/>
                                         <Border Grid.Column="3" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
                                             <TextBlock x:Name="CertCharacterConduct" FontSize="11" Margin="5,0,0,0"/>
