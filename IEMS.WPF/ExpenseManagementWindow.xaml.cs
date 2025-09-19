@@ -45,7 +45,6 @@ public partial class ExpenseManagementWindow : Window
             await LoadElectricityBills();
             await LoadOtherExpenses();
             InitializeCategoryFilter();
-            await RefreshDashboard();
 
             dgElectricityBills.ItemsSource = _electricityBills;
             dgOtherExpenses.ItemsSource = _otherExpenses;
@@ -55,6 +54,18 @@ public partial class ExpenseManagementWindow : Window
         catch (Exception ex)
         {
             MessageBox.Show($"Error initializing window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private async void Window_Loaded(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await RefreshDashboard();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error loading dashboard: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -308,15 +319,25 @@ public partial class ExpenseManagementWindow : Window
     {
         try
         {
+            // Check if UI elements are loaded
+            if (rbMonthly == null || rbYearly == null || rbOverall == null ||
+                txtElectricityTotal == null || txtOtherExpensesTotal == null ||
+                txtTransportTotal == null || txtSalariesTotal == null ||
+                txtTotalIncome == null || txtTotalExpenses == null ||
+                txtNetBalance == null || dgCategoryBreakdown == null)
+            {
+                return; // UI not ready yet
+            }
+
             var currentDate = DateTime.Now;
             DateTime fromDate, toDate;
 
-            if (rbMonthly?.IsChecked == true)
+            if (rbMonthly.IsChecked == true)
             {
                 fromDate = new DateTime(currentDate.Year, currentDate.Month, 1);
                 toDate = fromDate.AddMonths(1).AddDays(-1);
             }
-            else if (rbYearly?.IsChecked == true)
+            else if (rbYearly.IsChecked == true)
             {
                 fromDate = new DateTime(currentDate.Year, 1, 1);
                 toDate = new DateTime(currentDate.Year, 12, 31);
@@ -328,19 +349,19 @@ public partial class ExpenseManagementWindow : Window
             }
 
             // Calculate totals
-            var electricityTotal = rbOverall?.IsChecked == true
+            var electricityTotal = rbOverall.IsChecked == true
                 ? await _electricityBillService.GetTotalAmountByDateRangeAsync(DateTime.MinValue, DateTime.MaxValue)
                 : await _electricityBillService.GetTotalAmountByDateRangeAsync(fromDate, toDate);
 
-            var otherExpensesTotal = rbOverall?.IsChecked == true
+            var otherExpensesTotal = rbOverall.IsChecked == true
                 ? await _otherExpenseService.GetTotalAmountByDateRangeAsync(DateTime.MinValue, DateTime.MaxValue)
                 : await _otherExpenseService.GetTotalAmountByDateRangeAsync(fromDate, toDate);
 
-            var transportTotal = rbOverall?.IsChecked == true
+            var transportTotal = rbOverall.IsChecked == true
                 ? await _transportExpenseService.GetTotalAmountByDateRangeAsync(DateTime.MinValue, DateTime.MaxValue)
                 : await _transportExpenseService.GetTotalAmountByDateRangeAsync(fromDate, toDate);
 
-            var feeIncome = rbOverall?.IsChecked == true
+            var feeIncome = rbOverall.IsChecked == true
                 ? await _feePaymentService.GetTotalAmountByDateRangeAsync(DateTime.MinValue, DateTime.MaxValue)
                 : await _feePaymentService.GetTotalAmountByDateRangeAsync(fromDate, toDate);
 
@@ -349,9 +370,9 @@ public partial class ExpenseManagementWindow : Window
             var staff = await _staffService.GetAllAsync();
             var monthlySalaries = teachers.Sum(t => t.MonthlySalary) + staff.Sum(s => s.MonthlySalary);
 
-            var salariesTotal = rbMonthly?.IsChecked == true
+            var salariesTotal = rbMonthly.IsChecked == true
                 ? monthlySalaries
-                : rbYearly?.IsChecked == true
+                : rbYearly.IsChecked == true
                     ? monthlySalaries * 12
                     : monthlySalaries * 12; // For overall, assume 1 year
 
@@ -384,7 +405,7 @@ public partial class ExpenseManagementWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error refreshing dashboard: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show($"Error refreshing dashboard: {ex.Message}\n\nStack Trace:\n{ex.StackTrace}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
