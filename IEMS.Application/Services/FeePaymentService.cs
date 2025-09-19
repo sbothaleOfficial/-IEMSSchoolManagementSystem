@@ -152,6 +152,12 @@ public class FeePaymentService
         await _feePaymentRepository.DeleteAsync(id);
     }
 
+    public async Task<decimal> GetTotalAmountByDateRangeAsync(DateTime fromDate, DateTime toDate)
+    {
+        var feePayments = await _feePaymentRepository.GetByDateRangeAsync(fromDate, toDate);
+        return feePayments.Sum(f => f.AmountPaid);
+    }
+
     private static FeePaymentDto MapToDto(FeePayment feePayment)
     {
         return new FeePaymentDto

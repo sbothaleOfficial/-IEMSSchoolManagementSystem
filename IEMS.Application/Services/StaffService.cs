@@ -132,6 +132,11 @@ public class StaffService
         return existingStaff == null || (excludeId.HasValue && existingStaff.Id == excludeId.Value);
     }
 
+    public async Task<IEnumerable<Staff>> GetAllAsync()
+    {
+        return await _staffRepository.GetAllAsync();
+    }
+
 
     private static StaffDto MapToDto(Staff staff)
     {

@@ -17,6 +17,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<FeeStructure> FeeStructures { get; set; }
     public DbSet<Vehicle> Vehicles { get; set; }
     public DbSet<TransportExpense> TransportExpenses { get; set; }
+    public DbSet<ElectricityBill> ElectricityBills { get; set; }
+    public DbSet<OtherExpense> OtherExpenses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -148,6 +150,35 @@ public class ApplicationDbContext : DbContext
                   .WithMany(v => v.TransportExpenses)
                   .HasForeignKey(e => e.VehicleId)
                   .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<ElectricityBill>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.BillNumber).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Amount).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.Units).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.UnitsRate).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.TransactionId).HasMaxLength(100);
+            entity.Property(e => e.BankName).HasMaxLength(100);
+            entity.Property(e => e.ChequeNumber).HasMaxLength(50);
+            entity.Property(e => e.Notes).HasMaxLength(500);
+            entity.HasIndex(e => e.BillNumber).IsUnique();
+            entity.HasIndex(e => new { e.BillMonth, e.BillYear }).IsUnique();
+        });
+
+        modelBuilder.Entity<OtherExpense>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.ExpenseType).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Description).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Amount).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.TransactionId).HasMaxLength(100);
+            entity.Property(e => e.BankName).HasMaxLength(100);
+            entity.Property(e => e.ChequeNumber).HasMaxLength(50);
+            entity.Property(e => e.Notes).HasMaxLength(500);
+            entity.Property(e => e.InvoiceNumber).HasMaxLength(50);
+            entity.Property(e => e.VendorName).HasMaxLength(100);
         });
 
         SeedData(modelBuilder);
@@ -332,6 +363,18 @@ public class ApplicationDbContext : DbContext
             new TransportExpense { Id = 1, VehicleId = 1, Category = IEMS.Core.Enums.ExpenseCategory.FUEL, FuelType = IEMS.Core.Enums.FuelType.DIESEL, Amount = 5000, Quantity = 50, ExpenseDate = DateTime.Today.AddDays(-5), DriverName = "Rajesh Kumar", Description = "Fuel refill for bus", InvoiceNumber = "F001", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             new TransportExpense { Id = 2, VehicleId = 1, Category = IEMS.Core.Enums.ExpenseCategory.MAINTENANCE, FuelType = null, Amount = 2500, Quantity = 1, ExpenseDate = DateTime.Today.AddDays(-10), DriverName = "Rajesh Kumar", Description = "Engine oil change", InvoiceNumber = "M001", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             new TransportExpense { Id = 3, VehicleId = 2, Category = IEMS.Core.Enums.ExpenseCategory.FUEL, FuelType = IEMS.Core.Enums.FuelType.CNG, Amount = 1200, Quantity = 20, ExpenseDate = DateTime.Today.AddDays(-3), DriverName = "Suresh Patil", Description = "CNG refill for auto", InvoiceNumber = "F002", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+        );
+
+        modelBuilder.Entity<ElectricityBill>().HasData(
+            new ElectricityBill { Id = 1, BillNumber = "EB001", BillMonth = 8, BillYear = 2024, Amount = 8500, DueDate = new DateTime(2024, 9, 15), Units = 180, UnitsRate = 4.5m, IsPaid = true, PaidDate = new DateTime(2024, 9, 10), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, Notes = "August 2024 electricity bill", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new ElectricityBill { Id = 2, BillNumber = "EB002", BillMonth = 9, BillYear = 2024, Amount = 9200, DueDate = new DateTime(2024, 10, 15), Units = 195, UnitsRate = 4.6m, IsPaid = false, Notes = "September 2024 electricity bill", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new ElectricityBill { Id = 3, BillNumber = "EB003", BillMonth = 7, BillYear = 2024, Amount = 7800, DueDate = new DateTime(2024, 8, 15), Units = 165, UnitsRate = 4.4m, IsPaid = true, PaidDate = new DateTime(2024, 8, 12), PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN789123", Notes = "July 2024 electricity bill", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+        );
+
+        modelBuilder.Entity<OtherExpense>().HasData(
+            new OtherExpense { Id = 1, Category = IEMS.Core.Enums.OtherExpenseCategory.STATIONERY, ExpenseType = "Office Supplies", Description = "Books, pens, papers for office use", Amount = 2500, ExpenseDate = DateTime.Today.AddDays(-15), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, VendorName = "Shree Stationery Mart", InvoiceNumber = "INV001", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new OtherExpense { Id = 2, Category = IEMS.Core.Enums.OtherExpenseCategory.EVENT, ExpenseType = "Independence Day Celebration", Description = "Decorations, refreshments, and prizes for Independence Day", Amount = 15000, ExpenseDate = DateTime.Today.AddDays(-25), PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN456789", VendorName = "Event Decorators", InvoiceNumber = "INV002", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new OtherExpense { Id = 3, Category = IEMS.Core.Enums.OtherExpenseCategory.MAINTENANCE, ExpenseType = "Classroom Repair", Description = "Repair of desks and chairs in Grade 10 classroom", Amount = 5500, ExpenseDate = DateTime.Today.AddDays(-8), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "123456", BankName = "SBI Bank", VendorName = "Repair Services", InvoiceNumber = "INV003", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
         );
     }
 }

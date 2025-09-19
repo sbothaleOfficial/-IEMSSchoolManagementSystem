@@ -29,6 +29,8 @@ public partial class App : System.Windows.Application
                 services.AddScoped<IFeeStructureRepository, FeeStructureRepository>();
                 services.AddScoped<IVehicleRepository, VehicleRepository>();
                 services.AddScoped<ITransportExpenseRepository, TransportExpenseRepository>();
+                services.AddScoped<IElectricityBillRepository, ElectricityBillRepository>();
+                services.AddScoped<IOtherExpenseRepository, OtherExpenseRepository>();
                 services.AddScoped<StudentService>();
                 services.AddScoped<TeacherService>();
                 services.AddScoped<ClassService>();
@@ -37,6 +39,8 @@ public partial class App : System.Windows.Application
                 services.AddScoped<FeeStructureService>();
                 services.AddScoped<VehicleService>();
                 services.AddScoped<TransportExpenseService>();
+                services.AddScoped<ElectricityBillService>();
+                services.AddScoped<OtherExpenseService>();
 
                 services.AddSingleton<MainWindow>();
             })

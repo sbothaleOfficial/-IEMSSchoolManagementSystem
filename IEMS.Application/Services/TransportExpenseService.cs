@@ -145,6 +145,12 @@ public class TransportExpenseService
         return await _expenseRepository.GetMonthlyExpensesByVehicleAsync(vehicleId, year, month);
     }
 
+    public async Task<decimal> GetTotalAmountByDateRangeAsync(DateTime fromDate, DateTime toDate)
+    {
+        var expenses = await _expenseRepository.GetExpensesByDateRangeAsync(fromDate, toDate);
+        return expenses.Sum(e => e.Amount);
+    }
+
     private static TransportExpenseDto MapToDto(TransportExpense expense)
     {
         return new TransportExpenseDto

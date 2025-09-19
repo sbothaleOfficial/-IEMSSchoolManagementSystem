@@ -15,8 +15,10 @@ public partial class MainWindow : Window
     private readonly FeeStructureService _feeStructureService;
     private readonly VehicleService _vehicleService;
     private readonly TransportExpenseService _transportExpenseService;
+    private readonly ElectricityBillService _electricityBillService;
+    private readonly OtherExpenseService _otherExpenseService;
 
-    public MainWindow(StudentService studentService, TeacherService teacherService, ClassService classService, StaffService staffService, FeePaymentService feePaymentService, FeeStructureService feeStructureService, VehicleService vehicleService, TransportExpenseService transportExpenseService)
+    public MainWindow(StudentService studentService, TeacherService teacherService, ClassService classService, StaffService staffService, FeePaymentService feePaymentService, FeeStructureService feeStructureService, VehicleService vehicleService, TransportExpenseService transportExpenseService, ElectricityBillService electricityBillService, OtherExpenseService otherExpenseService)
     {
         InitializeComponent();
         _studentService = studentService;
@@ -27,6 +29,8 @@ public partial class MainWindow : Window
         _feeStructureService = feeStructureService;
         _vehicleService = vehicleService;
         _transportExpenseService = transportExpenseService;
+        _electricityBillService = electricityBillService;
+        _otherExpenseService = otherExpenseService;
 
         lblStatus.Text = "Dashboard loaded successfully";
     }
@@ -125,13 +129,31 @@ public partial class MainWindow : Window
 
     private void BtnFeesModule_Click(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show("Expense Management - Student Fees module\nComing soon!", "Module Under Development", MessageBoxButton.OK, MessageBoxImage.Information);
-        lblStatus.Text = "Expense Management - Student Fees (Coming Soon)";
+        try
+        {
+            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService, _feePaymentService, _feeStructureService);
+            studentsWindow.ShowDialog();
+            lblStatus.Text = "Student Fees Management module accessed";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening Student Fees Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening Student Fees Management";
+        }
     }
 
     private void BtnExpensesModule_Click(object sender, RoutedEventArgs e)
     {
-        MessageBox.Show("Expense Management - Expenses module\nComing soon!", "Module Under Development", MessageBoxButton.OK, MessageBoxImage.Information);
-        lblStatus.Text = "Expense Management - Expenses (Coming Soon)";
+        try
+        {
+            var expenseWindow = new ExpenseManagementWindow(_electricityBillService, _otherExpenseService, _transportExpenseService, _feePaymentService, _teacherService, _staffService);
+            expenseWindow.ShowDialog();
+            lblStatus.Text = "Expense Management module accessed";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening Expense Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening Expense Management";
+        }
     }
 }

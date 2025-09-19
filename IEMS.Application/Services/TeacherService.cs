@@ -110,4 +110,9 @@ public class TeacherService
         var existingTeacher = await _teacherRepository.GetTeacherByEmployeeIdAsync(employeeId);
         return existingTeacher == null || (excludeTeacherId.HasValue && existingTeacher.Id == excludeTeacherId.Value);
     }
+
+    public async Task<IEnumerable<Teacher>> GetAllAsync()
+    {
+        return await _teacherRepository.GetAllAsync();
+    }
 }
