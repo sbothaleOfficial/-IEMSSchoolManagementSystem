@@ -534,6 +534,10 @@
                                             Background="{StaticResource InfoBrush}" Foreground="White"
                                             Padding="15,10" Margin="10,0,0,0" FontWeight="Bold"
                                             Click="BtnPrintLeavingCert_Click"/>
+                                    <Button x:Name="btnExportLeavingCertPDF" Content="📄 Export to PDF"
+                                            Background="{StaticResource PrimaryBrush}" Foreground="White"
+                                            Padding="15,10" Margin="10,0,0,0" FontWeight="Bold"
+                                            Click="BtnExportLeavingCertPDF_Click"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>

@@ -1,5 +1,10 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Printing;
+using Microsoft.Win32;
+using System.IO;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
 using IEMS.WPF.Controls;
@@ -1144,14 +1149,42 @@ public partial class StudentsManagementWindow : Window
                     // Create a copy of the certificate border for printing
                     var certificateToPrint = LeavingCertificateBorder;
 
-                    // Print with A4 size
-                    printDialog.PrintVisual(certificateToPrint, $"Leaving Certificate - {selectedStudent.FullName}");
+                    // Get the printable area
+                    var printableArea = printDialog.PrintableAreaWidth;
+                    var printableHeight = printDialog.PrintableAreaHeight;
 
-                    toastNotification.Message = "Leaving Certificate sent to printer!";
-                    toastNotification.ToastType = ToastType.Success;
-                    toastNotification.Show();
+                    // Ensure the certificate fits the printable area
+                    var originalWidth = certificateToPrint.ActualWidth;
+                    var originalHeight = certificateToPrint.ActualHeight;
 
-                    lblStatus.Text = "Certificate printed";
+                    // Calculate scale factor to fit within printable area while maintaining aspect ratio
+                    var scaleX = printableArea / originalWidth;
+                    var scaleY = printableHeight / originalHeight;
+                    var scale = Math.Min(scaleX, scaleY);
+
+                    // Create a transform group for scaling
+                    var transformGroup = new TransformGroup();
+                    transformGroup.Children.Add(new ScaleTransform(scale, scale));
+
+                    // Apply transform to ensure it fits
+                    certificateToPrint.RenderTransform = transformGroup;
+
+                    try
+                    {
+                        // Print with proper scaling
+                        printDialog.PrintVisual(certificateToPrint, $"Leaving Certificate - {selectedStudent.FullName}");
+
+                        toastNotification.Message = "Leaving Certificate sent to printer!";
+                        toastNotification.ToastType = ToastType.Success;
+                        toastNotification.Show();
+
+                        lblStatus.Text = "Certificate printed";
+                    }
+                    finally
+                    {
+                        // Reset transform
+                        certificateToPrint.RenderTransform = null;
+                    }
                 }
             }
             else
@@ -1167,6 +1200,122 @@ public partial class StudentsManagementWindow : Window
             toastNotification.ToastType = ToastType.Error;
             toastNotification.Show();
         }
+    }
+
+    private void BtnExportLeavingCertPDF_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (cmbLeavingCertStudent.SelectedItem is StudentDto selectedStudent)
+            {
+                // First generate the certificate if not already done
+                BtnGenerateLeavingCert_Click(sender, e);
+
+                // Create save file dialog
+                var saveFileDialog = new SaveFileDialog
+                {
+                    Filter = "PDF files (*.pdf)|*.pdf",
+                    DefaultExt = "pdf",
+                    FileName = $"School_Leaving_Certificate_{selectedStudent.FullName.Replace(" ", "_")}_{DateTime.Now:yyyyMMdd}.pdf"
+                };
+
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    // Export certificate to PDF using visual capture
+                    ExportCertificateToPDF(LeavingCertificateBorder, saveFileDialog.FileName);
+
+                    toastNotification.Message = "Certificate exported to PDF successfully!";
+                    toastNotification.ToastType = ToastType.Success;
+                    toastNotification.Show();
+
+                    lblStatus.Text = "Certificate exported to PDF";
+                }
+            }
+            else
+            {
+                toastNotification.Message = "Please select a student and generate certificate first.";
+                toastNotification.ToastType = ToastType.Warning;
+                toastNotification.Show();
+            }
+        }
+        catch (Exception ex)
+        {
+            toastNotification.Message = $"Error exporting certificate: {ex.Message}";
+            toastNotification.ToastType = ToastType.Error;
+            toastNotification.Show();
+        }
+    }
+
+    private void ExportCertificateToPDF(FrameworkElement element, string filePath)
+    {
+        // Ensure the element is measured and arranged
+        element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        element.Arrange(new Rect(element.DesiredSize));
+
+        // Update layout to ensure all elements are rendered
+        element.UpdateLayout();
+
+        // Create render target bitmap with high DPI for quality
+        var dpi = 300; // High DPI for PDF quality
+        var renderBitmap = new RenderTargetBitmap(
+            (int)(element.ActualWidth * dpi / 96),
+            (int)(element.ActualHeight * dpi / 96),
+            dpi, dpi, PixelFormats.Pbgra32);
+
+        // Render the visual
+        renderBitmap.Render(element);
+
+        // Create print dialog to convert to PDF
+        var printDialog = new PrintDialog();
+
+        // Set printer to Microsoft Print to PDF if available
+        var printServer = new System.Printing.LocalPrintServer();
+        var printQueue = printServer.GetPrintQueue("Microsoft Print to PDF");
+
+        if (printQueue != null)
+        {
+            printDialog.PrintQueue = printQueue;
+        }
+
+        // Create a document for printing
+        var printDocument = new System.Windows.Documents.FixedDocument();
+        var pageContent = new System.Windows.Documents.PageContent();
+        var fixedPage = new System.Windows.Documents.FixedPage
+        {
+            Width = 793.7, // A4 width in device units (96 DPI)
+            Height = 1122.5 // A4 height in device units (96 DPI)
+        };
+
+        // Calculate scale to fit A4 page
+        var scaleX = fixedPage.Width / element.ActualWidth;
+        var scaleY = fixedPage.Height / element.ActualHeight;
+        var scale = Math.Min(scaleX, scaleY);
+
+        // Create a visual brush from the certificate
+        var visualBrush = new VisualBrush(element)
+        {
+            Stretch = Stretch.Uniform,
+            TileMode = TileMode.None
+        };
+
+        // Create a rectangle to hold the visual
+        var rectangle = new System.Windows.Shapes.Rectangle
+        {
+            Width = element.ActualWidth * scale,
+            Height = element.ActualHeight * scale,
+            Fill = visualBrush
+        };
+
+        // Center the content on the page
+        System.Windows.Documents.FixedPage.SetLeft(rectangle, (fixedPage.Width - rectangle.Width) / 2);
+        System.Windows.Documents.FixedPage.SetTop(rectangle, (fixedPage.Height - rectangle.Height) / 2);
+
+        fixedPage.Children.Add(rectangle);
+        pageContent.Child = fixedPage;
+        printDocument.Pages.Add(pageContent);
+
+        // Print the document
+        printDialog.PrintDocument(printDocument.DocumentPaginator, $"School Leaving Certificate - {DateTime.Now:yyyy-MM-dd}");
     }
 
     private void CmbMotherTongue_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
