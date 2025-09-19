@@ -110,10 +110,15 @@ public class ElectricityBillService
 
     private static ElectricityBillDto MapToDto(ElectricityBill bill)
     {
+        if (bill == null)
+        {
+            throw new ArgumentNullException(nameof(bill));
+        }
+
         return new ElectricityBillDto
         {
             Id = bill.Id,
-            BillNumber = bill.BillNumber,
+            BillNumber = bill.BillNumber ?? string.Empty,
             BillMonth = bill.BillMonth,
             BillYear = bill.BillYear,
             Amount = bill.Amount,

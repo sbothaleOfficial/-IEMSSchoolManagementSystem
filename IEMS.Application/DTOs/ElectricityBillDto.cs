@@ -22,28 +22,90 @@ public class ElectricityBillDto
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
-    public string MonthYearDisplay => $"{GetMonthName(BillMonth)} {BillYear}";
-    public string FormattedDueDate => DueDate.ToString("dd/MM/yyyy");
-    public string FormattedPaidDate => PaidDate?.ToString("dd/MM/yyyy") ?? "Not Paid";
-    public string PaymentStatus => IsPaid ? "Paid" : "Pending";
+    public string MonthYearDisplay
+    {
+        get
+        {
+            try
+            {
+                return $"{GetMonthName(BillMonth)} {BillYear}";
+            }
+            catch
+            {
+                return "Unknown";
+            }
+        }
+    }
+
+    public string FormattedDueDate
+    {
+        get
+        {
+            try
+            {
+                return DueDate.ToString("dd/MM/yyyy");
+            }
+            catch
+            {
+                return "Invalid Date";
+            }
+        }
+    }
+
+    public string FormattedPaidDate
+    {
+        get
+        {
+            try
+            {
+                return PaidDate?.ToString("dd/MM/yyyy") ?? "Not Paid";
+            }
+            catch
+            {
+                return "Invalid Date";
+            }
+        }
+    }
+
+    public string PaymentStatus
+    {
+        get
+        {
+            try
+            {
+                return IsPaid ? "Paid" : "Pending";
+            }
+            catch
+            {
+                return "Unknown";
+            }
+        }
+    }
 
     private static string GetMonthName(int month)
     {
-        return month switch
+        try
         {
-            1 => "January",
-            2 => "February",
-            3 => "March",
-            4 => "April",
-            5 => "May",
-            6 => "June",
-            7 => "July",
-            8 => "August",
-            9 => "September",
-            10 => "October",
-            11 => "November",
-            12 => "December",
-            _ => "Unknown"
-        };
+            return month switch
+            {
+                1 => "January",
+                2 => "February",
+                3 => "March",
+                4 => "April",
+                5 => "May",
+                6 => "June",
+                7 => "July",
+                8 => "August",
+                9 => "September",
+                10 => "October",
+                11 => "November",
+                12 => "December",
+                _ => "Unknown"
+            };
+        }
+        catch
+        {
+            return "Unknown";
+        }
     }
 }

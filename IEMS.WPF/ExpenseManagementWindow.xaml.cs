@@ -77,14 +77,22 @@ public partial class ExpenseManagementWindow : Window
         {
             var bills = await _electricityBillService.GetAllAsync();
             _electricityBills.Clear();
-            foreach (var bill in bills)
+
+            if (bills != null)
             {
-                _electricityBills.Add(bill);
+                foreach (var bill in bills)
+                {
+                    if (bill != null)
+                    {
+                        _electricityBills.Add(bill);
+                    }
+                }
             }
         }
         catch (Exception ex)
         {
             MessageBox.Show($"Error loading electricity bills: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = $"Error loading electricity bills: {ex.Message}";
         }
     }
 
