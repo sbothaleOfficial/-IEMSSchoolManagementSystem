@@ -25,6 +25,7 @@ public class StudentDto
     public string ClassName { get; set; } = string.Empty;
 
     public string FullName => $"{FirstName} {Surname}".Trim();
+    public string FullNameWithAdmissionNumber => $"{FullName} - {StudentNumber}";
     public string ClassWithDivision => !string.IsNullOrEmpty(ClassDivision)
         ? $"{Standard} ({ClassDivision})"
         : Standard;

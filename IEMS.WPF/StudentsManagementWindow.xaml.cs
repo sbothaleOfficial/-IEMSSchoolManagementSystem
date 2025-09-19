@@ -29,7 +29,6 @@ public partial class StudentsManagementWindow : Window
         LoadClasses();
         LoadFeePayments();
         LoadBonafideStudents();
-        LoadLeavingCertificateStudents();
         LoadDashboardData();
     }
 
@@ -53,6 +52,9 @@ public partial class StudentsManagementWindow : Window
 
             // Refresh dashboard after loading students
             LoadDashboardData();
+
+            // Load leaving certificate students dropdown after students data is loaded
+            LoadLeavingCertificateStudents();
         }
         catch (Exception ex)
         {
@@ -676,8 +678,11 @@ public partial class StudentsManagementWindow : Window
         try
         {
             // Use the same student data as the main students tab
-            cmbLeavingCertStudent.ItemsSource = _allStudents;
-            lblStatus.Text = $"Loaded {_allStudents.Count} students for Leaving certificates";
+            if (cmbLeavingCertStudent != null)
+                cmbLeavingCertStudent.ItemsSource = _allStudents;
+
+            if (lblStatus != null)
+                lblStatus.Text = $"Loaded {_allStudents.Count} students for Leaving certificates";
 
             // Populate the reason dropdown
             var leavingReasons = new List<string>
@@ -690,7 +695,8 @@ public partial class StudentsManagementWindow : Window
                 "Migration",
                 "Other"
             };
-            cmbLeavingReason.ItemsSource = leavingReasons;
+            if (cmbLeavingReason != null)
+                cmbLeavingReason.ItemsSource = leavingReasons;
 
             // Populate character/conduct dropdown
             var characterOptions = new List<string>
@@ -700,8 +706,18 @@ public partial class StudentsManagementWindow : Window
                 "Good",
                 "Satisfactory"
             };
-            cmbCharacterConduct.ItemsSource = characterOptions;
-            cmbCharacterConduct.SelectedIndex = 0; // Default to "Excellent"
+            if (cmbCharacterConduct != null)
+            {
+                cmbCharacterConduct.ItemsSource = characterOptions;
+                cmbCharacterConduct.SelectedIndex = 0; // Default to "Excellent"
+            }
+
+            // Populate progress in studies dropdown
+            if (cmbProgressInStudies != null)
+            {
+                cmbProgressInStudies.ItemsSource = characterOptions; // Same options as character conduct
+                cmbProgressInStudies.SelectedIndex = 0; // Default to "Excellent"
+            }
         }
         catch (Exception ex)
         {
@@ -717,8 +733,43 @@ public partial class StudentsManagementWindow : Window
         {
             if (cmbLeavingCertStudent.SelectedItem is StudentDto selectedStudent)
             {
-                // Populate the certificate preview with student data
-                PopulateLeavingCertificatePreview(selectedStudent);
+                try
+                {
+                    // Show the student details section
+                    gridLeavingCertDetails.Visibility = System.Windows.Visibility.Visible;
+
+                    // Populate the left panel student details
+                    if (lblLeavingStudentName != null) lblLeavingStudentName.Text = selectedStudent.FullName;
+                    if (lblLeavingMotherName != null) lblLeavingMotherName.Text = selectedStudent.MotherName;
+                    if (lblLeavingFatherName != null) lblLeavingFatherName.Text = selectedStudent.FatherName;
+                    if (lblLeavingAdmissionNo != null) lblLeavingAdmissionNo.Text = selectedStudent.StudentNumber;
+                    if (lblLeavingStudentId != null) lblLeavingStudentId.Text = selectedStudent.Id.ToString();
+                    if (lblLeavingClass != null) lblLeavingClass.Text = $"{selectedStudent.Standard} ({selectedStudent.ClassDivision})";
+                    if (lblLeavingDOB != null) lblLeavingDOB.Text = selectedStudent.DateOfBirth.ToString("dd/MM/yyyy");
+                    if (lblLeavingAdmissionDate != null) lblLeavingAdmissionDate.Text = selectedStudent.AdmissionDate.ToString("dd/MM/yyyy");
+                    if (lblLeavingReligion != null) lblLeavingReligion.Text = selectedStudent.Religion;
+                    if (lblLeavingCaste != null) lblLeavingCaste.Text = selectedStudent.CasteCategory;
+                    if (lblLeavingSubcaste != null) lblLeavingSubcaste.Text = ""; // Not available in current StudentDto
+                    if (lblLeavingMotherTongue != null) lblLeavingMotherTongue.Text = "Marathi"; // Default or could be added to StudentDto
+                    if (lblLeavingPlaceOfBirth != null) lblLeavingPlaceOfBirth.Text = selectedStudent.CityVillage ?? "";
+
+                    // Set default value for last class
+                    if (txtLastClass != null) txtLastClass.Text = selectedStudent.Standard;
+
+                    // Populate the certificate preview with student data
+                    PopulateLeavingCertificatePreview(selectedStudent);
+                }
+                catch (Exception labelEx)
+                {
+                    toastNotification.Message = $"Error populating student details: {labelEx.Message}";
+                    toastNotification.ToastType = ToastType.Error;
+                    toastNotification.Show();
+                }
+            }
+            else
+            {
+                // Hide the student details section if no student is selected
+                gridLeavingCertDetails.Visibility = System.Windows.Visibility.Collapsed;
             }
         }
         catch (Exception ex)
@@ -764,8 +815,7 @@ public partial class StudentsManagementWindow : Window
             if (FindName("CertSubcaste") is TextBlock certSubcaste)
                 certSubcaste.Text = ""; // Not available in current StudentDto
 
-            if (FindName("CertMotherTongue") is TextBlock certMotherTongue)
-                certMotherTongue.Text = ""; // Not available in current StudentDto
+            // Mother Tongue will be populated when certificate is generated based on dropdown selection
 
             if (FindName("CertGeneralRegisterNumber") is TextBlock certGeneralRegisterNumber)
                 certGeneralRegisterNumber.Text = student.StudentNumber;
@@ -873,11 +923,50 @@ public partial class StudentsManagementWindow : Window
                 if (FindName("CertLeavingDate") is TextBlock certLeavingDate)
                     certLeavingDate.Text = dpLeavingDate.SelectedDate.Value.ToString("dd/MM/yyyy");
 
-                if (FindName("CertLeavingReason") is TextBlock certLeavingReason)
-                    certLeavingReason.Text = cmbLeavingReason.SelectedItem.ToString();
+                // Populate Medium field
+                if (FindName("CertMedium") is TextBlock certMedium)
+                {
+                    var medium = (cmbMedium?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "English";
+                    certMedium.Text = medium;
+                }
 
+                // Populate Mother Tongue field
+                if (FindName("CertMotherTongue") is TextBlock certMotherTongue)
+                {
+                    var motherTongueSelection = (cmbMotherTongue?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Marathi";
+                    if (motherTongueSelection == "Other" && !string.IsNullOrWhiteSpace(txtCustomMotherTongue.Text))
+                    {
+                        certMotherTongue.Text = txtCustomMotherTongue.Text;
+                    }
+                    else if (motherTongueSelection != "Other")
+                    {
+                        certMotherTongue.Text = motherTongueSelection;
+                    }
+                    else
+                    {
+                        certMotherTongue.Text = "Marathi"; // Default if Other is selected but no custom value entered
+                    }
+                }
+
+                if (FindName("CertLeavingReason") is TextBlock certLeavingReason)
+                {
+                    var reason = (cmbLeavingReason.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "";
+                    certLeavingReason.Text = reason;
+                }
+
+                // For field 13 - Progress in Studies
+                if (FindName("CertProgressInStudies") is TextBlock certProgressInStudies)
+                {
+                    var progress = (cmbProgressInStudies?.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Good";
+                    certProgressInStudies.Text = progress;
+                }
+
+                // For field 13 - Behavior
                 if (FindName("CertCharacterConduct") is TextBlock certCharacterConduct)
-                    certCharacterConduct.Text = cmbCharacterConduct.SelectedItem.ToString();
+                {
+                    var conduct = (cmbCharacterConduct.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "Good";
+                    certCharacterConduct.Text = conduct;
+                }
 
                 if (FindName("CertRemarks") is TextBlock certRemarks)
                     certRemarks.Text = !string.IsNullOrWhiteSpace(txtLeavingRemarks.Text) ? txtLeavingRemarks.Text : "NIL";
@@ -942,6 +1031,35 @@ public partial class StudentsManagementWindow : Window
         catch (Exception ex)
         {
             toastNotification.Message = $"Error printing certificate: {ex.Message}";
+            toastNotification.ToastType = ToastType.Error;
+            toastNotification.Show();
+        }
+    }
+
+    private void CmbMotherTongue_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        try
+        {
+            if (cmbMotherTongue.SelectedItem is ComboBoxItem selectedItem)
+            {
+                var selectedValue = selectedItem.Content.ToString();
+                if (selectedValue == "Other")
+                {
+                    // Show the custom input textbox
+                    txtCustomMotherTongue.Visibility = System.Windows.Visibility.Visible;
+                    txtCustomMotherTongue.Focus();
+                }
+                else
+                {
+                    // Hide the custom input textbox
+                    txtCustomMotherTongue.Visibility = System.Windows.Visibility.Collapsed;
+                    txtCustomMotherTongue.Text = "";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            toastNotification.Message = $"Error handling mother tongue selection: {ex.Message}";
             toastNotification.ToastType = ToastType.Error;
             toastNotification.Show();
         }
