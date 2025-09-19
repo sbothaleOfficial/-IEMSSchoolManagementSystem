@@ -863,8 +863,9 @@
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
                                         <TextBlock Grid.Column="0" Text="15) In which grade were you studying and from when (letters and numbers):" FontSize="11"/>
-                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" Height="15">
-                                            <TextBlock x:Name="CertStandard" FontSize="11" Margin="5,0,0,0"/>
+                                        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="0,0,0,1" MinHeight="25">
+                                            <TextBlock x:Name="CertStandard" FontSize="11" Margin="5,0,0,0"
+                                                       TextWrapping="Wrap" VerticalAlignment="Top"/>
                                         </Border>
                                     </Grid>
 

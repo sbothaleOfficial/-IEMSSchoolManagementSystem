@@ -749,12 +749,39 @@ public partial class StudentsManagementWindow : Window
                     if (lblLeavingAdmissionDate != null) lblLeavingAdmissionDate.Text = selectedStudent.AdmissionDate.ToString("dd/MM/yyyy");
                     if (lblLeavingReligion != null) lblLeavingReligion.Text = selectedStudent.Religion;
                     if (lblLeavingCaste != null) lblLeavingCaste.Text = selectedStudent.CasteCategory;
-                    if (lblLeavingSubcaste != null) lblLeavingSubcaste.Text = ""; // Not available in current StudentDto
                     if (lblLeavingMotherTongue != null) lblLeavingMotherTongue.Text = "Marathi"; // Default or could be added to StudentDto
-                    if (lblLeavingPlaceOfBirth != null) lblLeavingPlaceOfBirth.Text = selectedStudent.CityVillage ?? "";
 
                     // Set default value for last class
                     if (txtLastClass != null) txtLastClass.Text = selectedStudent.Standard;
+
+                    // Populate Certificate Details fields with student data (auto-fill but allow override)
+                    if (txtBirthPlace != null) txtBirthPlace.Text = selectedStudent.CityVillage ?? "";
+                    if (txtSerialNoOverride != null) txtSerialNoOverride.Text = selectedStudent.SerialNo.ToString();
+                    if (txtStudentId != null) txtStudentId.Text = selectedStudent.Id.ToString();
+                    if (txtGeneralRegisterNumber != null) txtGeneralRegisterNumber.Text = selectedStudent.StudentNumber;
+                    if (txtPhoneNumber != null) txtPhoneNumber.Text = selectedStudent.ParentMobileNumber;
+
+                    // Auto-populate Place of Birth fields from student data
+                    // For now, we'll use defaults since we don't have specific fields in the database
+                    // Users can override these values manually
+                    if (txtTaluka != null) txtTaluka.Text = ""; // Empty by default, user can fill
+                    if (txtDistrict != null) txtDistrict.Text = ""; // Empty by default, user can fill
+                    if (txtBirthState != null) txtBirthState.Text = "Maharashtra"; // Default state
+
+                    // Auto-populate additional fields that don't exist in database yet
+                    if (txtAadhaarNumber != null) txtAadhaarNumber.Text = ""; // Empty by default, user must fill
+                    if (txtEmail != null) txtEmail.Text = ""; // Empty by default, user can fill
+
+                    // Set default Academic Session based on current date
+                    if (txtAcademicSession != null)
+                    {
+                        var currentYear = DateTime.Now.Year;
+                        var nextYear = currentYear + 1;
+                        var defaultAcademicSession = $"{currentYear}-{nextYear.ToString().Substring(2)}";
+                        txtAcademicSession.Text = defaultAcademicSession;
+                    }
+                    // txtSubcaste, txtAadhaarNumber, txtEmail remain empty for manual entry
+                    // txtState already defaults to "Maharashtra"
 
                     // Populate the certificate preview with student data
                     PopulateLeavingCertificatePreview(selectedStudent);
@@ -804,7 +831,21 @@ public partial class StudentsManagementWindow : Window
                 certAdmissionClass.Text = student.Standard;
 
             if (FindName("CertStandard") is TextBlock certStandard)
-                certStandard.Text = $"{student.Standard} ({student.ClassDivision})";
+            {
+                // Enhanced Grade field with default academic session format (both numeric and words)
+                var currentYear = DateTime.Now.Year;
+                var nextYear = currentYear + 1;
+                var academicSession = $"{currentYear}–{nextYear.ToString().Substring(2)}";
+                var standardWords = ConvertStandardToWords(student.Standard);
+
+                // Create both numeric and words format
+                var numericFormat = $"{student.Standard}th — Academic Session {academicSession}";
+                var wordsFormat = $"Class {standardWords} — Academic Session {ConvertAcademicSessionToWords(academicSession)}";
+
+                // Combine both formats
+                var combinedText = $"{numericFormat}, {wordsFormat}";
+                certStandard.Text = combinedText;
+            }
 
             if (FindName("CertReligion") is TextBlock certReligion)
                 certReligion.Text = student.Religion;
@@ -974,6 +1015,98 @@ public partial class StudentsManagementWindow : Window
                 if (FindName("CertIssueDate") is TextBlock certIssueDate)
                     certIssueDate.Text = DateTime.Now.ToString("dd/MM/yyyy");
 
+                // Populate new fields from Certificate Details textboxes
+                // Place of Birth fields (Field 8)
+                if (FindName("CertBirthPlace") is TextBlock certBirthPlace)
+                    certBirthPlace.Text = !string.IsNullOrWhiteSpace(txtBirthPlace?.Text) ? txtBirthPlace.Text : "";
+
+                if (FindName("CertTaluka") is TextBlock certTaluka)
+                    certTaluka.Text = !string.IsNullOrWhiteSpace(txtTaluka?.Text) ? txtTaluka.Text : "";
+
+                if (FindName("CertDistrict") is TextBlock certDistrict)
+                    certDistrict.Text = !string.IsNullOrWhiteSpace(txtDistrict?.Text) ? txtDistrict.Text : "";
+
+                if (FindName("CertBirthStateDisplay") is TextBlock certBirthStateDisplay)
+                    certBirthStateDisplay.Text = !string.IsNullOrWhiteSpace(txtBirthState?.Text) ? txtBirthState.Text : "Maharashtra";
+
+                // Populate Header fields
+                if (FindName("CertHeaderPhone") is TextBlock certHeaderPhone)
+                    certHeaderPhone.Text = !string.IsNullOrWhiteSpace(txtPhoneNumber?.Text) ? txtPhoneNumber.Text : "";
+
+                if (FindName("CertHeaderEmail") is TextBlock certHeaderEmail)
+                    certHeaderEmail.Text = !string.IsNullOrWhiteSpace(txtEmail?.Text) ? txtEmail.Text : "";
+
+                if (FindName("CertHeaderSerialNo") is TextBlock certHeaderSerialNo)
+                {
+                    var serialNo = !string.IsNullOrWhiteSpace(txtSerialNoOverride?.Text) ? txtSerialNoOverride.Text : selectedStudent.SerialNo.ToString();
+                    certHeaderSerialNo.Text = serialNo;
+                }
+
+                if (FindName("CertHeaderGeneralRegister") is TextBlock certHeaderGeneralRegister)
+                    certHeaderGeneralRegister.Text = !string.IsNullOrWhiteSpace(txtGeneralRegisterNumber?.Text) ? txtGeneralRegisterNumber.Text : selectedStudent.StudentNumber;
+
+                if (FindName("CertSubcaste") is TextBlock certSubcaste)
+                    certSubcaste.Text = !string.IsNullOrWhiteSpace(txtSubcaste?.Text) ? txtSubcaste.Text : "";
+
+                if (FindName("CertSerialNo") is TextBlock certSerialNo)
+                {
+                    // Use override if provided, otherwise use student's serial number
+                    var serialNo = !string.IsNullOrWhiteSpace(txtSerialNoOverride?.Text) ? txtSerialNoOverride.Text : selectedStudent.SerialNo.ToString();
+                    certSerialNo.Text = serialNo;
+                }
+
+                if (FindName("CertStudentId") is TextBlock certStudentId)
+                    certStudentId.Text = !string.IsNullOrWhiteSpace(txtStudentId?.Text) ? txtStudentId.Text : selectedStudent.Id.ToString();
+
+                if (FindName("CertAadhaarNumber") is TextBlock certAadhaarNumber)
+                    certAadhaarNumber.Text = !string.IsNullOrWhiteSpace(txtAadhaarNumber?.Text) ? txtAadhaarNumber.Text : "";
+
+                if (FindName("CertPhoneNumber") is TextBlock certPhoneNumber)
+                    certPhoneNumber.Text = !string.IsNullOrWhiteSpace(txtPhoneNumber?.Text) ? txtPhoneNumber.Text : "";
+
+                if (FindName("CertEmail") is TextBlock certEmail)
+                    certEmail.Text = !string.IsNullOrWhiteSpace(txtEmail?.Text) ? txtEmail.Text : "";
+
+                if (FindName("CertGeneralRegisterNumber") is TextBlock certGeneralRegisterNumber)
+                    certGeneralRegisterNumber.Text = !string.IsNullOrWhiteSpace(txtGeneralRegisterNumber?.Text) ? txtGeneralRegisterNumber.Text : selectedStudent.StudentNumber;
+
+                if (FindName("CertState") is TextBlock certState)
+                    certState.Text = !string.IsNullOrWhiteSpace(txtState?.Text) ? txtState.Text : "Maharashtra";
+
+                // Fix for Issue 4: Previous School and Grade
+                if (FindName("CertPreviousSchool") is TextBlock certPreviousSchool)
+                    certPreviousSchool.Text = !string.IsNullOrWhiteSpace(txtPreviousSchool?.Text) ? txtPreviousSchool.Text : "";
+
+                // Update Grade field with user-specified Academic Session (both numeric and words format)
+                if (FindName("CertStandard") is TextBlock certStandard)
+                {
+                    var userAcademicSession = !string.IsNullOrWhiteSpace(txtAcademicSession?.Text) ? txtAcademicSession.Text : "";
+                    var standardWords = ConvertStandardToWords(selectedStudent.Standard);
+
+                    string academicSessionToUse;
+                    if (!string.IsNullOrWhiteSpace(userAcademicSession))
+                    {
+                        academicSessionToUse = userAcademicSession;
+                    }
+                    else
+                    {
+                        // Fallback to current year if no academic session is specified
+                        var currentYear = DateTime.Now.Year;
+                        var nextYear = currentYear + 1;
+                        academicSessionToUse = $"{currentYear}–{nextYear.ToString().Substring(2)}";
+                    }
+
+                    // Create both numeric and words format as specified
+                    // Remove 'th' suffix if it already exists in selectedStudent.Standard
+                    var standardNumeric = selectedStudent.Standard.EndsWith("th") ? selectedStudent.Standard : $"{selectedStudent.Standard}th";
+                    var numericFormat = $"{standardNumeric} — Academic Session {academicSessionToUse}";
+                    var wordsFormat = $"Class {standardWords} — Academic Session {ConvertAcademicSessionToWords(academicSessionToUse)}";
+
+                    // Combine both formats with proper line break
+                    var combinedText = $"{numericFormat}\n{wordsFormat}";
+                    certStandard.Text = combinedText;
+                }
+
                 toastNotification.Message = "Leaving Certificate generated successfully!";
                 toastNotification.ToastType = ToastType.Success;
                 toastNotification.Show();
@@ -1064,5 +1197,116 @@ public partial class StudentsManagementWindow : Window
             toastNotification.ToastType = ToastType.Error;
             toastNotification.Show();
         }
+    }
+
+    private string ConvertStandardToWords(string standard)
+    {
+        var standardMap = new Dictionary<string, string>
+        {
+            {"1", "First"},
+            {"2", "Second"},
+            {"3", "Third"},
+            {"4", "Fourth"},
+            {"5", "Fifth"},
+            {"6", "Sixth"},
+            {"7", "Seventh"},
+            {"8", "Eighth"},
+            {"9", "Ninth"},
+            {"10", "Tenth"},
+            {"11", "Eleventh"},
+            {"12", "Twelfth"}
+        };
+
+        return standardMap.ContainsKey(standard) ? standardMap[standard] : standard;
+    }
+
+    private string ConvertAcademicSessionToWords(string academicSession)
+    {
+        // Convert format like "2025-26" to "Two Thousand Twenty-Five–Twenty-Six"
+        if (string.IsNullOrWhiteSpace(academicSession))
+            return "";
+
+        var parts = academicSession.Split('-', '–');
+        if (parts.Length != 2)
+            return academicSession;
+
+        try
+        {
+            var firstYear = int.Parse(parts[0]);
+            var secondPart = parts[1];
+
+            // Handle 2-digit second part (e.g., "26")
+            int secondYear;
+            if (secondPart.Length == 2)
+            {
+                // Convert "26" to "2026"
+                var century = firstYear / 100 * 100; // Gets 2000 from 2025
+                secondYear = century + int.Parse(secondPart);
+            }
+            else
+            {
+                // Full year format
+                secondYear = int.Parse(secondPart);
+            }
+
+            var firstYearWords = ConvertYearToWords(firstYear);
+            var secondYearWords = ConvertYearToWords(secondYear);
+
+            return $"{firstYearWords}–{secondYearWords}";
+        }
+        catch
+        {
+            return academicSession; // Return original if parsing fails
+        }
+    }
+
+    private string ConvertYearToWords(int year)
+    {
+        // Convert years like 2025 to "Two Thousand Twenty-Five"
+        if (year < 1000 || year > 9999)
+            return year.ToString();
+
+        var thousands = year / 1000;
+        var remainder = year % 1000;
+        var hundreds = remainder / 100;
+        var tens = (remainder % 100) / 10;
+        var units = remainder % 10;
+
+        var result = "";
+
+        // Thousands
+        if (thousands > 0)
+        {
+            result += ConvertNumberToWords(thousands) + " Thousand";
+        }
+
+        // Hundreds
+        if (hundreds > 0)
+        {
+            result += (result.Length > 0 ? " " : "") + ConvertNumberToWords(hundreds) + " Hundred";
+        }
+
+        // Tens and units
+        var lastTwoDigits = remainder % 100;
+        if (lastTwoDigits > 0)
+        {
+            if (result.Length > 0) result += " ";
+
+            if (lastTwoDigits < 20)
+            {
+                result += ConvertNumberToWords(lastTwoDigits);
+            }
+            else
+            {
+                var tensWords = ConvertNumberToWords(tens * 10);
+                result += tensWords;
+                if (units > 0)
+                {
+                    result += "-" + ConvertNumberToWords(units);
+                }
+            }
+        }
+
+        return result;
     }
 }
