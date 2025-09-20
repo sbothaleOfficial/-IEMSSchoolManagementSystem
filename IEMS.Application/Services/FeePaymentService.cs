@@ -158,6 +158,197 @@ public class FeePaymentService
         return feePayments.ToList().Sum(f => f.AmountPaid);
     }
 
+    public async Task<FeeAnalyticsDto> GetFeeAnalyticsAsync(string academicYear)
+    {
+        var allStudents = await _studentRepository.GetAllAsync();
+        var allFeePayments = await _feePaymentRepository.GetAllAsync();
+        var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYear == academicYear).ToList();
+
+        // Calculate basic analytics
+        var totalCollection = currentYearPayments.Sum(fp => fp.AmountPaid);
+        var totalPending = currentYearPayments.Sum(fp => fp.RemainingBalance);
+
+        // Students with pending fees
+        var studentsWithPending = currentYearPayments
+            .Where(fp => fp.RemainingBalance > 0)
+            .Select(fp => fp.StudentId)
+            .Distinct()
+            .Count();
+
+        var totalStudents = allStudents.Count();
+        var completionPercentage = totalStudents > 0 ? ((decimal)(totalStudents - studentsWithPending) / totalStudents) * 100 : 0;
+
+        // Class-wise analysis
+        var classWiseData = await GetClassWiseFeeAnalyticsAsync(academicYear);
+
+        // Monthly collections
+        var monthlyCollections = await GetMonthlyCollectionsAsync(academicYear);
+
+        // Fee type analytics
+        var feeTypeAnalytics = await GetFeeTypeAnalyticsAsync(academicYear);
+
+        return new FeeAnalyticsDto
+        {
+            TotalCollection = totalCollection,
+            PendingFees = totalPending,
+            StudentsWithPendingFees = studentsWithPending,
+            TotalStudents = totalStudents,
+            CompletionPercentage = completionPercentage,
+            ClassWisePendingFees = classWiseData,
+            MonthlyCollections = monthlyCollections,
+            FeeTypeAnalytics = feeTypeAnalytics
+        };
+    }
+
+    public async Task<List<ClassWiseFeeDto>> GetClassWiseFeeAnalyticsAsync(string academicYear)
+    {
+        var allClasses = await _classRepository.GetAllAsync();
+        var allFeePayments = await _feePaymentRepository.GetAllAsync();
+        var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYear == academicYear).ToList();
+
+        var classWiseData = new List<ClassWiseFeeDto>();
+
+        foreach (var classItem in allClasses)
+        {
+            var classStudents = classItem.Students.ToList();
+            var classPayments = currentYearPayments.Where(fp => classStudents.Any(s => s.Id == fp.StudentId)).ToList();
+
+            var studentsWithPending = classPayments
+                .Where(fp => fp.RemainingBalance > 0)
+                .Select(fp => fp.StudentId)
+                .Distinct()
+                .Count();
+
+            var totalPending = classPayments.Sum(fp => fp.RemainingBalance);
+            var totalCollected = classPayments.Sum(fp => fp.AmountPaid);
+            var collectionPercentage = (totalCollected + totalPending) > 0 ?
+                (totalCollected / (totalCollected + totalPending)) * 100 : 0;
+
+            classWiseData.Add(new ClassWiseFeeDto
+            {
+                ClassId = classItem.Id,
+                ClassName = classItem.Name,
+                Section = classItem.Section ?? "",
+                TotalStudents = classStudents.Count,
+                StudentsWithPendingFees = studentsWithPending,
+                TotalPendingAmount = totalPending,
+                AveragePendingPerStudent = classStudents.Count > 0 ? totalPending / classStudents.Count : 0,
+                CollectionPercentage = collectionPercentage
+            });
+        }
+
+        return classWiseData.OrderBy(c => c.ClassName).ToList();
+    }
+
+    public async Task<List<MonthlyCollectionDto>> GetMonthlyCollectionsAsync(string academicYear)
+    {
+        var allFeePayments = await _feePaymentRepository.GetAllAsync();
+        var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYear == academicYear).ToList();
+
+        var monthlyData = currentYearPayments
+            .GroupBy(fp => new { fp.PaymentDate.Year, fp.PaymentDate.Month })
+            .Select(g => new MonthlyCollectionDto
+            {
+                Year = g.Key.Year,
+                Month = g.Key.Month,
+                MonthName = new DateTime(g.Key.Year, g.Key.Month, 1).ToString("MMMM yyyy"),
+                TotalCollection = g.Sum(fp => fp.AmountPaid),
+                NumberOfPayments = g.Count(),
+                AveragePaymentAmount = g.Average(fp => fp.AmountPaid),
+                ByFeeType = g.GroupBy(fp => fp.FeeType)
+                    .Select(ft => new FeeTypeCollectionDto
+                    {
+                        FeeType = ft.Key,
+                        Amount = ft.Sum(fp => fp.AmountPaid),
+                        PaymentCount = ft.Count()
+                    }).ToList()
+            })
+            .OrderBy(m => m.Year)
+            .ThenBy(m => m.Month)
+            .ToList();
+
+        return monthlyData;
+    }
+
+    public async Task<List<FeeTypeAnalyticsDto>> GetFeeTypeAnalyticsAsync(string academicYear)
+    {
+        var allFeePayments = await _feePaymentRepository.GetAllAsync();
+        var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYear == academicYear).ToList();
+
+        var feeTypeData = currentYearPayments
+            .GroupBy(fp => fp.FeeType)
+            .Select(g =>
+            {
+                var totalCollected = g.Sum(fp => fp.AmountPaid);
+                var totalPending = g.Sum(fp => fp.RemainingBalance);
+                var studentsWithPending = g.Where(fp => fp.RemainingBalance > 0).Select(fp => fp.StudentId).Distinct().Count();
+                var collectionRate = (totalCollected + totalPending) > 0 ? (totalCollected / (totalCollected + totalPending)) * 100 : 0;
+
+                return new FeeTypeAnalyticsDto
+                {
+                    FeeType = g.Key,
+                    FeeTypeName = g.Key.ToString(),
+                    TotalCollected = totalCollected,
+                    TotalPending = totalPending,
+                    StudentsWithPending = studentsWithPending,
+                    CollectionRate = collectionRate
+                };
+            })
+            .OrderBy(ft => ft.FeeTypeName)
+            .ToList();
+
+        return feeTypeData;
+    }
+
+    public async Task<List<StudentFeeStatusDto>> GetStudentsWithPendingFeesAsync(string academicYear, int? classId = null)
+    {
+        var allFeePayments = await _feePaymentRepository.GetAllAsync();
+        var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYear == academicYear).ToList();
+
+        var studentsWithPending = currentYearPayments
+            .Where(fp => fp.RemainingBalance > 0)
+            .GroupBy(fp => fp.StudentId)
+            .Select(g =>
+            {
+                var student = g.First().Student;
+                if (classId.HasValue && student.ClassId != classId.Value)
+                    return null;
+
+                var totalPending = g.Sum(fp => fp.RemainingBalance);
+                var lastPayment = g.OrderByDescending(fp => fp.PaymentDate).FirstOrDefault();
+                var daysSinceLastPayment = lastPayment != null ?
+                    (DateTime.Now - lastPayment.PaymentDate).Days : 0;
+
+                return new StudentFeeStatusDto
+                {
+                    StudentId = student.Id,
+                    StudentName = student.FullName,
+                    ClassName = student.Class?.Name + " - " + student.Class?.Section,
+                    StudentNumber = student.StudentNumber,
+                    ParentPhone = student.ParentMobileNumber,
+                    TotalPendingAmount = totalPending,
+                    LastPaymentDate = lastPayment?.PaymentDate,
+                    DaysSinceLastPayment = daysSinceLastPayment,
+                    PendingByFeeType = g.GroupBy(fp => fp.FeeType)
+                        .Where(ft => ft.Sum(fp => fp.RemainingBalance) > 0)
+                        .Select(ft => new FeeTypePendingDto
+                        {
+                            FeeType = ft.Key,
+                            PendingAmount = ft.Sum(fp => fp.RemainingBalance),
+                            LastPaid = ft.OrderByDescending(fp => fp.PaymentDate).FirstOrDefault()?.PaymentDate,
+                            OverdueDays = ft.OrderByDescending(fp => fp.PaymentDate).FirstOrDefault()?.PaymentDate != null ?
+                                (DateTime.Now - ft.OrderByDescending(fp => fp.PaymentDate).First().PaymentDate).Days : 0
+                        }).ToList()
+                };
+            })
+            .Where(s => s != null)
+            .OrderByDescending(s => s!.TotalPendingAmount)
+            .Cast<StudentFeeStatusDto>()
+            .ToList();
+
+        return studentsWithPending;
+    }
+
     private static FeePaymentDto MapToDto(FeePayment feePayment)
     {
         return new FeePaymentDto

@@ -88,9 +88,8 @@ public partial class MainWindow : Window
     {
         try
         {
-            // Use existing ExpenseManagementWindow for now
-            var expenseWindow = new ExpenseManagementWindow(_electricityBillService, _otherExpenseService, _transportExpenseService, _feePaymentService, _teacherService, _staffService);
-            expenseWindow.ShowDialog();
+            var financeWindow = new FinanceManagementWindow(_feePaymentService, _classService, _studentService, _feeStructureService, _electricityBillService, _otherExpenseService, _transportExpenseService, _teacherService, _staffService);
+            financeWindow.ShowDialog();
             lblStatus.Text = "Finance Management module accessed";
         }
         catch (Exception ex)
