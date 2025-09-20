@@ -93,14 +93,10 @@
                                 </StackPanel>
                             </Grid>
 
-                            <UniformGrid Columns="2" Margin="0,20,0,0">
-                                <Button x:Name="btnStudentsModule" Content="View Students"
-                                        Height="35" Margin="5" Click="BtnStudentsModule_Click"
-                                        Style="{StaticResource PrimaryButtonStyle}"/>
-                                <Button x:Name="btnClassesModule" Content="View Classes"
-                                        Height="35" Margin="5" Click="BtnClassesModule_Click"
-                                        Style="{StaticResource SecondaryButtonStyle}"/>
-                            </UniformGrid>
+                            <Button x:Name="btnStudentManagement" Content="Manage Students"
+                                    Height="40" Margin="0,20,0,0" Click="BtnStudentManagement_Click"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    FontSize="14" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Border>
 
@@ -126,14 +122,10 @@
                                 </StackPanel>
                             </Grid>
 
-                            <UniformGrid Columns="2" Margin="0,20,0,0">
-                                <Button x:Name="btnBusesModule" Content="Buses"
-                                        Height="35" Margin="5" Click="BtnBusesModule_Click"
-                                        Style="{StaticResource PrimaryButtonStyle}"/>
-                                <Button x:Name="btnRoutesModule" Content="Routes"
-                                        Height="35" Margin="5" Click="BtnRoutesModule_Click"
-                                        Style="{StaticResource SecondaryButtonStyle}"/>
-                            </UniformGrid>
+                            <Button x:Name="btnTransportManagement" Content="Manage Transport"
+                                    Height="40" Margin="0,20,0,0" Click="BtnTransportManagement_Click"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    FontSize="14" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Border>
 
@@ -159,14 +151,10 @@
                                 </StackPanel>
                             </Grid>
 
-                            <UniformGrid Columns="2" Margin="0,20,0,0">
-                                <Button x:Name="btnTeachersModule" Content="Teachers"
-                                        Height="35" Margin="5" Click="BtnTeachersModule_Click"
-                                        Style="{StaticResource PrimaryButtonStyle}"/>
-                                <Button x:Name="btnSupportStaffModule" Content="Support Staff"
-                                        Height="35" Margin="5" Click="BtnSupportStaffModule_Click"
-                                        Style="{StaticResource SecondaryButtonStyle}"/>
-                            </UniformGrid>
+                            <Button x:Name="btnStaffManagement" Content="Manage Staff"
+                                    Height="40" Margin="0,20,0,0" Click="BtnStaffManagement_Click"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    FontSize="14" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Border>
 
@@ -187,19 +175,15 @@
                                 </Border>
 
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                    <TextBlock Text="Expense Management" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="Finance Management" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
                                     <TextBlock Text="Track finances, fees and expenditures" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,5,0,0"/>
                                 </StackPanel>
                             </Grid>
 
-                            <UniformGrid Columns="2" Margin="0,20,0,0">
-                                <Button x:Name="btnFeesModule" Content="Student Fees"
-                                        Height="35" Margin="5" Click="BtnFeesModule_Click"
-                                        Style="{StaticResource PrimaryButtonStyle}"/>
-                                <Button x:Name="btnExpensesModule" Content="Expenses"
-                                        Height="35" Margin="5" Click="BtnExpensesModule_Click"
-                                        Style="{StaticResource SecondaryButtonStyle}"/>
-                            </UniformGrid>
+                            <Button x:Name="btnFinanceManagement" Content="Manage Finance"
+                                    Height="40" Margin="0,20,0,0" Click="BtnFinanceManagement_Click"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    FontSize="14" FontWeight="SemiBold"/>
                         </StackPanel>
                     </Border>
                 </Grid>

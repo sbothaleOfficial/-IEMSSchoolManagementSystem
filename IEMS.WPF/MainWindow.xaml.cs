@@ -37,6 +37,70 @@ public partial class MainWindow : Window
 
     // Dashboard Navigation Event Handlers
 
+    // New Single Entry Point Handlers
+    private void BtnStudentManagement_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            // Use existing StudentsManagementWindow for now
+            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService, _feePaymentService, _feeStructureService);
+            studentsWindow.ShowDialog();
+            lblStatus.Text = "Student Management module accessed";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening Student Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening Student Management";
+        }
+    }
+
+    private void BtnTransportManagement_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var transportWindow = new TransportManagementWindow(_vehicleService, _transportExpenseService);
+            transportWindow.ShowDialog();
+            lblStatus.Text = "Transport Management module accessed";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening Transport Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening Transport Management";
+        }
+    }
+
+    private void BtnStaffManagement_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var staffWindow = new StaffManagementWindow(_teacherService, _classService, _staffService);
+            staffWindow.ShowDialog();
+            lblStatus.Text = "Staff Management module accessed";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening Staff Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening Staff Management";
+        }
+    }
+
+    private void BtnFinanceManagement_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            // Use existing ExpenseManagementWindow for now
+            var expenseWindow = new ExpenseManagementWindow(_electricityBillService, _otherExpenseService, _transportExpenseService, _feePaymentService, _teacherService, _staffService);
+            expenseWindow.ShowDialog();
+            lblStatus.Text = "Finance Management module accessed";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening Finance Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening Finance Management";
+        }
+    }
+
+    // Legacy Click Handlers (kept for backward compatibility if needed)
     private void BtnStudentsModule_Click(object sender, RoutedEventArgs e)
     {
         try
