@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
 using IEMS.Core.Entities;
+using IEMS.Core.Enums;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IEMS.WPF
@@ -24,6 +27,10 @@ namespace IEMS.WPF
         private List<FeePaymentDto> _allFeePayments = new();
         private List<ClassDto> _allClasses = new();
         private string _currentAcademicYear = DateTime.Now.Year.ToString() + "-" + (DateTime.Now.Year + 1).ToString().Substring(2);
+
+        // Expense management collections
+        private ObservableCollection<ElectricityBillDto> _electricityBills = new();
+        private ObservableCollection<OtherExpenseDto> _otherExpenses = new();
 
         public FinanceManagementWindow(FeePaymentService feePaymentService, ClassService classService, StudentService studentService, FeeStructureService feeStructureService, ElectricityBillService electricityBillService, OtherExpenseService otherExpenseService, TransportExpenseService transportExpenseService, TeacherService teacherService, StaffService staffService)
         {
@@ -44,8 +51,13 @@ namespace IEMS.WPF
         {
             try
             {
-                // Load Expense Management into frame
-                frameExpenseManagement.Content = new ExpenseManagementWindow(_electricityBillService, _otherExpenseService, _transportExpenseService, _feePaymentService, _teacherService, _staffService);
+                // Initialize expense management data
+                await LoadElectricityBills();
+                await LoadOtherExpenses();
+                InitializeCategoryFilter();
+
+                dgElectricityBills.ItemsSource = _electricityBills;
+                dgOtherExpenses.ItemsSource = _otherExpenses;
 
                 // Initialize academic year dropdown
                 InitializeAcademicYears();
@@ -58,6 +70,9 @@ namespace IEMS.WPF
                 await LoadClasses();
                 await LoadFeePayments();
                 await LoadAnalytics();
+
+                // Load expense dashboard
+                await RefreshExpenseDashboard();
 
                 lblStatus.Text = "Finance Management Ready";
             }
@@ -201,50 +216,31 @@ namespace IEMS.WPF
             }
         }
 
-        private async void BtnCollectFee_Click(object sender, RoutedEventArgs e)
+        private void BtnGoToStudentManagement_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                var feeWindow = new AddEditFeePaymentWindow(_feePaymentService, _feeStructureService, _studentService);
-                if (feeWindow.ShowDialog() == true)
-                {
-                    await LoadFeePayments();
-                    await LoadAnalytics();
-                }
+                // Close current window
+                this.Close();
+
+                // Open Student Management window directly on Fee Payment tab
+                var studentsWindow = new StudentsManagementWindow(
+                    _studentService,
+                    _classService,
+                    _teacherService,
+                    _feePaymentService,
+                    _feeStructureService,
+                    null, // BulkPromotionService (optional)
+                    null  // IAcademicYearRepository (optional)
+                );
+
+                // Note: User will need to manually navigate to Fee Payment tab
+                // as the TabControl doesn't have a public name
+                studentsWindow.ShowDialog();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error opening fee collection: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private void BtnViewReceipt_Click(object sender, RoutedEventArgs e)
-        {
-            if (dgFeePayments.SelectedItem is FeePaymentDto selectedPayment)
-            {
-                try
-                {
-                    var receiptDto = new FeeReceiptDto
-                    {
-                        ReceiptNumber = selectedPayment.ReceiptNumber,
-                        ReceiptDate = selectedPayment.PaymentDate,
-                        StudentName = selectedPayment.StudentName,
-                        ClassName = selectedPayment.ClassName,
-                        FeeType = selectedPayment.FeeType,
-                        AmountPaid = selectedPayment.AmountPaid,
-                        PaymentMethod = selectedPayment.PaymentMethod
-                    };
-                    var receiptWindow = new FeeReceiptWindow(receiptDto, _feePaymentService);
-                    receiptWindow.ShowDialog();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error opening receipt: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
-            else
-            {
-                MessageBox.Show("Please select a payment to view receipt.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Error opening Student Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -314,9 +310,364 @@ namespace IEMS.WPF
 
         #endregion
 
+
         private void BtnBack_Click(object sender, RoutedEventArgs e)
         {
             Close();
         }
+
+        #region Expense Management Methods
+
+        #region Electricity Bills Tab
+
+        private async Task LoadElectricityBills()
+        {
+            try
+            {
+                var bills = await _electricityBillService.GetAllAsync();
+                _electricityBills.Clear();
+
+                if (bills != null)
+                {
+                    foreach (var bill in bills)
+                    {
+                        if (bill != null)
+                        {
+                            _electricityBills.Add(bill);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading electricity bills: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                lblStatus.Text = $"Error loading electricity bills: {ex.Message}";
+            }
+        }
+
+        private async void BtnAddElectricityBill_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var addWindow = new AddEditElectricityBillWindow(_electricityBillService);
+                if (addWindow.ShowDialog() == true)
+                {
+                    await LoadElectricityBills();
+                    await RefreshExpenseDashboard();
+                    lblStatus.Text = "Electricity bill added successfully";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening add electricity bill window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void BtnEditElectricityBill_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is Button button && button.Tag is int billId)
+                {
+                    var editWindow = new AddEditElectricityBillWindow(_electricityBillService, billId);
+                    if (editWindow.ShowDialog() == true)
+                    {
+                        await LoadElectricityBills();
+                        await RefreshExpenseDashboard();
+                        lblStatus.Text = "Electricity bill updated successfully";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening edit electricity bill window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void BtnDeleteElectricityBill_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is Button button && button.Tag is int billId)
+                {
+                    var result = MessageBox.Show("Are you sure you want to delete this electricity bill?",
+                        "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        await _electricityBillService.DeleteAsync(billId);
+                        await LoadElectricityBills();
+                        await RefreshExpenseDashboard();
+                        lblStatus.Text = "Electricity bill deleted successfully";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error deleting electricity bill: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void DgElectricityBills_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (dgElectricityBills.SelectedItem is ElectricityBillDto selectedBill)
+            {
+                var editWindow = new AddEditElectricityBillWindow(_electricityBillService, selectedBill.Id);
+                if (editWindow.ShowDialog() == true)
+                {
+                    await LoadElectricityBills();
+                    await RefreshExpenseDashboard();
+                }
+            }
+        }
+
+        #endregion
+
+        #region Other Expenses Tab
+
+        private async Task LoadOtherExpenses()
+        {
+            try
+            {
+                var expenses = await _otherExpenseService.GetAllAsync();
+                _otherExpenses.Clear();
+                foreach (var expense in expenses)
+                {
+                    _otherExpenses.Add(expense);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading other expenses: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void InitializeCategoryFilter()
+        {
+            var categories = new List<string> { "All Categories" };
+            categories.AddRange(Enum.GetNames<OtherExpenseCategory>().Select(c => c.Replace("_", " ")));
+            cmbCategoryFilter.ItemsSource = categories;
+            cmbCategoryFilter.SelectedIndex = 0;
+        }
+
+        private async void CmbCategoryFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            try
+            {
+                if (cmbCategoryFilter.SelectedItem is string selectedCategory && selectedCategory != "All Categories")
+                {
+                    var category = Enum.Parse<OtherExpenseCategory>(selectedCategory.Replace(" ", "_"));
+                    var filteredExpenses = await _otherExpenseService.GetByCategoryAsync(category);
+
+                    _otherExpenses.Clear();
+                    foreach (var expense in filteredExpenses)
+                    {
+                        _otherExpenses.Add(expense);
+                    }
+                }
+                else
+                {
+                    await LoadOtherExpenses();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error filtering expenses: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void BtnClearFilter_Click(object sender, RoutedEventArgs e)
+        {
+            cmbCategoryFilter.SelectedIndex = 0;
+            await LoadOtherExpenses();
+        }
+
+        private async void BtnAddOtherExpense_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var addWindow = new AddEditOtherExpenseWindow(_otherExpenseService);
+                if (addWindow.ShowDialog() == true)
+                {
+                    await LoadOtherExpenses();
+                    await RefreshExpenseDashboard();
+                    lblStatus.Text = "Other expense added successfully";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening add other expense window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void BtnEditOtherExpense_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is Button button && button.Tag is int expenseId)
+                {
+                    var editWindow = new AddEditOtherExpenseWindow(_otherExpenseService, expenseId);
+                    if (editWindow.ShowDialog() == true)
+                    {
+                        await LoadOtherExpenses();
+                        await RefreshExpenseDashboard();
+                        lblStatus.Text = "Other expense updated successfully";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening edit other expense window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void BtnDeleteOtherExpense_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (sender is Button button && button.Tag is int expenseId)
+                {
+                    var result = MessageBox.Show("Are you sure you want to delete this expense?",
+                        "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        await _otherExpenseService.DeleteAsync(expenseId);
+                        await LoadOtherExpenses();
+                        await RefreshExpenseDashboard();
+                        lblStatus.Text = "Other expense deleted successfully";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error deleting other expense: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private async void DgOtherExpenses_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            if (dgOtherExpenses.SelectedItem is OtherExpenseDto selectedExpense)
+            {
+                var editWindow = new AddEditOtherExpenseWindow(_otherExpenseService, selectedExpense.Id);
+                if (editWindow.ShowDialog() == true)
+                {
+                    await LoadOtherExpenses();
+                    await RefreshExpenseDashboard();
+                }
+            }
+        }
+
+        #endregion
+
+        #region Expense Analytics Tab
+
+        private async void ViewRadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+            await RefreshExpenseDashboard();
+        }
+
+        private async void BtnRefreshDashboard_Click(object sender, RoutedEventArgs e)
+        {
+            await RefreshExpenseDashboard();
+        }
+
+        private async Task RefreshExpenseDashboard()
+        {
+            try
+            {
+                // Check if UI elements are loaded
+                if (rbMonthly == null || rbYearly == null || rbOverall == null ||
+                    txtElectricityTotal == null || txtOtherExpensesTotal == null ||
+                    txtTransportTotal == null || txtSalariesTotal == null ||
+                    txtTotalIncome == null || txtTotalExpenses == null ||
+                    txtNetBalance == null || dgCategoryBreakdown == null)
+                {
+                    return; // UI not ready yet
+                }
+
+                DateTime fromDate, toDate;
+                GetDateRange(out fromDate, out toDate);
+
+                // Get expense data by filtering existing collections
+                var electricityBills = await _electricityBillService.GetAllAsync();
+                var electricityTotal = electricityBills
+                    .Where(b => (b.PaidDate ?? b.DueDate) >= fromDate && (b.PaidDate ?? b.DueDate) <= toDate)
+                    .Sum(b => b.Amount);
+
+                var otherExpenses = await _otherExpenseService.GetAllAsync();
+                var otherExpensesTotal = otherExpenses
+                    .Where(e => e.ExpenseDate >= fromDate && e.ExpenseDate <= toDate)
+                    .Sum(e => e.Amount);
+
+                // For transport expenses - use a simple calculation
+                var transportTotal = 0m; // Placeholder - would need to implement based on TransportExpenseService
+
+                // For salaries - use a simple calculation
+                var salariesTotal = 0m; // Placeholder - would need to implement based on StaffService
+
+                // Get income data from fee payments
+                var feePayments = await _feePaymentService.GetAllFeePaymentsAsync();
+                var totalIncome = feePayments
+                    .Where(f => f.PaymentDate >= fromDate && f.PaymentDate <= toDate)
+                    .Sum(f => f.AmountPaid);
+
+                // Update UI
+                txtElectricityTotal.Text = $"₹{electricityTotal:N2}";
+                txtOtherExpensesTotal.Text = $"₹{otherExpensesTotal:N2}";
+                txtTransportTotal.Text = $"₹{transportTotal:N2}";
+                txtSalariesTotal.Text = $"₹{salariesTotal:N2}";
+                txtTotalIncome.Text = $"₹{totalIncome:N2}";
+
+                var totalExpenses = electricityTotal + otherExpensesTotal + transportTotal + salariesTotal;
+                txtTotalExpenses.Text = $"₹{totalExpenses:N2}";
+
+                var netBalance = totalIncome - totalExpenses;
+                txtNetBalance.Text = $"₹{netBalance:N2}";
+                txtNetBalance.Foreground = netBalance >= 0
+                    ? new SolidColorBrush(Color.FromRgb(76, 175, 80)) // Green
+                    : new SolidColorBrush(Color.FromRgb(244, 67, 54)); // Red
+
+                // Update category breakdown
+                var categoryData = new List<dynamic>
+                {
+                    new { Category = "Electricity", Amount = electricityTotal, Percentage = totalExpenses > 0 ? (electricityTotal / totalExpenses) * 100 : 0 },
+                    new { Category = "Other Expenses", Amount = otherExpensesTotal, Percentage = totalExpenses > 0 ? (otherExpensesTotal / totalExpenses) * 100 : 0 },
+                    new { Category = "Transport", Amount = transportTotal, Percentage = totalExpenses > 0 ? (transportTotal / totalExpenses) * 100 : 0 },
+                    new { Category = "Staff Salaries", Amount = salariesTotal, Percentage = totalExpenses > 0 ? (salariesTotal / totalExpenses) * 100 : 0 }
+                };
+
+                dgCategoryBreakdown.ItemsSource = categoryData.Where(c => c.Amount > 0);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error refreshing expense dashboard: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void GetDateRange(out DateTime fromDate, out DateTime toDate)
+        {
+            var today = DateTime.Today;
+
+            if (rbMonthly?.IsChecked == true)
+            {
+                fromDate = new DateTime(today.Year, today.Month, 1);
+                toDate = fromDate.AddMonths(1).AddDays(-1);
+            }
+            else if (rbYearly?.IsChecked == true)
+            {
+                fromDate = new DateTime(today.Year, 1, 1);
+                toDate = new DateTime(today.Year, 12, 31);
+            }
+            else // Overall
+            {
+                fromDate = DateTime.MinValue;
+                toDate = DateTime.MaxValue;
+            }
+        }
+
+        #endregion
+
+        #endregion
     }
 }

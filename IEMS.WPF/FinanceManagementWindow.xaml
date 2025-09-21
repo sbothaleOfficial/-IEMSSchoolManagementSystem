@@ -14,7 +14,7 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" Padding="20,15">
+        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" Height="80" Padding="20,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -172,35 +172,220 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- Class-wise Analysis Tab -->
-            <TabItem Header="Class-wise Analysis">
+            <!-- Fee Analytics Tab (Read-only) -->
+            <TabItem Header="📊 Fee Analytics">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid Margin="20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Navigation Header -->
+                        <Border Grid.Row="0" Background="{StaticResource InfoLightBrush}"
+                                BorderBrush="{StaticResource InfoBrush}"
+                                BorderThickness="1" Padding="15" Margin="0,0,0,20" CornerRadius="5">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="Fee Analytics &amp; Reports" FontSize="18" FontWeight="Bold"
+                                               Foreground="{StaticResource InfoBrush}"/>
+                                    <TextBlock Text="View fee collection statistics and pending fee reports. For fee collection operations, go to Student Management."
+                                               FontSize="12" Foreground="{StaticResource TextSecondaryBrush}"
+                                               TextWrapping="Wrap" Margin="0,5,0,0"/>
+                                </StackPanel>
+
+                                <Button Grid.Column="1" x:Name="btnGoToStudentManagement"
+                                        Content="Go to Student Management →"
+                                        Click="BtnGoToStudentManagement_Click"
+                                        Style="{StaticResource PrimaryButtonStyle}"
+                                        Height="40" Padding="20,0" VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Recent Fee Payments Section -->
+                        <TextBlock Grid.Row="1" Text="Recent Fee Payments (Last 30 days)" FontSize="16" FontWeight="Bold"
+                                   Margin="0,10,0,10"/>
+
+                        <Border Grid.Row="2" Style="{StaticResource CardStyle}" Height="200" Margin="0,0,0,20">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="5">
+                                    <TextBlock Text="From:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                                    <DatePicker x:Name="dpFeeFromDate" Width="120" Height="25" Margin="0,0,5,0" FontSize="11"/>
+                                    <TextBlock Text="To:" VerticalAlignment="Center" Margin="5,0"/>
+                                    <DatePicker x:Name="dpFeeToDate" Width="120" Height="25" Margin="5,0,10,0" FontSize="11"/>
+                                    <Button Content="Refresh" Width="60" Height="25" Click="BtnApplyFeeFilter_Click" FontSize="11"/>
+                                </StackPanel>
+
+                                <DataGrid Grid.Row="1" x:Name="dgFeePayments"
+                                          AutoGenerateColumns="False"
+                                          CanUserAddRows="False"
+                                          IsReadOnly="True"
+                                          SelectionMode="Single"
+                                          GridLinesVisibility="Horizontal"
+                                          HeadersVisibility="Column"
+                                          AlternatingRowBackground="#F5F5F5">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Receipt No" Binding="{Binding ReceiptNumber}" Width="90"/>
+                                        <DataGridTextColumn Header="Date" Binding="{Binding PaymentDate, StringFormat=dd/MM/yyyy}" Width="90"/>
+                                        <DataGridTextColumn Header="Student" Binding="{Binding StudentName}" Width="180"/>
+                                        <DataGridTextColumn Header="Class" Binding="{Binding ClassName}" Width="100"/>
+                                        <DataGridTextColumn Header="Fee Type" Binding="{Binding FeeType}" Width="100"/>
+                                        <DataGridTextColumn Header="Amount" Binding="{Binding AmountPaid, StringFormat=₹{0:N2}}" Width="90"/>
+                                        <DataGridTextColumn Header="Mode" Binding="{Binding PaymentMethod}" Width="80"/>
+                                        <DataGridTextColumn Header="Balance" Binding="{Binding RemainingBalance, StringFormat=₹{0:N2}}" Width="*"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </Grid>
+                        </Border>
+
+                        <!-- Class-wise Analysis -->
+                        <TextBlock Grid.Row="3" Text="Class-wise Fee Analysis" FontSize="16" FontWeight="Bold"
+                                   Margin="0,10,0,10"/>
+
+                        <Border Grid.Row="4" Style="{StaticResource CardStyle}" Height="250" Margin="0,0,0,20">
+                            <DataGrid x:Name="dgClassWiseAnalysis" AutoGenerateColumns="False"
+                                      IsReadOnly="True"
+                                      HeadersVisibility="Column" GridLinesVisibility="Horizontal"
+                                      AlternatingRowBackground="#F5F5F5">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Class" Binding="{Binding ClassName}" Width="100"/>
+                                    <DataGridTextColumn Header="Section" Binding="{Binding Section}" Width="80"/>
+                                    <DataGridTextColumn Header="Total Students" Binding="{Binding TotalStudents}" Width="100"/>
+                                    <DataGridTextColumn Header="Students with Pending" Binding="{Binding StudentsWithPendingFees}" Width="150"/>
+                                    <DataGridTextColumn Header="Total Pending Amount" Binding="{Binding TotalPendingAmount, StringFormat=₹{0:N2}}" Width="150"/>
+                                    <DataGridTextColumn Header="Avg Pending per Student" Binding="{Binding AveragePendingPerStudent, StringFormat=₹{0:N2}}" Width="150"/>
+                                    <DataGridTextColumn Header="Collection %" Binding="{Binding CollectionPercentage, StringFormat={}{0:F1}%}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+
+                        <!-- Pending Fees Section -->
+                        <Grid Grid.Row="5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                <TextBlock Text="Students with Pending Fees" FontSize="16" FontWeight="Bold"
+                                           VerticalAlignment="Center" Margin="0,10,20,10"/>
+                                <TextBlock Text="Filter by Class:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <ComboBox x:Name="cmbClassFilter" Width="150" Height="30"
+                                          SelectionChanged="CmbClassFilter_SelectionChanged"
+                                          VerticalAlignment="Center">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <Button x:Name="btnExportPendingFees" Content="📤 Export to Excel"
+                                        Click="BtnExportPendingFees_Click"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Width="130" Height="30" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <Button x:Name="btnCollectFeesNav" Content="💰 Collect Fees"
+                                        Click="BtnGoToStudentManagement_Click"
+                                        Style="{StaticResource SuccessButtonStyle}"
+                                        Width="130" Height="30" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Border Grid.Row="6" Style="{StaticResource CardStyle}" MinHeight="200" Margin="0,0,0,20">
+                            <DataGrid x:Name="dgPendingFees" AutoGenerateColumns="False"
+                                      IsReadOnly="True"
+                                      HeadersVisibility="Column" GridLinesVisibility="Horizontal"
+                                      AlternatingRowBackground="#F5F5F5">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Student Name" Binding="{Binding StudentName}" Width="200"/>
+                                    <DataGridTextColumn Header="Class" Binding="{Binding ClassName}" Width="120"/>
+                                    <DataGridTextColumn Header="Student No." Binding="{Binding StudentNumber}" Width="100"/>
+                                    <DataGridTextColumn Header="Parent Phone" Binding="{Binding ParentPhone}" Width="120"/>
+                                    <DataGridTextColumn Header="Total Pending" Binding="{Binding TotalPendingAmount, StringFormat=₹{0:N2}}" Width="120"/>
+                                    <DataGridTextColumn Header="Last Payment" Binding="{Binding LastPaymentDate, StringFormat=dd/MM/yyyy}" Width="100"/>
+                                    <DataGridTextColumn Header="Days Overdue" Binding="{Binding DaysSinceLastPayment}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Expense Management Tab -->
+            <!-- Electricity Bills Tab -->
+            <TabItem Header="🔌 Electricity Bills">
                 <Grid Margin="20">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="Class-wise Fee Analysis"
-                               FontSize="20" FontWeight="Bold" Margin="0,0,0,20"/>
+                    <!-- Electricity Bills Header -->
+                    <Grid Grid.Row="0" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                    <DataGrid Grid.Row="1" x:Name="dgClassWiseAnalysis" AutoGenerateColumns="False"
-                              HeadersVisibility="Column" GridLinesVisibility="Horizontal"
-                              AlternatingRowBackground="#F5F5F5">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Electricity Bills Management" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Track monthly electricity bills, units consumed and payment status" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,5,0,0"/>
+                        </StackPanel>
+
+                        <Button Grid.Column="1" x:Name="btnAddElectricityBill" Content="+ Add New Bill"
+                                Height="35" Padding="15,0" Click="BtnAddElectricityBill_Click"
+                                Style="{StaticResource PrimaryButtonStyle}"/>
+                    </Grid>
+
+                    <!-- Electricity Bills DataGrid -->
+                    <DataGrid Grid.Row="1" x:Name="dgElectricityBills"
+                              AutoGenerateColumns="False" CanUserAddRows="False"
+                              MouseDoubleClick="DgElectricityBills_MouseDoubleClick">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Class" Binding="{Binding ClassName}" Width="100"/>
-                            <DataGridTextColumn Header="Section" Binding="{Binding Section}" Width="80"/>
-                            <DataGridTextColumn Header="Total Students" Binding="{Binding TotalStudents}" Width="100"/>
-                            <DataGridTextColumn Header="Students with Pending" Binding="{Binding StudentsWithPendingFees}" Width="150"/>
-                            <DataGridTextColumn Header="Total Pending Amount" Binding="{Binding TotalPendingAmount, StringFormat=₹{0:N2}}" Width="150"/>
-                            <DataGridTextColumn Header="Avg Pending per Student" Binding="{Binding AveragePendingPerStudent, StringFormat=₹{0:N2}}" Width="150"/>
-                            <DataGridTextColumn Header="Collection %" Binding="{Binding CollectionPercentage, StringFormat={}{0:F1}%}" Width="*"/>
+                            <DataGridTextColumn Header="Bill Number" Binding="{Binding BillNumber}" Width="120"/>
+                            <DataGridTextColumn Header="Month/Year" Binding="{Binding MonthYearDisplay}" Width="120"/>
+                            <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat=₹{0:N2}}" Width="100"/>
+                            <DataGridTextColumn Header="Units" Binding="{Binding Units}" Width="80"/>
+                            <DataGridTextColumn Header="Rate/Unit" Binding="{Binding UnitsRate, StringFormat=₹{0:N2}}" Width="90"/>
+                            <DataGridTextColumn Header="Due Date" Binding="{Binding FormattedDueDate}" Width="100"/>
+                            <DataGridTextColumn Header="Status" Binding="{Binding PaymentStatus}" Width="80"/>
+                            <DataGridTextColumn Header="Paid Date" Binding="{Binding FormattedPaidDate}" Width="100"/>
+                            <DataGridTemplateColumn Header="Actions" Width="120">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Content="Edit" Tag="{Binding Id}" Click="BtnEditElectricityBill_Click"
+                                                    Style="{StaticResource SecondaryButtonStyle}" Width="50" Height="25" FontSize="10" Margin="2"/>
+                                            <Button Content="Delete" Tag="{Binding Id}" Click="BtnDeleteElectricityBill_Click"
+                                                    Style="{StaticResource DangerButtonStyle}" Width="50" Height="25" FontSize="10" Margin="2"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
             </TabItem>
 
-            <!-- Pending Fees Tab -->
-            <TabItem Header="Pending Fees">
+            <!-- Other Expenses Tab -->
+            <TabItem Header="📝 Other Expenses">
                 <Grid Margin="20">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -208,55 +393,87 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="Students with Pending Fees"
-                               FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
+                    <!-- Other Expenses Header -->
+                    <Grid Grid.Row="0" Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                    <!-- Filters -->
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,20">
-                        <TextBlock Text="Filter by Class:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                        <ComboBox x:Name="cmbClassFilter" Width="150" Height="30"
-                                  SelectionChanged="CmbClassFilter_SelectionChanged">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Name}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                        <Button x:Name="btnExportPendingFees" Content="📤 Export to Excel"
-                                Click="BtnExportPendingFees_Click"
-                                Style="{StaticResource SecondaryButtonStyle}"
-                                Width="150" Height="30" Margin="20,0,0,0"/>
-                    </StackPanel>
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="Other Expenses Management" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Track stationery, events, maintenance and other school-related expenses" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,5,0,0"/>
+                        </StackPanel>
 
-                    <DataGrid Grid.Row="2" x:Name="dgPendingFees" AutoGenerateColumns="False"
-                              HeadersVisibility="Column" GridLinesVisibility="Horizontal"
-                              AlternatingRowBackground="#F5F5F5">
+                        <Button Grid.Column="1" x:Name="btnAddOtherExpense" Content="+ Add New Expense"
+                                Height="35" Padding="15,0" Click="BtnAddOtherExpense_Click"
+                                Style="{StaticResource PrimaryButtonStyle}"/>
+                    </Grid>
+
+                    <!-- Category Filter -->
+                    <Grid Grid.Row="1" Margin="0,0,0,15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0" Text="Filter by Category:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="{StaticResource TextPrimaryBrush}"/>
+                        <ComboBox Grid.Column="1" x:Name="cmbCategoryFilter" SelectionChanged="CmbCategoryFilter_SelectionChanged"/>
+                        <Button Grid.Column="2" x:Name="btnClearFilter" Content="Clear Filter" Margin="10,0,0,0"
+                                Height="30" Click="BtnClearFilter_Click" Style="{StaticResource SecondaryButtonStyle}"/>
+                    </Grid>
+
+                    <!-- Other Expenses DataGrid -->
+                    <DataGrid Grid.Row="2" x:Name="dgOtherExpenses"
+                              AutoGenerateColumns="False" CanUserAddRows="False"
+                              MouseDoubleClick="DgOtherExpenses_MouseDoubleClick">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Student Name" Binding="{Binding StudentName}" Width="200"/>
-                            <DataGridTextColumn Header="Class" Binding="{Binding ClassName}" Width="120"/>
-                            <DataGridTextColumn Header="Student No." Binding="{Binding StudentNumber}" Width="100"/>
-                            <DataGridTextColumn Header="Parent Phone" Binding="{Binding ParentPhone}" Width="120"/>
-                            <DataGridTextColumn Header="Total Pending" Binding="{Binding TotalPendingAmount, StringFormat=₹{0:N2}}" Width="120"/>
-                            <DataGridTextColumn Header="Last Payment" Binding="{Binding LastPaymentDate, StringFormat=dd/MM/yyyy}" Width="100"/>
-                            <DataGridTextColumn Header="Days Since Last Payment" Binding="{Binding DaysSinceLastPayment}" Width="*"/>
+                            <DataGridTextColumn Header="Category" Binding="{Binding CategoryDisplay}" Width="120"/>
+                            <DataGridTextColumn Header="Expense Type" Binding="{Binding ExpenseType}" Width="150"/>
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="200"/>
+                            <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat=₹{0:N2}}" Width="100"/>
+                            <DataGridTextColumn Header="Date" Binding="{Binding FormattedExpenseDate}" Width="100"/>
+                            <DataGridTextColumn Header="Vendor" Binding="{Binding VendorName}" Width="120"/>
+                            <DataGridTextColumn Header="Invoice #" Binding="{Binding InvoiceNumber}" Width="100"/>
+                            <DataGridTemplateColumn Header="Actions" Width="120">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Content="Edit" Tag="{Binding Id}" Click="BtnEditOtherExpense_Click"
+                                                    Style="{StaticResource SecondaryButtonStyle}" Width="50" Height="25" FontSize="10" Margin="2"/>
+                                            <Button Content="Delete" Tag="{Binding Id}" Click="BtnDeleteOtherExpense_Click"
+                                                    Style="{StaticResource DangerButtonStyle}" Width="50" Height="25" FontSize="10" Margin="2"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
             </TabItem>
 
-            <!-- Fee Collection Tab -->
-            <TabItem Header="Fee Collection">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
+            <!-- Expense Analytics Tab -->
+            <TabItem Header="📊 Expense Analytics">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <Grid Margin="20">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
 
-                    <!-- Toolbar -->
-                    <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}"
-                            BorderBrush="{StaticResource BorderBrush}"
-                            BorderThickness="0,0,0,1" Padding="10">
-                        <Grid>
+                        <!-- Dashboard Header -->
+                        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+                            <TextBlock Text="Expense Analytics Dashboard" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                            <TextBlock Text="Comprehensive view of all school expenses including transport, fees, salaries and utilities" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,5,0,0"/>
+                        </StackPanel>
+
+                        <!-- View Selection -->
+                        <Grid Grid.Row="1" Margin="0,0,0,20">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
@@ -264,51 +481,149 @@
                             </Grid.ColumnDefinitions>
 
                             <StackPanel Grid.Column="0" Orientation="Horizontal">
-                                <Button x:Name="btnCollectFee" Content="💰 Collect Fee"
-                                        Click="BtnCollectFee_Click"
-                                        Style="{StaticResource PrimaryButtonStyle}"
-                                        Width="120" Height="35" Margin="0,0,10,0"/>
-                                <Button x:Name="btnViewReceipt" Content="🧾 View Receipt"
-                                        Click="BtnViewReceipt_Click"
-                                        Style="{StaticResource SecondaryButtonStyle}"
-                                        Width="120" Height="35"/>
+                                <TextBlock Text="View:" VerticalAlignment="Center" Margin="0,0,10,0" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <RadioButton x:Name="rbMonthly" Content="Monthly" IsChecked="True" Margin="0,0,15,0"
+                                             Checked="ViewRadioButton_Checked"/>
+                                <RadioButton x:Name="rbYearly" Content="Yearly" Margin="0,0,15,0"
+                                             Checked="ViewRadioButton_Checked"/>
+                                <RadioButton x:Name="rbOverall" Content="Overall"
+                                             Checked="ViewRadioButton_Checked"/>
                             </StackPanel>
 
-                            <StackPanel Grid.Column="2" Orientation="Horizontal">
-                                <TextBlock Text="From:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                                <DatePicker x:Name="dpFeeFromDate" Width="120" Height="30" Margin="0,0,5,0"/>
-                                <TextBlock Text="To:" VerticalAlignment="Center" Margin="5,0"/>
-                                <DatePicker x:Name="dpFeeToDate" Width="120" Height="30" Margin="5,0,10,0"/>
-                                <Button Content="Apply Filter" Width="80" Height="30" Click="BtnApplyFeeFilter_Click"/>
-                            </StackPanel>
+                            <Button Grid.Column="2" x:Name="btnRefreshDashboard" Content="🔄 Refresh"
+                                    Height="30" Click="BtnRefreshDashboard_Click" Style="{StaticResource SecondaryButtonStyle}"/>
                         </Grid>
-                    </Border>
 
-                    <!-- Fee Payments DataGrid -->
-                    <DataGrid Grid.Row="1" x:Name="dgFeePayments"
-                              AutoGenerateColumns="False"
-                              CanUserAddRows="False"
-                              SelectionMode="Single"
-                              GridLinesVisibility="Horizontal"
-                              HeadersVisibility="Column"
-                              AlternatingRowBackground="#F5F5F5">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="Receipt No" Binding="{Binding ReceiptNumber}" Width="100"/>
-                            <DataGridTextColumn Header="Date" Binding="{Binding PaymentDate, StringFormat=dd/MM/yyyy}" Width="100"/>
-                            <DataGridTextColumn Header="Student" Binding="{Binding StudentName}" Width="200"/>
-                            <DataGridTextColumn Header="Class" Binding="{Binding ClassName}" Width="120"/>
-                            <DataGridTextColumn Header="Fee Type" Binding="{Binding FeeType}" Width="120"/>
-                            <DataGridTextColumn Header="Amount Paid" Binding="{Binding AmountPaid, StringFormat=₹{0:N2}}" Width="100"/>
-                            <DataGridTextColumn Header="Payment Mode" Binding="{Binding PaymentMethod}" Width="100"/>
-                            <DataGridTextColumn Header="Remaining Balance" Binding="{Binding RemainingBalance, StringFormat=₹{0:N2}}" Width="*"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Grid>
-            </TabItem>
+                        <!-- Summary Cards -->
+                        <UniformGrid Grid.Row="2" Columns="4" Margin="0,0,0,20">
+                            <!-- Electricity Expenses Card -->
+                            <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="15" Margin="5"
+                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Grid.Column="0" Background="#FF9800" Width="50" Height="50" CornerRadius="25" Margin="0,0,10,0">
+                                            <TextBlock Text="⚡" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="Electricity" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                            <TextBlock x:Name="txtElectricityTotal" Text="₹0.00" FontSize="18" FontWeight="Bold" Foreground="#FF9800"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
 
-            <!-- Expense Management Tab -->
-            <TabItem Header="Expense Management">
-                <Frame x:Name="frameExpenseManagement" NavigationUIVisibility="Hidden"/>
+                            <!-- Other Expenses Card -->
+                            <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="15" Margin="5"
+                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Grid.Column="0" Background="#9C27B0" Width="50" Height="50" CornerRadius="25" Margin="0,0,10,0">
+                                            <TextBlock Text="📝" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="Other Expenses" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                            <TextBlock x:Name="txtOtherExpensesTotal" Text="₹0.00" FontSize="18" FontWeight="Bold" Foreground="#9C27B0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Transport Expenses Card -->
+                            <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="15" Margin="5"
+                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Grid.Column="0" Background="#2196F3" Width="50" Height="50" CornerRadius="25" Margin="0,0,10,0">
+                                            <TextBlock Text="🚌" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="Transport" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                            <TextBlock x:Name="txtTransportTotal" Text="₹0.00" FontSize="18" FontWeight="Bold" Foreground="#2196F3"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Staff Salaries Card -->
+                            <Border Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="15" Margin="5"
+                                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Border Grid.Column="0" Background="#4CAF50" Width="50" Height="50" CornerRadius="25" Margin="0,0,10,0">
+                                            <TextBlock Text="👥" FontSize="26" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="Staff Salaries" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                            <TextBlock x:Name="txtSalariesTotal" Text="₹0.00" FontSize="18" FontWeight="Bold" Foreground="#4CAF50"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
+
+                        <!-- Total Income vs Expenses -->
+                        <Border Grid.Row="3" Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="15" Margin="0,0,0,20"
+                                BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" HorizontalAlignment="Center">
+                                    <TextBlock Text="Total Income" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtTotalIncome" Text="₹0.00" FontSize="24" FontWeight="Bold" Foreground="#4CAF50" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                                    <TextBlock Text="(Student Fees)" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Center">
+                                    <TextBlock Text="Total Expenses" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtTotalExpenses" Text="₹0.00" FontSize="24" FontWeight="Bold" Foreground="#F44336" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                                    <TextBlock Text="(All Categories)" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="2" HorizontalAlignment="Center">
+                                    <TextBlock Text="Net Balance" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" HorizontalAlignment="Center"/>
+                                    <TextBlock x:Name="txtNetBalance" Text="₹0.00" FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                                    <TextBlock Text="(Income - Expenses)" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Category Breakdown -->
+                        <Border Grid.Row="4" Background="{StaticResource SurfaceBrush}" CornerRadius="8" Padding="15"
+                                BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                            <StackPanel>
+                                <TextBlock Text="Expense Breakdown by Category" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,15"/>
+                                <DataGrid x:Name="dgCategoryBreakdown" AutoGenerateColumns="False" CanUserAddRows="False"
+                                          Height="200">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="*"/>
+                                        <DataGridTextColumn Header="Amount" Binding="{Binding Amount, StringFormat=₹{0:N2}}" Width="120"/>
+                                        <DataGridTextColumn Header="Percentage" Binding="{Binding Percentage, StringFormat={}{0:F1}%}" Width="100"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </ScrollViewer>
             </TabItem>
         </TabControl>
 
