@@ -8,6 +8,6 @@ public class ClassDto
     public int TeacherId { get; set; }
     public string TeacherName { get; set; } = string.Empty;
     public int StudentCount { get; set; }
-    public string DisplayName => $"{Name} - {Section}";
-    public string FullDescription => $"{Name} - {Section} (Class Teacher: {TeacherName})";
+    public string DisplayName => string.IsNullOrWhiteSpace(Section) ? Name : $"{Name} - {Section}";
+    public string FullDescription => string.IsNullOrWhiteSpace(Section) ? $"{Name} (Class Teacher: {TeacherName})" : $"{Name} - {Section} (Class Teacher: {TeacherName})";
 }
