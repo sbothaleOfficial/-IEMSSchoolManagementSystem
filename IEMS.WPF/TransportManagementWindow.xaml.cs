@@ -4,6 +4,7 @@ using System.Windows.Media;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
 using IEMS.Core.Enums;
+using IEMS.WPF.Helpers;
 
 namespace IEMS.WPF;
 
@@ -32,9 +33,12 @@ public partial class TransportManagementWindow : Window
         }
     }
 
-    private async void TransportManagementWindow_Loaded(object sender, RoutedEventArgs e)
+    private void TransportManagementWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        await LoadAllData();
+        AsyncHelper.SafeFireAndForget(async () =>
+        {
+            await LoadAllData();
+        }, "Transport Management Window Loading Error");
     }
 
     private async Task LoadAllData()
@@ -129,194 +133,224 @@ public partial class TransportManagementWindow : Window
     }
 
     // Vehicle Management Event Handlers
-    private async void BtnAddVehicle_Click(object sender, RoutedEventArgs e)
+    private void BtnAddVehicle_Click(object sender, RoutedEventArgs e)
     {
-        try
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            var addVehicleWindow = new AddEditVehicleWindow(_vehicleService);
-            if (addVehicleWindow.ShowDialog() == true)
+            try
             {
-                await LoadVehicles();
-                await UpdateDashboard();
-                lblStatus.Text = "Vehicle added successfully";
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error opening add vehicle dialog: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
-
-    private async void BtnEditVehicle_Click(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            if (dgVehicles.SelectedItem is VehicleDto selectedVehicle)
-            {
-                var editVehicleWindow = new AddEditVehicleWindow(_vehicleService, selectedVehicle);
-                if (editVehicleWindow.ShowDialog() == true)
+                var addVehicleWindow = new AddEditVehicleWindow(_vehicleService);
+                if (addVehicleWindow.ShowDialog() == true)
                 {
                     await LoadVehicles();
                     await UpdateDashboard();
-                    lblStatus.Text = "Vehicle updated successfully";
+                    lblStatus.Text = "Vehicle added successfully";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening add vehicle dialog: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }, "Add Vehicle Error");
+    }
+
+    private void BtnEditVehicle_Click(object sender, RoutedEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(async () =>
+        {
+            try
+            {
+                if (dgVehicles.SelectedItem is VehicleDto selectedVehicle)
+                {
+                    var editVehicleWindow = new AddEditVehicleWindow(_vehicleService, selectedVehicle);
+                    if (editVehicleWindow.ShowDialog() == true)
+                    {
+                        await LoadVehicles();
+                        await UpdateDashboard();
+                        lblStatus.Text = "Vehicle updated successfully";
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please select a vehicle to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening edit vehicle dialog: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }, "Edit Vehicle Error");
+    }
+
+    private void BtnDeleteVehicle_Click(object sender, RoutedEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(async () =>
+        {
+            try
+            {
+                if (dgVehicles.SelectedItem is VehicleDto selectedVehicle)
+                {
+                    var result = MessageBox.Show(
+                        $"Are you sure you want to delete vehicle '{selectedVehicle.VehicleNumber}'?\n\nThis action cannot be undone.",
+                        "Confirm Delete",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Warning);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        await _vehicleService.DeleteVehicleAsync(selectedVehicle.Id);
+                        await LoadVehicles();
+                        await UpdateDashboard();
+                        lblStatus.Text = $"Vehicle '{selectedVehicle.VehicleNumber}' deleted successfully";
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please select a vehicle to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error deleting vehicle: {ex.Message}", "Delete Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }, "Delete Vehicle Error");
+    }
+
+    private void BtnViewExpenses_Click(object sender, RoutedEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(async () =>
+        {
+            if (dgVehicles.SelectedItem is VehicleDto selectedVehicle)
+            {
+                // Switch to expenses tab and filter by selected vehicle
+                var tabControl = (TabControl)this.FindName("TabControl") ??
+                                this.FindVisualChildren<TabControl>().FirstOrDefault();
+
+                if (tabControl != null && tabControl.Items.Count > 1)
+                {
+                    tabControl.SelectedIndex = 1; // Switch to Expenses tab
+
+                    // Filter expenses by selected vehicle
+                    cmbFilterVehicle.SelectedValue = selectedVehicle.Id;
                 }
             }
             else
             {
-                MessageBox.Show("Please select a vehicle to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Please select a vehicle to view its expenses.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error opening edit vehicle dialog: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
-
-    private async void BtnDeleteVehicle_Click(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            if (dgVehicles.SelectedItem is VehicleDto selectedVehicle)
-            {
-                var result = MessageBox.Show(
-                    $"Are you sure you want to delete vehicle '{selectedVehicle.VehicleNumber}'?\n\nThis action cannot be undone.",
-                    "Confirm Delete",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning);
-
-                if (result == MessageBoxResult.Yes)
-                {
-                    await _vehicleService.DeleteVehicleAsync(selectedVehicle.Id);
-                    await LoadVehicles();
-                    await UpdateDashboard();
-                    lblStatus.Text = $"Vehicle '{selectedVehicle.VehicleNumber}' deleted successfully";
-                }
-            }
-            else
-            {
-                MessageBox.Show("Please select a vehicle to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error deleting vehicle: {ex.Message}", "Delete Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
-
-    private async void BtnViewExpenses_Click(object sender, RoutedEventArgs e)
-    {
-        if (dgVehicles.SelectedItem is VehicleDto selectedVehicle)
-        {
-            // Switch to expenses tab and filter by selected vehicle
-            var tabControl = (TabControl)this.FindName("TabControl") ??
-                            this.FindVisualChildren<TabControl>().FirstOrDefault();
-
-            if (tabControl != null && tabControl.Items.Count > 1)
-            {
-                tabControl.SelectedIndex = 1; // Switch to Expenses tab
-
-                // Filter expenses by selected vehicle
-                cmbFilterVehicle.SelectedValue = selectedVehicle.Id;
-            }
-        }
-        else
-        {
-            MessageBox.Show("Please select a vehicle to view its expenses.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
+        }, "View Vehicle Expenses Error");
     }
 
     // Expense Management Event Handlers
-    private async void BtnAddExpense_Click(object sender, RoutedEventArgs e)
+    private void BtnAddExpense_Click(object sender, RoutedEventArgs e)
     {
-        try
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            var addExpenseWindow = new AddEditTransportExpenseWindow(_expenseService, _vehicleService);
-            if (addExpenseWindow.ShowDialog() == true)
+            try
             {
-                await LoadExpenses();
-                await LoadVehicles(); // Refresh vehicle totals
-                await UpdateDashboard();
-                lblStatus.Text = "Expense added successfully";
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error opening add expense dialog: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
-
-    private async void BtnEditExpense_Click(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            if (dgExpenses.SelectedItem is TransportExpenseDto selectedExpense)
-            {
-                var editExpenseWindow = new AddEditTransportExpenseWindow(_expenseService, _vehicleService, selectedExpense);
-                if (editExpenseWindow.ShowDialog() == true)
+                var addExpenseWindow = new AddEditTransportExpenseWindow(_expenseService, _vehicleService);
+                if (addExpenseWindow.ShowDialog() == true)
                 {
                     await LoadExpenses();
                     await LoadVehicles(); // Refresh vehicle totals
                     await UpdateDashboard();
-                    lblStatus.Text = "Expense updated successfully";
+                    lblStatus.Text = "Expense added successfully";
                 }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Please select an expense to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"Error opening add expense dialog: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error opening edit expense dialog: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+        }, "Add Expense Error");
     }
 
-    private async void BtnDeleteExpense_Click(object sender, RoutedEventArgs e)
+    private void BtnEditExpense_Click(object sender, RoutedEventArgs e)
     {
-        try
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            if (dgExpenses.SelectedItem is TransportExpenseDto selectedExpense)
+            try
             {
-                var result = MessageBox.Show(
-                    $"Are you sure you want to delete this expense?\n\nVehicle: {selectedExpense.VehicleNumber}\nAmount: ₹{selectedExpense.Amount:N2}\nDate: {selectedExpense.ExpenseDate:dd/MM/yyyy}\n\nThis action cannot be undone.",
-                    "Confirm Delete",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning);
-
-                if (result == MessageBoxResult.Yes)
+                if (dgExpenses.SelectedItem is TransportExpenseDto selectedExpense)
                 {
-                    await _expenseService.DeleteExpenseAsync(selectedExpense.Id);
-                    await LoadExpenses();
-                    await LoadVehicles(); // Refresh vehicle totals
-                    await UpdateDashboard();
-                    lblStatus.Text = "Expense deleted successfully";
+                    var editExpenseWindow = new AddEditTransportExpenseWindow(_expenseService, _vehicleService, selectedExpense);
+                    if (editExpenseWindow.ShowDialog() == true)
+                    {
+                        await LoadExpenses();
+                        await LoadVehicles(); // Refresh vehicle totals
+                        await UpdateDashboard();
+                        lblStatus.Text = "Expense updated successfully";
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please select an expense to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Please select an expense to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"Error opening edit expense dialog: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-        catch (Exception ex)
+        }, "Edit Expense Error");
+    }
+
+    private void BtnDeleteExpense_Click(object sender, RoutedEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            MessageBox.Show($"Error deleting expense: {ex.Message}", "Delete Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+            try
+            {
+                if (dgExpenses.SelectedItem is TransportExpenseDto selectedExpense)
+                {
+                    var result = MessageBox.Show(
+                        $"Are you sure you want to delete this expense?\n\nVehicle: {selectedExpense.VehicleNumber}\nAmount: ₹{selectedExpense.Amount:N2}\nDate: {selectedExpense.ExpenseDate:dd/MM/yyyy}\n\nThis action cannot be undone.",
+                        "Confirm Delete",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Warning);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        await _expenseService.DeleteExpenseAsync(selectedExpense.Id);
+                        await LoadExpenses();
+                        await LoadVehicles(); // Refresh vehicle totals
+                        await UpdateDashboard();
+                        lblStatus.Text = "Expense deleted successfully";
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please select an expense to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error deleting expense: {ex.Message}", "Delete Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }, "Delete Expense Error");
     }
 
     // Filter Event Handlers
-    private async void CmbFilterVehicle_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void CmbFilterVehicle_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        ApplyExpenseFilters();
+        AsyncHelper.SafeFireAndForget(async () =>
+        {
+            ApplyExpenseFilters();
+        }, "Vehicle Filter Selection Error");
     }
 
-    private async void CmbFilterCategory_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void CmbFilterCategory_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        ApplyExpenseFilters();
+        AsyncHelper.SafeFireAndForget(async () =>
+        {
+            ApplyExpenseFilters();
+        }, "Category Filter Selection Error");
     }
 
-    private async void DateFilter_Changed(object sender, SelectionChangedEventArgs e)
+    private void DateFilter_Changed(object sender, SelectionChangedEventArgs e)
     {
-        ApplyExpenseFilters();
+        AsyncHelper.SafeFireAndForget(async () =>
+        {
+            ApplyExpenseFilters();
+        }, "Date Filter Change Error");
     }
 
     private void ApplyExpenseFilters()
@@ -370,9 +404,12 @@ public partial class TransportManagementWindow : Window
     }
 
     // Utility Event Handlers
-    private async void BtnRefresh_Click(object sender, RoutedEventArgs e)
+    private void BtnRefresh_Click(object sender, RoutedEventArgs e)
     {
-        await LoadAllData();
+        AsyncHelper.SafeFireAndForget(async () =>
+        {
+            await LoadAllData();
+        }, "Refresh Data Error");
     }
 
     private void BtnClose_Click(object sender, RoutedEventArgs e)
