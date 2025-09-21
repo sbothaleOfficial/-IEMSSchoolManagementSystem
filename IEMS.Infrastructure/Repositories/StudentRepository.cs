@@ -65,4 +65,31 @@ public class StudentRepository : IStudentRepository
             .Include(s => s.Class)
             .FirstOrDefaultAsync(s => s.StudentNumber == studentNumber);
     }
+
+    public async Task<IEnumerable<Student>> GetStudentsWithClassDetailsAsync(int classId)
+    {
+        return await _context.Students
+            .Include(s => s.Class)
+            .Include(s => s.FeePayments)
+            .Where(s => s.ClassId == classId)
+            .ToListAsync();
+    }
+
+    public async Task UpdateMultipleStudentsAsync(IEnumerable<Student> students)
+    {
+        if (students == null || !students.Any())
+            return;
+
+        _context.Students.UpdateRange(students);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<Student>> GetStudentsWithPendingFeesAsync(int classId)
+    {
+        return await _context.Students
+            .Include(s => s.Class)
+            .Include(s => s.FeePayments)
+            .Where(s => s.ClassId == classId)
+            .ToListAsync();
+    }
 }

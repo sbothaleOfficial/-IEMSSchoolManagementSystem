@@ -19,6 +19,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<TransportExpense> TransportExpenses { get; set; }
     public DbSet<ElectricityBill> ElectricityBills { get; set; }
     public DbSet<OtherExpense> OtherExpenses { get; set; }
+    public DbSet<AcademicYear> AcademicYears { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -181,6 +182,17 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.VendorName).HasMaxLength(100);
         });
 
+        modelBuilder.Entity<AcademicYear>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Year).IsRequired().HasMaxLength(10);
+            entity.Property(e => e.StartDate).IsRequired();
+            entity.Property(e => e.EndDate).IsRequired();
+            entity.Property(e => e.IsCurrent).IsRequired();
+            entity.HasIndex(e => e.Year).IsUnique();
+            entity.HasIndex(e => e.IsCurrent);
+        });
+
         SeedData(modelBuilder);
     }
 
@@ -279,7 +291,9 @@ public class ApplicationDbContext : DbContext
             new Class { Id = 2, Name = "Grade 10", Section = "B", TeacherId = 2 },
             new Class { Id = 3, Name = "Grade 9", Section = "A", TeacherId = 3 },
             new Class { Id = 4, Name = "Grade 9", Section = "B", TeacherId = 4 },
-            new Class { Id = 5, Name = "Grade 8", Section = "A", TeacherId = 5 }
+            new Class { Id = 5, Name = "Grade 8", Section = "A", TeacherId = 5 },
+            new Class { Id = 6, Name = "Class 1", Section = "", TeacherId = 1 },
+            new Class { Id = 7, Name = "Class 2", Section = "", TeacherId = 2 }
         );
 
         modelBuilder.Entity<Student>().HasData(
@@ -312,6 +326,107 @@ public class ApplicationDbContext : DbContext
                 AdmissionDate = new DateTime(2023, 6, 1), CasteCategory = "SC",
                 Religion = "Hindu", IsBPL = true, IsSemiEnglish = true,
                 Address = "789 Pine Rd, City", CityVillage = "Nashik", ParentMobileNumber = "9876543212", ClassId = 2
+            },
+            // Class 1 Students for Bulk Promotion Testing
+            new Student
+            {
+                Id = 4, SerialNo = 4, Standard = "1st", ClassDivision = "",
+                FirstName = "Aarav", FatherName = "Raj Sharma", Surname = "Sharma",
+                DateOfBirth = new DateTime(2017, 3, 15), Gender = "Male",
+                MotherName = "Priya Sharma", StudentNumber = "S004",
+                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "General",
+                Religion = "Hindu", IsBPL = false, IsSemiEnglish = true,
+                Address = "101 Class Street, City", CityVillage = "Mumbai", ParentMobileNumber = "9876543220", ClassId = 6
+            },
+            new Student
+            {
+                Id = 5, SerialNo = 5, Standard = "1st", ClassDivision = "",
+                FirstName = "Ananya", FatherName = "Suresh Patel", Surname = "Patel",
+                DateOfBirth = new DateTime(2017, 6, 20), Gender = "Female",
+                MotherName = "Meera Patel", StudentNumber = "S005",
+                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "OBC",
+                Religion = "Hindu", IsBPL = false, IsSemiEnglish = true,
+                Address = "102 Class Street, City", CityVillage = "Pune", ParentMobileNumber = "9876543221", ClassId = 6
+            },
+            new Student
+            {
+                Id = 6, SerialNo = 6, Standard = "1st", ClassDivision = "",
+                FirstName = "Ishaan", FatherName = "Amit Kumar", Surname = "Kumar",
+                DateOfBirth = new DateTime(2017, 1, 10), Gender = "Male",
+                MotherName = "Sunita Kumar", StudentNumber = "S006",
+                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "General",
+                Religion = "Hindu", IsBPL = false, IsSemiEnglish = false,
+                Address = "103 Class Street, City", CityVillage = "Delhi", ParentMobileNumber = "9876543222", ClassId = 6
+            },
+            new Student
+            {
+                Id = 7, SerialNo = 7, Standard = "1st", ClassDivision = "",
+                FirstName = "Diya", FatherName = "Ravi Singh", Surname = "Singh",
+                DateOfBirth = new DateTime(2017, 9, 5), Gender = "Female",
+                MotherName = "Kavita Singh", StudentNumber = "S007",
+                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "SC",
+                Religion = "Hindu", IsBPL = true, IsSemiEnglish = true,
+                Address = "104 Class Street, City", CityVillage = "Nagpur", ParentMobileNumber = "9876543223", ClassId = 6
+            },
+            new Student
+            {
+                Id = 8, SerialNo = 8, Standard = "1st", ClassDivision = "",
+                FirstName = "Arjun", FatherName = "Manoj Gupta", Surname = "Gupta",
+                DateOfBirth = new DateTime(2017, 4, 25), Gender = "Male",
+                MotherName = "Asha Gupta", StudentNumber = "S008",
+                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "General",
+                Religion = "Hindu", IsBPL = false, IsSemiEnglish = true,
+                Address = "105 Class Street, City", CityVillage = "Indore", ParentMobileNumber = "9876543224", ClassId = 6
+            },
+            new Student
+            {
+                Id = 9, SerialNo = 9, Standard = "1st", ClassDivision = "",
+                FirstName = "Sara", FatherName = "Ahmed Khan", Surname = "Khan",
+                DateOfBirth = new DateTime(2017, 7, 12), Gender = "Female",
+                MotherName = "Fatima Khan", StudentNumber = "S009",
+                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "General",
+                Religion = "Muslim", IsBPL = false, IsSemiEnglish = true,
+                Address = "106 Class Street, City", CityVillage = "Bhopal", ParentMobileNumber = "9876543225", ClassId = 6
+            },
+            new Student
+            {
+                Id = 10, SerialNo = 10, Standard = "1st", ClassDivision = "",
+                FirstName = "Karan", FatherName = "Vikram Reddy", Surname = "Reddy",
+                DateOfBirth = new DateTime(2017, 11, 8), Gender = "Male",
+                MotherName = "Lakshmi Reddy", StudentNumber = "S010",
+                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "OBC",
+                Religion = "Hindu", IsBPL = false, IsSemiEnglish = false,
+                Address = "107 Class Street, City", CityVillage = "Hyderabad", ParentMobileNumber = "9876543226", ClassId = 6
+            },
+            new Student
+            {
+                Id = 11, SerialNo = 11, Standard = "1st", ClassDivision = "",
+                FirstName = "Myra", FatherName = "Rajesh Jain", Surname = "Jain",
+                DateOfBirth = new DateTime(2017, 2, 28), Gender = "Female",
+                MotherName = "Pooja Jain", StudentNumber = "S011",
+                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "General",
+                Religion = "Jain", IsBPL = false, IsSemiEnglish = true,
+                Address = "108 Class Street, City", CityVillage = "Jaipur", ParentMobileNumber = "9876543227", ClassId = 6
+            },
+            new Student
+            {
+                Id = 12, SerialNo = 12, Standard = "1st", ClassDivision = "",
+                FirstName = "Vihaan", FatherName = "Deepak Yadav", Surname = "Yadav",
+                DateOfBirth = new DateTime(2017, 8, 14), Gender = "Male",
+                MotherName = "Neha Yadav", StudentNumber = "S012",
+                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "OBC",
+                Religion = "Hindu", IsBPL = true, IsSemiEnglish = false,
+                Address = "109 Class Street, City", CityVillage = "Lucknow", ParentMobileNumber = "9876543228", ClassId = 6
+            },
+            new Student
+            {
+                Id = 13, SerialNo = 13, Standard = "1st", ClassDivision = "",
+                FirstName = "Riya", FatherName = "Anil Verma", Surname = "Verma",
+                DateOfBirth = new DateTime(2017, 5, 18), Gender = "Female",
+                MotherName = "Seema Verma", StudentNumber = "S013",
+                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "General",
+                Religion = "Hindu", IsBPL = false, IsSemiEnglish = true,
+                Address = "110 Class Street, City", CityVillage = "Kanpur", ParentMobileNumber = "9876543229", ClassId = 6
             }
         );
 
@@ -350,7 +465,17 @@ public class ApplicationDbContext : DbContext
             new FeeStructure { Id = 5, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 60000, AcademicYear = "2024-25", Description = "Annual Tuition Fees" },
             new FeeStructure { Id = 6, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.ADMISSION, Amount = 5000, AcademicYear = "2024-25", Description = "One-time Admission Fees" },
             new FeeStructure { Id = 7, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 2000, AcademicYear = "2024-25", Description = "Examination Fees" },
-            new FeeStructure { Id = 8, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 12000, AcademicYear = "2024-25", Description = "Annual Transport Fees" }
+            new FeeStructure { Id = 8, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 12000, AcademicYear = "2024-25", Description = "Annual Transport Fees" },
+            // Fee structures for Class 1 (Elementary level - lower fees)
+            new FeeStructure { Id = 9, ClassId = 6, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 35000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 1" },
+            new FeeStructure { Id = 10, ClassId = 6, FeeType = IEMS.Core.Enums.FeeType.ADMISSION, Amount = 3000, AcademicYear = "2024-25", Description = "One-time Admission Fees for Class 1" },
+            new FeeStructure { Id = 11, ClassId = 6, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 1000, AcademicYear = "2024-25", Description = "Examination Fees for Class 1" },
+            new FeeStructure { Id = 12, ClassId = 6, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 8000, AcademicYear = "2024-25", Description = "Annual Transport Fees for Class 1" },
+            // Fee structures for Class 2 (Elementary level - lower fees)
+            new FeeStructure { Id = 13, ClassId = 7, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 38000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 2" },
+            new FeeStructure { Id = 14, ClassId = 7, FeeType = IEMS.Core.Enums.FeeType.ADMISSION, Amount = 3000, AcademicYear = "2024-25", Description = "One-time Admission Fees for Class 2" },
+            new FeeStructure { Id = 15, ClassId = 7, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 1200, AcademicYear = "2024-25", Description = "Examination Fees for Class 2" },
+            new FeeStructure { Id = 16, ClassId = 7, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 8000, AcademicYear = "2024-25", Description = "Annual Transport Fees for Class 2" }
         );
 
         modelBuilder.Entity<Vehicle>().HasData(
@@ -375,6 +500,13 @@ public class ApplicationDbContext : DbContext
             new OtherExpense { Id = 1, Category = IEMS.Core.Enums.OtherExpenseCategory.STATIONERY, ExpenseType = "Office Supplies", Description = "Books, pens, papers for office use", Amount = 2500, ExpenseDate = DateTime.Today.AddDays(-15), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, VendorName = "Shree Stationery Mart", InvoiceNumber = "INV001", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             new OtherExpense { Id = 2, Category = IEMS.Core.Enums.OtherExpenseCategory.EVENT, ExpenseType = "Independence Day Celebration", Description = "Decorations, refreshments, and prizes for Independence Day", Amount = 15000, ExpenseDate = DateTime.Today.AddDays(-25), PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN456789", VendorName = "Event Decorators", InvoiceNumber = "INV002", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             new OtherExpense { Id = 3, Category = IEMS.Core.Enums.OtherExpenseCategory.MAINTENANCE, ExpenseType = "Classroom Repair", Description = "Repair of desks and chairs in Grade 10 classroom", Amount = 5500, ExpenseDate = DateTime.Today.AddDays(-8), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "123456", BankName = "SBI Bank", VendorName = "Repair Services", InvoiceNumber = "INV003", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+        );
+
+        modelBuilder.Entity<AcademicYear>().HasData(
+            new AcademicYear { Id = 1, Year = "2022-23", StartDate = new DateTime(2022, 6, 1), EndDate = new DateTime(2023, 5, 31), IsCurrent = false, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new AcademicYear { Id = 2, Year = "2023-24", StartDate = new DateTime(2023, 6, 1), EndDate = new DateTime(2024, 5, 31), IsCurrent = false, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new AcademicYear { Id = 3, Year = "2024-25", StartDate = new DateTime(2024, 6, 1), EndDate = new DateTime(2025, 5, 31), IsCurrent = true, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new AcademicYear { Id = 4, Year = "2025-26", StartDate = new DateTime(2025, 6, 1), EndDate = new DateTime(2026, 5, 31), IsCurrent = false, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
         );
     }
 }
