@@ -9,6 +9,7 @@ using IEMS.Application.Services;
 using IEMS.Application.DTOs;
 using IEMS.Core.Entities;
 using IEMS.Core.Enums;
+using IEMS.WPF.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IEMS.WPF
@@ -47,39 +48,42 @@ namespace IEMS.WPF
             Loaded += Window_Loaded;
         }
 
-        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            try
+            AsyncHelper.SafeFireAndForget(async () =>
             {
-                // Initialize expense management data
-                await LoadElectricityBills();
-                await LoadOtherExpenses();
-                InitializeCategoryFilter();
+                try
+                {
+                    // Initialize expense management data
+                    await LoadElectricityBills();
+                    await LoadOtherExpenses();
+                    InitializeCategoryFilter();
 
-                dgElectricityBills.ItemsSource = _electricityBills;
-                dgOtherExpenses.ItemsSource = _otherExpenses;
+                    dgElectricityBills.ItemsSource = _electricityBills;
+                    dgOtherExpenses.ItemsSource = _otherExpenses;
 
-                // Initialize academic year dropdown
-                InitializeAcademicYears();
+                    // Initialize academic year dropdown
+                    InitializeAcademicYears();
 
-                // Initialize date filters
-                dpFeeFromDate.SelectedDate = DateTime.Today.AddDays(-30);
-                dpFeeToDate.SelectedDate = DateTime.Today;
+                    // Initialize date filters
+                    dpFeeFromDate.SelectedDate = DateTime.Today.AddDays(-30);
+                    dpFeeToDate.SelectedDate = DateTime.Today;
 
-                // Load initial data
-                await LoadClasses();
-                await LoadFeePayments();
-                await LoadAnalytics();
+                    // Load initial data
+                    await LoadClasses();
+                    await LoadFeePayments();
+                    await LoadAnalytics();
 
-                // Load expense dashboard
-                await RefreshExpenseDashboard();
+                    // Load expense dashboard
+                    await RefreshExpenseDashboard();
 
-                lblStatus.Text = "Finance Management Ready";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading Finance Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                    lblStatus.Text = "Finance Management Ready";
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error loading Finance Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }, "Finance Management Window Loading Error");
         }
 
         private void InitializeAcademicYears()
@@ -134,15 +138,6 @@ namespace IEMS.WPF
             {
                 var analytics = await _feePaymentService.GetFeeAnalyticsAsync(_currentAcademicYear);
 
-                // Update summary cards
-                txtTotalCollection.Text = $"₹{analytics.TotalCollection:N2}";
-                txtPendingFees.Text = $"₹{analytics.PendingFees:N2}";
-                txtStudentsWithPending.Text = analytics.StudentsWithPendingFees.ToString();
-                txtCollectionRate.Text = $"{analytics.CompletionPercentage:F1}%";
-
-                // Load data grids
-                dgMonthlyTrend.ItemsSource = analytics.MonthlyCollections;
-                dgFeeTypeAnalytics.ItemsSource = analytics.FeeTypeAnalytics;
                 dgClassWiseAnalysis.ItemsSource = analytics.ClassWisePendingFees;
 
                 // Load pending fees
@@ -192,28 +187,37 @@ namespace IEMS.WPF
 
         #region Event Handlers
 
-        private async void CmbAcademicYear_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CmbAcademicYear_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (cmbAcademicYear.SelectedItem != null)
+            AsyncHelper.SafeFireAndForget(async () =>
             {
-                _currentAcademicYear = cmbAcademicYear.SelectedItem.ToString() ?? _currentAcademicYear;
+                if (cmbAcademicYear.SelectedItem != null)
+                {
+                    _currentAcademicYear = cmbAcademicYear.SelectedItem.ToString() ?? _currentAcademicYear;
+                    await LoadAnalytics();
+                }
+            }, "Academic Year Selection Error");
+        }
+
+        private void BtnRefreshAnalytics_Click(object sender, RoutedEventArgs e)
+        {
+            AsyncHelper.SafeFireAndForget(async () =>
+            {
+                await LoadFeePayments();
                 await LoadAnalytics();
-            }
+            }, "Analytics Refresh Error");
         }
 
-        private async void BtnRefreshAnalytics_Click(object sender, RoutedEventArgs e)
+        private void CmbClassFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            await LoadFeePayments();
-            await LoadAnalytics();
-        }
-
-        private async void CmbClassFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            if (cmbClassFilter.SelectedItem is ClassDto selectedClass)
+            AsyncHelper.SafeFireAndForget(async () =>
             {
-                var classId = selectedClass.Id == 0 ? (int?)null : selectedClass.Id;
-                await LoadPendingFees(classId);
-            }
+                if (cmbClassFilter.SelectedItem is ClassDto selectedClass)
+                {
+                    var classId = selectedClass.Id == 0 ? (int?)null : selectedClass.Id;
+                    await LoadPendingFees(classId);
+                }
+            }, "Class Filter Selection Error");
         }
 
         private void BtnGoToStudentManagement_Click(object sender, RoutedEventArgs e)
