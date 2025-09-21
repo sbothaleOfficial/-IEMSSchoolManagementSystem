@@ -287,11 +287,11 @@ public class ApplicationDbContext : DbContext
         );
 
         modelBuilder.Entity<Class>().HasData(
-            new Class { Id = 1, Name = "Grade 10", Section = "A", TeacherId = 1 },
-            new Class { Id = 2, Name = "Grade 10", Section = "B", TeacherId = 2 },
-            new Class { Id = 3, Name = "Grade 9", Section = "A", TeacherId = 3 },
-            new Class { Id = 4, Name = "Grade 9", Section = "B", TeacherId = 4 },
-            new Class { Id = 5, Name = "Grade 8", Section = "A", TeacherId = 5 },
+            new Class { Id = 1, Name = "Class 10", Section = "A", TeacherId = 1 },
+            new Class { Id = 2, Name = "Class 10", Section = "B", TeacherId = 2 },
+            new Class { Id = 3, Name = "Class 9", Section = "A", TeacherId = 3 },
+            new Class { Id = 4, Name = "Class 9", Section = "B", TeacherId = 4 },
+            new Class { Id = 5, Name = "Class 8", Section = "A", TeacherId = 5 },
             new Class { Id = 6, Name = "Class 1", Section = "", TeacherId = 1 },
             new Class { Id = 7, Name = "Class 2", Section = "", TeacherId = 2 }
         );
@@ -499,7 +499,7 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<OtherExpense>().HasData(
             new OtherExpense { Id = 1, Category = IEMS.Core.Enums.OtherExpenseCategory.STATIONERY, ExpenseType = "Office Supplies", Description = "Books, pens, papers for office use", Amount = 2500, ExpenseDate = DateTime.Today.AddDays(-15), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, VendorName = "Shree Stationery Mart", InvoiceNumber = "INV001", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             new OtherExpense { Id = 2, Category = IEMS.Core.Enums.OtherExpenseCategory.EVENT, ExpenseType = "Independence Day Celebration", Description = "Decorations, refreshments, and prizes for Independence Day", Amount = 15000, ExpenseDate = DateTime.Today.AddDays(-25), PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN456789", VendorName = "Event Decorators", InvoiceNumber = "INV002", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new OtherExpense { Id = 3, Category = IEMS.Core.Enums.OtherExpenseCategory.MAINTENANCE, ExpenseType = "Classroom Repair", Description = "Repair of desks and chairs in Grade 10 classroom", Amount = 5500, ExpenseDate = DateTime.Today.AddDays(-8), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "123456", BankName = "SBI Bank", VendorName = "Repair Services", InvoiceNumber = "INV003", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+            new OtherExpense { Id = 3, Category = IEMS.Core.Enums.OtherExpenseCategory.MAINTENANCE, ExpenseType = "Classroom Repair", Description = "Repair of desks and chairs in Class 10 classroom", Amount = 5500, ExpenseDate = DateTime.Today.AddDays(-8), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "123456", BankName = "SBI Bank", VendorName = "Repair Services", InvoiceNumber = "INV003", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
         );
 
         modelBuilder.Entity<AcademicYear>().HasData(
