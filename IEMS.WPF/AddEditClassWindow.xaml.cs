@@ -21,12 +21,37 @@ public partial class AddEditClassWindow : Window
         _isEditMode = classToEdit != null;
 
         Title = _isEditMode ? "Edit Class" : "Add Class";
+        LoadClassNames();
         LoadTeachers();
 
         if (_isEditMode && _classToEdit != null)
         {
             PopulateFields();
         }
+    }
+
+    private void LoadClassNames()
+    {
+        var classNames = new List<string>
+        {
+            "-- Select Class --",
+            "Nursery",
+            "KG1",
+            "KG2",
+            "Class 1",
+            "Class 2",
+            "Class 3",
+            "Class 4",
+            "Class 5",
+            "Class 6",
+            "Class 7",
+            "Class 8",
+            "Class 9",
+            "Class 10"
+        };
+
+        cmbClassName.ItemsSource = classNames;
+        cmbClassName.SelectedIndex = 0;
     }
 
     private async void LoadTeachers()
@@ -55,7 +80,7 @@ public partial class AddEditClassWindow : Window
     {
         if (_classToEdit == null) return;
 
-        txtClassName.Text = _classToEdit.Name;
+        cmbClassName.SelectedItem = _classToEdit.Name;
         txtSection.Text = _classToEdit.Section;
         cmbTeacher.SelectedValue = _classToEdit.TeacherId;
     }
@@ -69,7 +94,7 @@ public partial class AddEditClassWindow : Window
             var classDto = new ClassDto
             {
                 Id = _isEditMode ? _classToEdit!.Id : 0,
-                Name = txtClassName.Text.Trim(),
+                Name = cmbClassName.SelectedItem?.ToString() ?? "",
                 Section = txtSection.Text.Trim(),
                 TeacherId = (int)cmbTeacher.SelectedValue
             };
@@ -107,10 +132,10 @@ public partial class AddEditClassWindow : Window
 
     private bool ValidateInput()
     {
-        if (string.IsNullOrWhiteSpace(txtClassName.Text))
+        if (cmbClassName.SelectedIndex <= 0 || cmbClassName.SelectedItem?.ToString() == "-- Select Class --")
         {
-            ShowValidationError("Class name is required.");
-            txtClassName.Focus();
+            ShowValidationError("Please select a class name.");
+            cmbClassName.Focus();
             return false;
         }
 
