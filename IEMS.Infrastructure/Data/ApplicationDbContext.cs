@@ -198,308 +198,192 @@ public class ApplicationDbContext : DbContext
 
     private static void SeedData(ModelBuilder modelBuilder)
     {
+        // 10 Teachers
         modelBuilder.Entity<Teacher>().HasData(
-            new Teacher
-            {
-                Id = 1,
-                EmployeeId = "T001",
-                FirstName = "Priya",
-                LastName = "Sharma",
-                PhoneNumber = "9876543201",
-                Address = "123 Teachers Colony, Mumbai, Maharashtra",
-                JoiningDate = new DateTime(2020, 6, 15),
-                MonthlySalary = 55000,
-                Email = "priya.sharma@iemsschool.edu.in",
-                BankAccountNumber = "SBI1234567890",
-                AadharNumber = "1234-5678-9012",
-                PANNumber = "ABCDE1234F",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            },
-            new Teacher
-            {
-                Id = 2,
-                EmployeeId = "T002",
-                FirstName = "Rajesh",
-                LastName = "Patel",
-                PhoneNumber = "9876543202",
-                Address = "456 Gandhi Nagar, Pune, Maharashtra",
-                JoiningDate = new DateTime(2019, 4, 10),
-                MonthlySalary = 62000,
-                Email = "rajesh.patel@iemsschool.edu.in",
-                BankAccountNumber = "HDFC9876543210",
-                AadharNumber = "2345-6789-0123",
-                PANNumber = "FGHIJ5678K",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            },
-            new Teacher
-            {
-                Id = 3,
-                EmployeeId = "T003",
-                FirstName = "Anita",
-                LastName = "Kulkarni",
-                PhoneNumber = "9876543203",
-                Address = "789 Shivaji Park, Nashik, Maharashtra",
-                JoiningDate = new DateTime(2021, 8, 25),
-                MonthlySalary = 48000,
-                Email = "anita.kulkarni@iemsschool.edu.in",
-                BankAccountNumber = "ICICI5432109876",
-                AadharNumber = "3456-7890-1234",
-                PANNumber = "LMNOP9012Q",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            },
-            new Teacher
-            {
-                Id = 4,
-                EmployeeId = "T004",
-                FirstName = "Suresh",
-                LastName = "Gupta",
-                PhoneNumber = "9876543204",
-                Address = "101 Nehru Colony, Nagpur, Maharashtra",
-                JoiningDate = new DateTime(2018, 3, 12),
-                MonthlySalary = 68000,
-                Email = "suresh.gupta@iemsschool.edu.in",
-                BankAccountNumber = "AXIS6789012345",
-                AadharNumber = "4567-8901-2345",
-                PANNumber = "RSTUV3456W",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            },
-            new Teacher
-            {
-                Id = 5,
-                EmployeeId = "T005",
-                FirstName = "Kavita",
-                LastName = "Singh",
-                PhoneNumber = "9876543205",
-                Address = "202 Laxmi Nagar, Aurangabad, Maharashtra",
-                JoiningDate = new DateTime(2022, 1, 18),
-                MonthlySalary = 45000,
-                Email = null,
-                BankAccountNumber = null,
-                AadharNumber = "5678-9012-3456",
-                PANNumber = null,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            }
+            new Teacher { Id = 1, EmployeeId = "T001", FirstName = "Priya", LastName = "Sharma", PhoneNumber = "9876543201", Address = "123 Teachers Colony, Mumbai", JoiningDate = new DateTime(2020, 6, 15), MonthlySalary = 55000, Email = "priya.sharma@iemsschool.edu.in", BankAccountNumber = "SBI1234567890", AadharNumber = "1234-5678-9012", PANNumber = "ABCDE1234F", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Teacher { Id = 2, EmployeeId = "T002", FirstName = "Rajesh", LastName = "Patel", PhoneNumber = "9876543202", Address = "456 Gandhi Nagar, Pune", JoiningDate = new DateTime(2019, 4, 10), MonthlySalary = 62000, Email = "rajesh.patel@iemsschool.edu.in", BankAccountNumber = "HDFC9876543210", AadharNumber = "2345-6789-0123", PANNumber = "FGHIJ5678K", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Teacher { Id = 3, EmployeeId = "T003", FirstName = "Anita", LastName = "Kulkarni", PhoneNumber = "9876543203", Address = "789 Shivaji Park, Nashik", JoiningDate = new DateTime(2021, 8, 25), MonthlySalary = 48000, Email = "anita.kulkarni@iemsschool.edu.in", BankAccountNumber = "ICICI5432109876", AadharNumber = "3456-7890-1234", PANNumber = "LMNOP9012Q", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Teacher { Id = 4, EmployeeId = "T004", FirstName = "Suresh", LastName = "Gupta", PhoneNumber = "9876543204", Address = "101 Nehru Colony, Nagpur", JoiningDate = new DateTime(2018, 3, 12), MonthlySalary = 68000, Email = "suresh.gupta@iemsschool.edu.in", BankAccountNumber = "AXIS6789012345", AadharNumber = "4567-8901-2345", PANNumber = "RSTUV3456W", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Teacher { Id = 5, EmployeeId = "T005", FirstName = "Kavita", LastName = "Singh", PhoneNumber = "9876543205", Address = "202 Laxmi Nagar, Aurangabad", JoiningDate = new DateTime(2022, 1, 18), MonthlySalary = 45000, Email = "kavita.singh@iemsschool.edu.in", BankAccountNumber = "PNB3456789012", AadharNumber = "5678-9012-3456", PANNumber = "WXYZ7890A", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Teacher { Id = 6, EmployeeId = "T006", FirstName = "Amit", LastName = "Verma", PhoneNumber = "9876543206", Address = "303 Saraswati Vihar, Delhi", JoiningDate = new DateTime(2020, 9, 20), MonthlySalary = 52000, Email = "amit.verma@iemsschool.edu.in", BankAccountNumber = "BOI4567890123", AadharNumber = "6789-0123-4567", PANNumber = "BCDEF8901B", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Teacher { Id = 7, EmployeeId = "T007", FirstName = "Sunita", LastName = "Joshi", PhoneNumber = "9876543207", Address = "404 Indira Nagar, Jaipur", JoiningDate = new DateTime(2019, 11, 5), MonthlySalary = 58000, Email = "sunita.joshi@iemsschool.edu.in", BankAccountNumber = "UCO5678901234", AadharNumber = "7890-1234-5678", PANNumber = "CDEFG9012C", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Teacher { Id = 8, EmployeeId = "T008", FirstName = "Vikram", LastName = "Yadav", PhoneNumber = "9876543208", Address = "505 Vasant Kunj, Lucknow", JoiningDate = new DateTime(2021, 2, 14), MonthlySalary = 46000, Email = "vikram.yadav@iemsschool.edu.in", BankAccountNumber = "CBI6789012345", AadharNumber = "8901-2345-6789", PANNumber = "DEFGH0123D", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Teacher { Id = 9, EmployeeId = "T009", FirstName = "Meera", LastName = "Agarwal", PhoneNumber = "9876543209", Address = "606 MG Road, Bangalore", JoiningDate = new DateTime(2020, 7, 30), MonthlySalary = 54000, Email = "meera.agarwal@iemsschool.edu.in", BankAccountNumber = "IOB7890123456", AadharNumber = "9012-3456-7890", PANNumber = "EFGHI1234E", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Teacher { Id = 10, EmployeeId = "T010", FirstName = "Rohit", LastName = "Mishra", PhoneNumber = "9876543210", Address = "707 Park Street, Kolkata", JoiningDate = new DateTime(2018, 12, 10), MonthlySalary = 65000, Email = "rohit.mishra@iemsschool.edu.in", BankAccountNumber = "UNION8901234567", AadharNumber = "0123-4567-8901", PANNumber = "FGHIJ2345F", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
         );
 
+        // 10 Classes across different standards
         modelBuilder.Entity<Class>().HasData(
             new Class { Id = 1, Name = "Class 10", Section = "A", TeacherId = 1 },
             new Class { Id = 2, Name = "Class 10", Section = "B", TeacherId = 2 },
             new Class { Id = 3, Name = "Class 9", Section = "A", TeacherId = 3 },
             new Class { Id = 4, Name = "Class 9", Section = "B", TeacherId = 4 },
             new Class { Id = 5, Name = "Class 8", Section = "A", TeacherId = 5 },
-            new Class { Id = 6, Name = "Class 1", Section = "", TeacherId = 1 },
-            new Class { Id = 7, Name = "Class 2", Section = "", TeacherId = 2 }
+            new Class { Id = 6, Name = "Class 8", Section = "B", TeacherId = 6 },
+            new Class { Id = 7, Name = "Class 7", Section = "A", TeacherId = 7 },
+            new Class { Id = 8, Name = "Class 6", Section = "A", TeacherId = 8 },
+            new Class { Id = 9, Name = "Class 5", Section = "A", TeacherId = 9 },
+            new Class { Id = 10, Name = "Class 1", Section = "A", TeacherId = 10 }
         );
 
-        modelBuilder.Entity<Student>().HasData(
-            new Student
+        // 100+ Students distributed across 10 classes
+        var students = new List<Student>();
+        var firstNames = new[] { "Aarav", "Ananya", "Arjun", "Diya", "Ishaan", "Kavya", "Karan", "Myra", "Riya", "Vihaan", "Saanvi", "Reyansh", "Anvi", "Vivaan", "Aadya", "Aayan", "Pihu", "Krishna", "Advik", "Samaira", "Kiaan", "Avni", "Aryan", "Pari", "Sai", "Atharv", "Ira", "Ayaan", "Navya", "Rudra", "Anaya", "Om", "Tara", "Shaurya", "Kashvi", "Mihir", "Prisha", "Aadhya", "Dev", "Krisha", "Arnav", "Janvi", "Yug", "Shanaya", "Arjun", "Anika", "Vedant", "Reet", "Aarush", "Khushi" };
+        var surnames = new[] { "Sharma", "Patel", "Singh", "Kumar", "Gupta", "Agarwal", "Verma", "Jain", "Shah", "Yadav", "Reddy", "Khan", "Mishra", "Chopra", "Bansal", "Agrawal", "Malhotra", "Kapoor", "Mittal", "Joshi", "Saxena", "Srivastava", "Pandey", "Tiwari", "Dubey" };
+        var cities = new[] { "Mumbai", "Delhi", "Pune", "Bangalore", "Chennai", "Kolkata", "Hyderabad", "Ahmedabad", "Jaipur", "Lucknow", "Kanpur", "Nagpur", "Indore", "Bhopal", "Patna", "Vadodara", "Ludhiana", "Agra", "Nashik", "Faridabad", "Meerut", "Rajkot", "Kalyan", "Vasai", "Varanasi" };
+        var religions = new[] { "Hindu", "Muslim", "Christian", "Sikh", "Jain", "Buddhist" };
+        var casteCategories = new[] { "General", "OBC", "SC", "ST" };
+
+        int studentId = 1;
+        for (int classId = 1; classId <= 10; classId++)
+        {
+            string className = classId == 1 ? "10th" : classId == 2 ? "10th" : classId == 3 ? "9th" : classId == 4 ? "9th" : classId == 5 ? "8th" : classId == 6 ? "8th" : classId == 7 ? "7th" : classId == 8 ? "6th" : classId == 9 ? "5th" : "1st";
+            string section = classId == 1 ? "A" : classId == 2 ? "B" : classId == 3 ? "A" : classId == 4 ? "B" : classId == 5 ? "A" : classId == 6 ? "B" : classId == 7 ? "A" : classId == 8 ? "A" : classId == 9 ? "A" : "A";
+
+            int studentsPerClass = classId <= 2 ? 15 : classId <= 4 ? 12 : 10; // More students in higher classes
+
+            for (int i = 0; i < studentsPerClass; i++)
             {
-                Id = 1, SerialNo = 1, Standard = "10th", ClassDivision = "A",
-                FirstName = "Alice", FatherName = "Robert Brown", Surname = "Brown",
-                DateOfBirth = new DateTime(2008, 5, 15), Gender = "Female",
-                MotherName = "Mary Brown", StudentNumber = "S001",
-                AdmissionDate = new DateTime(2023, 6, 1), CasteCategory = "General",
-                Religion = "Christian", IsBPL = false, IsSemiEnglish = true,
-                Address = "123 Main St, City", CityVillage = "Mumbai", ParentMobileNumber = "9876543210", ClassId = 1
-            },
-            new Student
-            {
-                Id = 2, SerialNo = 2, Standard = "10th", ClassDivision = "A",
-                FirstName = "Bob", FatherName = "David Wilson", Surname = "Wilson",
-                DateOfBirth = new DateTime(2008, 8, 22), Gender = "Male",
-                MotherName = "Susan Wilson", StudentNumber = "S002",
-                AdmissionDate = new DateTime(2023, 6, 1), CasteCategory = "OBC",
-                Religion = "Hindu", IsBPL = true, IsSemiEnglish = false,
-                Address = "456 Oak Ave, City", CityVillage = "Pune", ParentMobileNumber = "9876543211", ClassId = 1
-            },
-            new Student
-            {
-                Id = 3, SerialNo = 3, Standard = "10th", ClassDivision = "B",
-                FirstName = "Charlie", FatherName = "Michael Davis", Surname = "Davis",
-                DateOfBirth = new DateTime(2008, 12, 3), Gender = "Male",
-                MotherName = "Jennifer Davis", StudentNumber = "S003",
-                AdmissionDate = new DateTime(2023, 6, 1), CasteCategory = "SC",
-                Religion = "Hindu", IsBPL = true, IsSemiEnglish = true,
-                Address = "789 Pine Rd, City", CityVillage = "Nashik", ParentMobileNumber = "9876543212", ClassId = 2
-            },
-            // Class 1 Students for Bulk Promotion Testing
-            new Student
-            {
-                Id = 4, SerialNo = 4, Standard = "1st", ClassDivision = "",
-                FirstName = "Aarav", FatherName = "Raj Sharma", Surname = "Sharma",
-                DateOfBirth = new DateTime(2017, 3, 15), Gender = "Male",
-                MotherName = "Priya Sharma", StudentNumber = "S004",
-                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "General",
-                Religion = "Hindu", IsBPL = false, IsSemiEnglish = true,
-                Address = "101 Class Street, City", CityVillage = "Mumbai", ParentMobileNumber = "9876543220", ClassId = 6
-            },
-            new Student
-            {
-                Id = 5, SerialNo = 5, Standard = "1st", ClassDivision = "",
-                FirstName = "Ananya", FatherName = "Suresh Patel", Surname = "Patel",
-                DateOfBirth = new DateTime(2017, 6, 20), Gender = "Female",
-                MotherName = "Meera Patel", StudentNumber = "S005",
-                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "OBC",
-                Religion = "Hindu", IsBPL = false, IsSemiEnglish = true,
-                Address = "102 Class Street, City", CityVillage = "Pune", ParentMobileNumber = "9876543221", ClassId = 6
-            },
-            new Student
-            {
-                Id = 6, SerialNo = 6, Standard = "1st", ClassDivision = "",
-                FirstName = "Ishaan", FatherName = "Amit Kumar", Surname = "Kumar",
-                DateOfBirth = new DateTime(2017, 1, 10), Gender = "Male",
-                MotherName = "Sunita Kumar", StudentNumber = "S006",
-                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "General",
-                Religion = "Hindu", IsBPL = false, IsSemiEnglish = false,
-                Address = "103 Class Street, City", CityVillage = "Delhi", ParentMobileNumber = "9876543222", ClassId = 6
-            },
-            new Student
-            {
-                Id = 7, SerialNo = 7, Standard = "1st", ClassDivision = "",
-                FirstName = "Diya", FatherName = "Ravi Singh", Surname = "Singh",
-                DateOfBirth = new DateTime(2017, 9, 5), Gender = "Female",
-                MotherName = "Kavita Singh", StudentNumber = "S007",
-                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "SC",
-                Religion = "Hindu", IsBPL = true, IsSemiEnglish = true,
-                Address = "104 Class Street, City", CityVillage = "Nagpur", ParentMobileNumber = "9876543223", ClassId = 6
-            },
-            new Student
-            {
-                Id = 8, SerialNo = 8, Standard = "1st", ClassDivision = "",
-                FirstName = "Arjun", FatherName = "Manoj Gupta", Surname = "Gupta",
-                DateOfBirth = new DateTime(2017, 4, 25), Gender = "Male",
-                MotherName = "Asha Gupta", StudentNumber = "S008",
-                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "General",
-                Religion = "Hindu", IsBPL = false, IsSemiEnglish = true,
-                Address = "105 Class Street, City", CityVillage = "Indore", ParentMobileNumber = "9876543224", ClassId = 6
-            },
-            new Student
-            {
-                Id = 9, SerialNo = 9, Standard = "1st", ClassDivision = "",
-                FirstName = "Sara", FatherName = "Ahmed Khan", Surname = "Khan",
-                DateOfBirth = new DateTime(2017, 7, 12), Gender = "Female",
-                MotherName = "Fatima Khan", StudentNumber = "S009",
-                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "General",
-                Religion = "Muslim", IsBPL = false, IsSemiEnglish = true,
-                Address = "106 Class Street, City", CityVillage = "Bhopal", ParentMobileNumber = "9876543225", ClassId = 6
-            },
-            new Student
-            {
-                Id = 10, SerialNo = 10, Standard = "1st", ClassDivision = "",
-                FirstName = "Karan", FatherName = "Vikram Reddy", Surname = "Reddy",
-                DateOfBirth = new DateTime(2017, 11, 8), Gender = "Male",
-                MotherName = "Lakshmi Reddy", StudentNumber = "S010",
-                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "OBC",
-                Religion = "Hindu", IsBPL = false, IsSemiEnglish = false,
-                Address = "107 Class Street, City", CityVillage = "Hyderabad", ParentMobileNumber = "9876543226", ClassId = 6
-            },
-            new Student
-            {
-                Id = 11, SerialNo = 11, Standard = "1st", ClassDivision = "",
-                FirstName = "Myra", FatherName = "Rajesh Jain", Surname = "Jain",
-                DateOfBirth = new DateTime(2017, 2, 28), Gender = "Female",
-                MotherName = "Pooja Jain", StudentNumber = "S011",
-                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "General",
-                Religion = "Jain", IsBPL = false, IsSemiEnglish = true,
-                Address = "108 Class Street, City", CityVillage = "Jaipur", ParentMobileNumber = "9876543227", ClassId = 6
-            },
-            new Student
-            {
-                Id = 12, SerialNo = 12, Standard = "1st", ClassDivision = "",
-                FirstName = "Vihaan", FatherName = "Deepak Yadav", Surname = "Yadav",
-                DateOfBirth = new DateTime(2017, 8, 14), Gender = "Male",
-                MotherName = "Neha Yadav", StudentNumber = "S012",
-                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "OBC",
-                Religion = "Hindu", IsBPL = true, IsSemiEnglish = false,
-                Address = "109 Class Street, City", CityVillage = "Lucknow", ParentMobileNumber = "9876543228", ClassId = 6
-            },
-            new Student
-            {
-                Id = 13, SerialNo = 13, Standard = "1st", ClassDivision = "",
-                FirstName = "Riya", FatherName = "Anil Verma", Surname = "Verma",
-                DateOfBirth = new DateTime(2017, 5, 18), Gender = "Female",
-                MotherName = "Seema Verma", StudentNumber = "S013",
-                AdmissionDate = new DateTime(2024, 6, 1), CasteCategory = "General",
-                Religion = "Hindu", IsBPL = false, IsSemiEnglish = true,
-                Address = "110 Class Street, City", CityVillage = "Kanpur", ParentMobileNumber = "9876543229", ClassId = 6
+                var firstName = firstNames[(studentId - 1) % firstNames.Length];
+                var surname = surnames[(studentId - 1) % surnames.Length];
+                var city = cities[(studentId - 1) % cities.Length];
+                var religion = religions[(studentId - 1) % religions.Length];
+                var caste = casteCategories[(studentId - 1) % casteCategories.Length];
+
+                students.Add(new Student
+                {
+                    Id = studentId,
+                    SerialNo = studentId,
+                    Standard = className,
+                    ClassDivision = section,
+                    FirstName = firstName,
+                    FatherName = $"{surnames[(studentId + 10) % surnames.Length]} {surnames[(studentId + 5) % surnames.Length]}",
+                    Surname = surname,
+                    DateOfBirth = className == "10th" ? new DateTime(2008, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  className == "9th" ? new DateTime(2009, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  className == "8th" ? new DateTime(2010, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  className == "7th" ? new DateTime(2011, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  className == "6th" ? new DateTime(2012, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  className == "5th" ? new DateTime(2013, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  new DateTime(2017, (studentId % 12) + 1, (studentId % 28) + 1),
+                    Gender = studentId % 2 == 0 ? "Female" : "Male",
+                    MotherName = $"{firstNames[(studentId + 15) % firstNames.Length]} {surname}",
+                    StudentNumber = $"S{studentId:D3}",
+                    AdmissionDate = new DateTime(2024, 6, 1),
+                    CasteCategory = caste,
+                    Religion = religion,
+                    IsBPL = studentId % 5 == 0,
+                    IsSemiEnglish = studentId % 3 != 0,
+                    Address = $"{studentId * 10 + 1} Test Street, {city}",
+                    CityVillage = city,
+                    ParentMobileNumber = $"98765{(43210 + studentId):D5}",
+                    ClassId = classId
+                });
+
+                studentId++;
+                if (studentId > 120) break; // Ensure we don't exceed reasonable limits
             }
-        );
+            if (studentId > 120) break;
+        }
 
+        modelBuilder.Entity<Student>().HasData(students.ToArray());
+
+        // 10 Staff members
         modelBuilder.Entity<Staff>().HasData(
-            new Staff
-            {
-                Id = 1, EmployeeId = "ST001", FirstName = "Rajesh", LastName = "Kumar",
-                PhoneNumber = "9876543213", JoiningDate = new DateTime(2020, 3, 15),
-                Address = "101 Transport Ave, City", Position = "Driver", MonthlySalary = 25000,
-                Email = "rajesh.kumar@school.edu", BankAccountNumber = "1234567890",
-                AadharNumber = "123456789012", PANNumber = "ABCDE1234F"
-            },
-            new Staff
-            {
-                Id = 2, EmployeeId = "ST002", FirstName = "Kamala", LastName = "Devi",
-                PhoneNumber = "9876543215", JoiningDate = new DateTime(2019, 7, 22),
-                Address = "202 Clean St, City", Position = "Peon", MonthlySalary = 18000,
-                Email = "kamala.devi@school.edu", BankAccountNumber = "2345678901",
-                AadharNumber = "234567890123", PANNumber = "BCDEF2345G"
-            },
-            new Staff
-            {
-                Id = 3, EmployeeId = "ST003", FirstName = "Suresh", LastName = "Singh",
-                PhoneNumber = "9876543217", JoiningDate = new DateTime(2021, 11, 8),
-                Address = "303 Office Lane, City", Position = "Clerk", MonthlySalary = 22000,
-                Email = "suresh.singh@school.edu", BankAccountNumber = "3456789012",
-                AadharNumber = "345678901234", PANNumber = "CDEFG3456H"
-            }
+            new Staff { Id = 1, EmployeeId = "ST001", FirstName = "Rajesh", LastName = "Kumar", PhoneNumber = "9876543213", JoiningDate = new DateTime(2020, 3, 15), Address = "101 Transport Ave, Mumbai", Position = "Driver", MonthlySalary = 25000, Email = "rajesh.kumar@school.edu", BankAccountNumber = "1234567890", AadharNumber = "123456789012", PANNumber = "ABCDE1234F" },
+            new Staff { Id = 2, EmployeeId = "ST002", FirstName = "Kamala", LastName = "Devi", PhoneNumber = "9876543215", JoiningDate = new DateTime(2019, 7, 22), Address = "202 Clean St, Delhi", Position = "Peon", MonthlySalary = 18000, Email = "kamala.devi@school.edu", BankAccountNumber = "2345678901", AadharNumber = "234567890123", PANNumber = "BCDEF2345G" },
+            new Staff { Id = 3, EmployeeId = "ST003", FirstName = "Suresh", LastName = "Singh", PhoneNumber = "9876543217", JoiningDate = new DateTime(2021, 11, 8), Address = "303 Office Lane, Pune", Position = "Clerk", MonthlySalary = 22000, Email = "suresh.singh@school.edu", BankAccountNumber = "3456789012", AadharNumber = "345678901234", PANNumber = "CDEFG3456H" },
+            new Staff { Id = 4, EmployeeId = "ST004", FirstName = "Priya", LastName = "Mehta", PhoneNumber = "9876543218", JoiningDate = new DateTime(2020, 5, 12), Address = "404 Support St, Bangalore", Position = "Lab Assistant", MonthlySalary = 20000, Email = "priya.mehta@school.edu", BankAccountNumber = "4567890123", AadharNumber = "456789012345", PANNumber = "DEFGH4567I" },
+            new Staff { Id = 5, EmployeeId = "ST005", FirstName = "Mohan", LastName = "Rao", PhoneNumber = "9876543219", JoiningDate = new DateTime(2018, 9, 3), Address = "505 Maintenance Rd, Chennai", Position = "Electrician", MonthlySalary = 28000, Email = "mohan.rao@school.edu", BankAccountNumber = "5678901234", AadharNumber = "567890123456", PANNumber = "EFGHI5678J" },
+            new Staff { Id = 6, EmployeeId = "ST006", FirstName = "Sunita", LastName = "Nair", PhoneNumber = "9876543220", JoiningDate = new DateTime(2021, 2, 18), Address = "606 Admin Block, Kolkata", Position = "Office Assistant", MonthlySalary = 19000, Email = "sunita.nair@school.edu", BankAccountNumber = "6789012345", AadharNumber = "678901234567", PANNumber = "FGHIJ6789K" },
+            new Staff { Id = 7, EmployeeId = "ST007", FirstName = "Vinod", LastName = "Patil", PhoneNumber = "9876543221", JoiningDate = new DateTime(2019, 12, 25), Address = "707 Security Gate, Hyderabad", Position = "Security Guard", MonthlySalary = 16000, Email = "vinod.patil@school.edu", BankAccountNumber = "7890123456", AadharNumber = "789012345678", PANNumber = "GHIJK7890L" },
+            new Staff { Id = 8, EmployeeId = "ST008", FirstName = "Lata", LastName = "Desai", PhoneNumber = "9876543222", JoiningDate = new DateTime(2020, 8, 14), Address = "808 Library Block, Ahmedabad", Position = "Librarian", MonthlySalary = 24000, Email = "lata.desai@school.edu", BankAccountNumber = "8901234567", AadharNumber = "890123456789", PANNumber = "HIJKL8901M" },
+            new Staff { Id = 9, EmployeeId = "ST009", FirstName = "Ravi", LastName = "Iyer", PhoneNumber = "9876543223", JoiningDate = new DateTime(2017, 4, 6), Address = "909 Transport Yard, Jaipur", Position = "Mechanic", MonthlySalary = 26000, Email = "ravi.iyer@school.edu", BankAccountNumber = "9012345678", AadharNumber = "901234567890", PANNumber = "IJKLM9012N" },
+            new Staff { Id = 10, EmployeeId = "ST010", FirstName = "Geeta", LastName = "Sharma", PhoneNumber = "9876543224", JoiningDate = new DateTime(2022, 1, 20), Address = "101 Canteen Block, Lucknow", Position = "Cook", MonthlySalary = 17000, Email = "geeta.sharma@school.edu", BankAccountNumber = "0123456789", AadharNumber = "012345678901", PANNumber = "JKLMN0123O" }
         );
 
+        // 10 FeeStructure records across different classes and fee types
         modelBuilder.Entity<FeeStructure>().HasData(
-            new FeeStructure { Id = 1, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 60000, AcademicYear = "2024-25", Description = "Annual Tuition Fees" },
-            new FeeStructure { Id = 2, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.ADMISSION, Amount = 5000, AcademicYear = "2024-25", Description = "One-time Admission Fees" },
-            new FeeStructure { Id = 3, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 2000, AcademicYear = "2024-25", Description = "Examination Fees" },
-            new FeeStructure { Id = 4, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 12000, AcademicYear = "2024-25", Description = "Annual Transport Fees" },
-            new FeeStructure { Id = 5, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 60000, AcademicYear = "2024-25", Description = "Annual Tuition Fees" },
-            new FeeStructure { Id = 6, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.ADMISSION, Amount = 5000, AcademicYear = "2024-25", Description = "One-time Admission Fees" },
-            new FeeStructure { Id = 7, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 2000, AcademicYear = "2024-25", Description = "Examination Fees" },
-            new FeeStructure { Id = 8, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 12000, AcademicYear = "2024-25", Description = "Annual Transport Fees" },
-            // Fee structures for Class 1 (Elementary level - lower fees)
-            new FeeStructure { Id = 9, ClassId = 6, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 35000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 1" },
-            new FeeStructure { Id = 10, ClassId = 6, FeeType = IEMS.Core.Enums.FeeType.ADMISSION, Amount = 3000, AcademicYear = "2024-25", Description = "One-time Admission Fees for Class 1" },
-            new FeeStructure { Id = 11, ClassId = 6, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 1000, AcademicYear = "2024-25", Description = "Examination Fees for Class 1" },
-            new FeeStructure { Id = 12, ClassId = 6, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 8000, AcademicYear = "2024-25", Description = "Annual Transport Fees for Class 1" },
-            // Fee structures for Class 2 (Elementary level - lower fees)
-            new FeeStructure { Id = 13, ClassId = 7, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 38000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 2" },
-            new FeeStructure { Id = 14, ClassId = 7, FeeType = IEMS.Core.Enums.FeeType.ADMISSION, Amount = 3000, AcademicYear = "2024-25", Description = "One-time Admission Fees for Class 2" },
-            new FeeStructure { Id = 15, ClassId = 7, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 1200, AcademicYear = "2024-25", Description = "Examination Fees for Class 2" },
-            new FeeStructure { Id = 16, ClassId = 7, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 8000, AcademicYear = "2024-25", Description = "Annual Transport Fees for Class 2" }
+            new FeeStructure { Id = 1, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 60000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 10-A" },
+            new FeeStructure { Id = 2, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 60000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 10-B" },
+            new FeeStructure { Id = 3, ClassId = 3, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 55000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 9-A" },
+            new FeeStructure { Id = 4, ClassId = 4, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 55000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 9-B" },
+            new FeeStructure { Id = 5, ClassId = 5, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 50000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 8-A" },
+            new FeeStructure { Id = 6, ClassId = 6, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 50000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 8-B" },
+            new FeeStructure { Id = 7, ClassId = 7, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 45000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 7-A" },
+            new FeeStructure { Id = 8, ClassId = 8, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 40000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 6-A" },
+            new FeeStructure { Id = 9, ClassId = 9, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 38000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 5-A" },
+            new FeeStructure { Id = 10, ClassId = 10, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 35000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 1-A" }
         );
 
+        // 10 Vehicles for transport
         modelBuilder.Entity<Vehicle>().HasData(
             new Vehicle { Id = 1, VehicleNumber = "MH12AB1234", VehicleType = IEMS.Core.Enums.VehicleType.BUS, DriverName = "Rajesh Kumar", DriverPhone = "9876543213", Route = "Main Street - School", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             new Vehicle { Id = 2, VehicleNumber = "MH12CD5678", VehicleType = IEMS.Core.Enums.VehicleType.AUTO, DriverName = "Suresh Patil", DriverPhone = "9876543214", Route = "Park Road - School", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new Vehicle { Id = 3, VehicleNumber = "MH12EF9012", VehicleType = IEMS.Core.Enums.VehicleType.TRAVELLER, DriverName = "Mohan Singh", DriverPhone = "9876543215", Route = "Highway - School", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+            new Vehicle { Id = 3, VehicleNumber = "MH12EF9012", VehicleType = IEMS.Core.Enums.VehicleType.TRAVELLER, DriverName = "Mohan Singh", DriverPhone = "9876543215", Route = "Highway - School", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Vehicle { Id = 4, VehicleNumber = "DL8CAB9876", VehicleType = IEMS.Core.Enums.VehicleType.BUS, DriverName = "Ashok Yadav", DriverPhone = "9876543216", Route = "South Delhi - School", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Vehicle { Id = 5, VehicleNumber = "UP16GH3456", VehicleType = IEMS.Core.Enums.VehicleType.AUTO, DriverName = "Ramesh Gupta", DriverPhone = "9876543217", Route = "Lucknow City - School", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Vehicle { Id = 6, VehicleNumber = "KA05JK7890", VehicleType = IEMS.Core.Enums.VehicleType.TRAVELLER, DriverName = "Prakash Nair", DriverPhone = "9876543218", Route = "Bangalore North - School", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Vehicle { Id = 7, VehicleNumber = "TN07LM2345", VehicleType = IEMS.Core.Enums.VehicleType.BUS, DriverName = "Murugan Pillai", DriverPhone = "9876543219", Route = "Chennai Central - School", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Vehicle { Id = 8, VehicleNumber = "WB10NO6789", VehicleType = IEMS.Core.Enums.VehicleType.AUTO, DriverName = "Biswajit Das", DriverPhone = "9876543220", Route = "Kolkata East - School", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Vehicle { Id = 9, VehicleNumber = "RJ14PQ0123", VehicleType = IEMS.Core.Enums.VehicleType.TRAVELLER, DriverName = "Dinesh Sharma", DriverPhone = "9876543221", Route = "Jaipur Pink City - School", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new Vehicle { Id = 10, VehicleNumber = "GJ01RS4567", VehicleType = IEMS.Core.Enums.VehicleType.BUS, DriverName = "Kiran Patel", DriverPhone = "9876543222", Route = "Ahmedabad West - School", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
         );
 
+        // 10 TransportExpense records across different vehicles
         modelBuilder.Entity<TransportExpense>().HasData(
             new TransportExpense { Id = 1, VehicleId = 1, Category = IEMS.Core.Enums.ExpenseCategory.FUEL, FuelType = IEMS.Core.Enums.FuelType.DIESEL, Amount = 5000, Quantity = 50, ExpenseDate = DateTime.Today.AddDays(-5), DriverName = "Rajesh Kumar", Description = "Fuel refill for bus", InvoiceNumber = "F001", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new TransportExpense { Id = 2, VehicleId = 1, Category = IEMS.Core.Enums.ExpenseCategory.MAINTENANCE, FuelType = null, Amount = 2500, Quantity = 1, ExpenseDate = DateTime.Today.AddDays(-10), DriverName = "Rajesh Kumar", Description = "Engine oil change", InvoiceNumber = "M001", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new TransportExpense { Id = 3, VehicleId = 2, Category = IEMS.Core.Enums.ExpenseCategory.FUEL, FuelType = IEMS.Core.Enums.FuelType.CNG, Amount = 1200, Quantity = 20, ExpenseDate = DateTime.Today.AddDays(-3), DriverName = "Suresh Patil", Description = "CNG refill for auto", InvoiceNumber = "F002", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+            new TransportExpense { Id = 2, VehicleId = 2, Category = IEMS.Core.Enums.ExpenseCategory.FUEL, FuelType = IEMS.Core.Enums.FuelType.CNG, Amount = 1200, Quantity = 20, ExpenseDate = DateTime.Today.AddDays(-3), DriverName = "Suresh Patil", Description = "CNG refill for auto", InvoiceNumber = "F002", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new TransportExpense { Id = 3, VehicleId = 3, Category = IEMS.Core.Enums.ExpenseCategory.MAINTENANCE, FuelType = null, Amount = 3500, Quantity = 1, ExpenseDate = DateTime.Today.AddDays(-7), DriverName = "Mohan Singh", Description = "Brake pad replacement", InvoiceNumber = "M001", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new TransportExpense { Id = 4, VehicleId = 4, Category = IEMS.Core.Enums.ExpenseCategory.FUEL, FuelType = IEMS.Core.Enums.FuelType.DIESEL, Amount = 6200, Quantity = 65, ExpenseDate = DateTime.Today.AddDays(-2), DriverName = "Ashok Yadav", Description = "Weekly diesel refill", InvoiceNumber = "F003", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new TransportExpense { Id = 5, VehicleId = 5, Category = IEMS.Core.Enums.ExpenseCategory.FUEL, FuelType = IEMS.Core.Enums.FuelType.CNG, Amount = 980, Quantity = 15, ExpenseDate = DateTime.Today.AddDays(-4), DriverName = "Ramesh Gupta", Description = "CNG refill", InvoiceNumber = "F004", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new TransportExpense { Id = 6, VehicleId = 6, Category = IEMS.Core.Enums.ExpenseCategory.MAINTENANCE, FuelType = null, Amount = 2800, Quantity = 1, ExpenseDate = DateTime.Today.AddDays(-12), DriverName = "Prakash Nair", Description = "Tire replacement", InvoiceNumber = "M002", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new TransportExpense { Id = 7, VehicleId = 7, Category = IEMS.Core.Enums.ExpenseCategory.FUEL, FuelType = IEMS.Core.Enums.FuelType.DIESEL, Amount = 4800, Quantity = 45, ExpenseDate = DateTime.Today.AddDays(-1), DriverName = "Murugan Pillai", Description = "Daily diesel supply", InvoiceNumber = "F005", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new TransportExpense { Id = 8, VehicleId = 8, Category = IEMS.Core.Enums.ExpenseCategory.FUEL, FuelType = IEMS.Core.Enums.FuelType.CNG, Amount = 1400, Quantity = 22, ExpenseDate = DateTime.Today.AddDays(-6), DriverName = "Biswajit Das", Description = "Auto CNG refill", InvoiceNumber = "F006", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new TransportExpense { Id = 9, VehicleId = 9, Category = IEMS.Core.Enums.ExpenseCategory.MAINTENANCE, FuelType = null, Amount = 4200, Quantity = 1, ExpenseDate = DateTime.Today.AddDays(-15), DriverName = "Dinesh Sharma", Description = "Engine service and oil change", InvoiceNumber = "M003", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new TransportExpense { Id = 10, VehicleId = 10, Category = IEMS.Core.Enums.ExpenseCategory.FUEL, FuelType = IEMS.Core.Enums.FuelType.DIESEL, Amount = 5500, Quantity = 55, ExpenseDate = DateTime.Today.AddDays(-8), DriverName = "Kiran Patel", Description = "Bus fuel refill", InvoiceNumber = "F007", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
         );
 
+        // 10 ElectricityBill records for different months
         modelBuilder.Entity<ElectricityBill>().HasData(
-            new ElectricityBill { Id = 1, BillNumber = "EB001", BillMonth = 8, BillYear = 2024, Amount = 8500, DueDate = new DateTime(2024, 9, 15), Units = 180, UnitsRate = 4.5m, IsPaid = true, PaidDate = new DateTime(2024, 9, 10), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, Notes = "August 2024 electricity bill", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new ElectricityBill { Id = 2, BillNumber = "EB002", BillMonth = 9, BillYear = 2024, Amount = 9200, DueDate = new DateTime(2024, 10, 15), Units = 195, UnitsRate = 4.6m, IsPaid = false, Notes = "September 2024 electricity bill", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new ElectricityBill { Id = 3, BillNumber = "EB003", BillMonth = 7, BillYear = 2024, Amount = 7800, DueDate = new DateTime(2024, 8, 15), Units = 165, UnitsRate = 4.4m, IsPaid = true, PaidDate = new DateTime(2024, 8, 12), PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN789123", Notes = "July 2024 electricity bill", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+            new ElectricityBill { Id = 1, BillNumber = "EB001", BillMonth = 1, BillYear = 2024, Amount = 7200, DueDate = new DateTime(2024, 2, 15), Units = 150, UnitsRate = 4.8m, IsPaid = true, PaidDate = new DateTime(2024, 2, 10), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, Notes = "January 2024 electricity bill", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new ElectricityBill { Id = 2, BillNumber = "EB002", BillMonth = 2, BillYear = 2024, Amount = 6800, DueDate = new DateTime(2024, 3, 15), Units = 140, UnitsRate = 4.8m, IsPaid = true, PaidDate = new DateTime(2024, 3, 12), PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN123456", Notes = "February 2024 electricity bill", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new ElectricityBill { Id = 3, BillNumber = "EB003", BillMonth = 3, BillYear = 2024, Amount = 7500, DueDate = new DateTime(2024, 4, 15), Units = 155, UnitsRate = 4.8m, IsPaid = true, PaidDate = new DateTime(2024, 4, 8), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "CH001", BankName = "SBI Bank", Notes = "March 2024 electricity bill", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new ElectricityBill { Id = 4, BillNumber = "EB004", BillMonth = 4, BillYear = 2024, Amount = 8200, DueDate = new DateTime(2024, 5, 15), Units = 170, UnitsRate = 4.8m, IsPaid = true, PaidDate = new DateTime(2024, 5, 14), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, Notes = "April 2024 electricity bill", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new ElectricityBill { Id = 5, BillNumber = "EB005", BillMonth = 5, BillYear = 2024, Amount = 9500, DueDate = new DateTime(2024, 6, 15), Units = 200, UnitsRate = 4.75m, IsPaid = true, PaidDate = new DateTime(2024, 6, 10), PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN234567", Notes = "May 2024 electricity bill - High consumption due to summer", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new ElectricityBill { Id = 6, BillNumber = "EB006", BillMonth = 6, BillYear = 2024, Amount = 10200, DueDate = new DateTime(2024, 7, 15), Units = 220, UnitsRate = 4.6m, IsPaid = true, PaidDate = new DateTime(2024, 7, 12), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, Notes = "June 2024 electricity bill - Peak summer consumption", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new ElectricityBill { Id = 7, BillNumber = "EB007", BillMonth = 7, BillYear = 2024, Amount = 7800, DueDate = new DateTime(2024, 8, 15), Units = 165, UnitsRate = 4.7m, IsPaid = true, PaidDate = new DateTime(2024, 8, 12), PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN789123", Notes = "July 2024 electricity bill", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new ElectricityBill { Id = 8, BillNumber = "EB008", BillMonth = 8, BillYear = 2024, Amount = 8500, DueDate = new DateTime(2024, 9, 15), Units = 180, UnitsRate = 4.7m, IsPaid = true, PaidDate = new DateTime(2024, 9, 10), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, Notes = "August 2024 electricity bill", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new ElectricityBill { Id = 9, BillNumber = "EB009", BillMonth = 9, BillYear = 2024, Amount = 9200, DueDate = new DateTime(2024, 10, 15), Units = 195, UnitsRate = 4.7m, IsPaid = false, Notes = "September 2024 electricity bill - Pending payment", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new ElectricityBill { Id = 10, BillNumber = "EB010", BillMonth = 10, BillYear = 2024, Amount = 8800, DueDate = new DateTime(2024, 11, 15), Units = 185, UnitsRate = 4.75m, IsPaid = false, Notes = "October 2024 electricity bill - Current month", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
         );
 
+        // 10 OtherExpense records across different categories
         modelBuilder.Entity<OtherExpense>().HasData(
             new OtherExpense { Id = 1, Category = IEMS.Core.Enums.OtherExpenseCategory.STATIONERY, ExpenseType = "Office Supplies", Description = "Books, pens, papers for office use", Amount = 2500, ExpenseDate = DateTime.Today.AddDays(-15), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, VendorName = "Shree Stationery Mart", InvoiceNumber = "INV001", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             new OtherExpense { Id = 2, Category = IEMS.Core.Enums.OtherExpenseCategory.EVENT, ExpenseType = "Independence Day Celebration", Description = "Decorations, refreshments, and prizes for Independence Day", Amount = 15000, ExpenseDate = DateTime.Today.AddDays(-25), PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN456789", VendorName = "Event Decorators", InvoiceNumber = "INV002", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new OtherExpense { Id = 3, Category = IEMS.Core.Enums.OtherExpenseCategory.MAINTENANCE, ExpenseType = "Classroom Repair", Description = "Repair of desks and chairs in Class 10 classroom", Amount = 5500, ExpenseDate = DateTime.Today.AddDays(-8), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "123456", BankName = "SBI Bank", VendorName = "Repair Services", InvoiceNumber = "INV003", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+            new OtherExpense { Id = 3, Category = IEMS.Core.Enums.OtherExpenseCategory.MAINTENANCE, ExpenseType = "Classroom Repair", Description = "Repair of desks and chairs in Class 10 classroom", Amount = 5500, ExpenseDate = DateTime.Today.AddDays(-8), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "123456", BankName = "SBI Bank", VendorName = "Repair Services", InvoiceNumber = "INV003", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new OtherExpense { Id = 4, Category = IEMS.Core.Enums.OtherExpenseCategory.STATIONERY, ExpenseType = "Teaching Materials", Description = "Charts, models, and laboratory equipment", Amount = 8200, ExpenseDate = DateTime.Today.AddDays(-20), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, VendorName = "Educational Supplies Co", InvoiceNumber = "INV004", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new OtherExpense { Id = 5, Category = IEMS.Core.Enums.OtherExpenseCategory.EVENT, ExpenseType = "Annual Sports Day", Description = "Sports equipment, prizes, and refreshments for annual sports day", Amount = 22000, ExpenseDate = DateTime.Today.AddDays(-45), PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN567890", VendorName = "Sports Events Org", InvoiceNumber = "INV005", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new OtherExpense { Id = 6, Category = IEMS.Core.Enums.OtherExpenseCategory.MAINTENANCE, ExpenseType = "Plumbing Work", Description = "Repair of washroom facilities and water pipeline", Amount = 12000, ExpenseDate = DateTime.Today.AddDays(-12), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "234567", BankName = "HDFC Bank", VendorName = "City Plumbers", InvoiceNumber = "INV006", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new OtherExpense { Id = 7, Category = IEMS.Core.Enums.OtherExpenseCategory.STATIONERY, ExpenseType = "Computer Accessories", Description = "Keyboards, mouse, cables for computer lab", Amount = 4500, ExpenseDate = DateTime.Today.AddDays(-30), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, VendorName = "Tech Solutions", InvoiceNumber = "INV007", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new OtherExpense { Id = 8, Category = IEMS.Core.Enums.OtherExpenseCategory.EVENT, ExpenseType = "Teachers Day Celebration", Description = "Flowers, gifts, and refreshments for teachers day", Amount = 3500, ExpenseDate = DateTime.Today.AddDays(-35), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, VendorName = "Local Florist", InvoiceNumber = "INV008", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new OtherExpense { Id = 9, Category = IEMS.Core.Enums.OtherExpenseCategory.MAINTENANCE, ExpenseType = "Garden Maintenance", Description = "Plant care, fertilizers, and gardening tools", Amount = 6800, ExpenseDate = DateTime.Today.AddDays(-18), PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN678901", VendorName = "Green Gardens", InvoiceNumber = "INV009", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new OtherExpense { Id = 10, Category = IEMS.Core.Enums.OtherExpenseCategory.STATIONERY, ExpenseType = "Library Books", Description = "New textbooks and reference books for library", Amount = 18500, ExpenseDate = DateTime.Today.AddDays(-40), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "345678", BankName = "SBI Bank", VendorName = "Academic Publishers", InvoiceNumber = "INV010", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+        );
+
+        // 10 FeePayment records across different students
+        modelBuilder.Entity<FeePayment>().HasData(
+            new FeePayment { Id = 1, StudentId = 1, ReceiptNumber = "REC001", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 15000, PaymentDate = DateTime.Today.AddDays(-20), PreviousBalance = 60000, RemainingBalance = 45000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 2, StudentId = 2, ReceiptNumber = "REC002", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 20000, PaymentDate = DateTime.Today.AddDays(-18), PreviousBalance = 60000, RemainingBalance = 40000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN112233", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 3, StudentId = 3, ReceiptNumber = "REC003", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 18000, PaymentDate = DateTime.Today.AddDays(-15), PreviousBalance = 60000, RemainingBalance = 42000, LateFee = 500, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "CH445566", BankName = "HDFC Bank", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 4, StudentId = 10, ReceiptNumber = "REC004", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 10000, PaymentDate = DateTime.Today.AddDays(-25), PreviousBalance = 35000, RemainingBalance = 25000, LateFee = 0, Discount = 1000, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 5, StudentId = 15, ReceiptNumber = "REC005", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 12000, PaymentDate = DateTime.Today.AddDays(-12), PreviousBalance = 55000, RemainingBalance = 43000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN223344", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 6, StudentId = 20, ReceiptNumber = "REC006", FeeType = IEMS.Core.Enums.FeeType.ADMISSION, AmountPaid = 5000, PaymentDate = DateTime.Today.AddDays(-30), PreviousBalance = 5000, RemainingBalance = 0, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 7, StudentId = 25, ReceiptNumber = "REC007", FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, AmountPaid = 4000, PaymentDate = DateTime.Today.AddDays(-22), PreviousBalance = 12000, RemainingBalance = 8000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN334455", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 8, StudentId = 30, ReceiptNumber = "REC008", FeeType = IEMS.Core.Enums.FeeType.EXAM, AmountPaid = 2000, PaymentDate = DateTime.Today.AddDays(-5), PreviousBalance = 2000, RemainingBalance = 0, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 9, StudentId = 35, ReceiptNumber = "REC009", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 8000, PaymentDate = DateTime.Today.AddDays(-8), PreviousBalance = 38000, RemainingBalance = 30000, LateFee = 200, Discount = 500, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "CH556677", BankName = "SBI Bank", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 10, StudentId = 40, ReceiptNumber = "REC010", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 16000, PaymentDate = DateTime.Today.AddDays(-3), PreviousBalance = 50000, RemainingBalance = 34000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN445566", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
         );
 
         modelBuilder.Entity<AcademicYear>().HasData(
