@@ -140,50 +140,53 @@ public partial class StudentsManagementWindow : Window
         }
     }
 
-    private async void BtnDeleteStudent_Click(object sender, RoutedEventArgs e)
+    private void BtnDeleteStudent_Click(object sender, RoutedEventArgs e)
     {
-        if (dgStudents.SelectedItem is StudentDto selectedStudent)
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            var result = MessageBox.Show($"Are you sure you want to delete student {selectedStudent.FullName}?",
-                                       "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
+            if (dgStudents.SelectedItem is StudentDto selectedStudent)
             {
-                try
-                {
-                    loadingOverlay.IsLoading = true;
-                    loadingOverlay.LoadingMessage = "Deleting student...";
+                var result = MessageBox.Show($"Are you sure you want to delete student {selectedStudent.FullName}?",
+                                           "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
 
-                    await _studentService.DeleteStudentAsync(selectedStudent.Id);
-                    var currentSearch = txtSearchStudents.Text;
-                    LoadStudents();
-                    LoadClasses(); // Refresh to update student counts in classes
-                    txtSearchStudents.Text = currentSearch; // Restore search after refresh
+                if (result == MessageBoxResult.Yes)
+                {
+                    try
+                    {
+                        loadingOverlay.IsLoading = true;
+                        loadingOverlay.LoadingMessage = "Deleting student...";
 
-                    toastNotification.Message = $"Student {selectedStudent.FullName} deleted successfully";
-                    toastNotification.ToastType = ToastType.Success;
-                    toastNotification.Show();
-                    FilterStudents();
-                    LoadDashboardData(); // Refresh dashboard
-                    lblStatus.Text = "Student deleted successfully";
-                }
-                catch (Exception ex)
-                {
-                    toastNotification.Message = $"Error deleting student: {ex.Message}";
-                    toastNotification.ToastType = ToastType.Error;
-                    toastNotification.Show();
-                    lblStatus.Text = "Error deleting student";
-                }
-                finally
-                {
-                    loadingOverlay.IsLoading = false;
+                        await _studentService.DeleteStudentAsync(selectedStudent.Id);
+                        var currentSearch = txtSearchStudents.Text;
+                        LoadStudents();
+                        LoadClasses(); // Refresh to update student counts in classes
+                        txtSearchStudents.Text = currentSearch; // Restore search after refresh
+
+                        toastNotification.Message = $"Student {selectedStudent.FullName} deleted successfully";
+                        toastNotification.ToastType = ToastType.Success;
+                        toastNotification.Show();
+                        FilterStudents();
+                        LoadDashboardData(); // Refresh dashboard
+                        lblStatus.Text = "Student deleted successfully";
+                    }
+                    catch (Exception ex)
+                    {
+                        toastNotification.Message = $"Error deleting student: {ex.Message}";
+                        toastNotification.ToastType = ToastType.Error;
+                        toastNotification.Show();
+                        lblStatus.Text = "Error deleting student";
+                    }
+                    finally
+                    {
+                        loadingOverlay.IsLoading = false;
+                    }
                 }
             }
-        }
-        else
-        {
-            MessageBox.Show("Please select a student to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
+            else
+            {
+                MessageBox.Show("Please select a student to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }, "Student Delete Error");
     }
 
     private void BtnRefreshStudents_Click(object sender, RoutedEventArgs e)
