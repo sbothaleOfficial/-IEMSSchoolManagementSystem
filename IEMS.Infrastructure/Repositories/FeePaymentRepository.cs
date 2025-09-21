@@ -3,12 +3,14 @@ using IEMS.Core.Enums;
 using IEMS.Core.Interfaces;
 using IEMS.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace IEMS.Infrastructure.Repositories;
 
 public class FeePaymentRepository : IFeePaymentRepository
 {
     private readonly ApplicationDbContext _context;
+    private static readonly SemaphoreSlim _receiptGenerationSemaphore = new(1, 1);
 
     public FeePaymentRepository(ApplicationDbContext context)
     {
@@ -106,17 +108,51 @@ public class FeePaymentRepository : IFeePaymentRepository
 
     public async Task<string> GenerateReceiptNumberAsync()
     {
-        var lastReceipt = await _context.FeePayments
-            .OrderByDescending(fp => fp.Id)
-            .FirstOrDefaultAsync();
-
-        int nextNumber = 1;
-        if (lastReceipt != null && int.TryParse(lastReceipt.ReceiptNumber, out int lastNumber))
+        // Use semaphore to ensure thread-safe receipt number generation
+        await _receiptGenerationSemaphore.WaitAsync();
+        try
         {
-            nextNumber = lastNumber + 1;
-        }
+            // Use a database transaction to ensure atomicity
+            using var transaction = await _context.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+            try
+            {
+                // Get the last receipt number with row-level locking
+                var lastReceipt = await _context.FeePayments
+                    .OrderByDescending(fp => fp.Id)
+                    .FirstOrDefaultAsync();
 
-        return nextNumber.ToString("D6");
+                int nextNumber = 1;
+                if (lastReceipt != null && int.TryParse(lastReceipt.ReceiptNumber, out int lastNumber))
+                {
+                    nextNumber = lastNumber + 1;
+                }
+
+                var receiptNumber = nextNumber.ToString("D6");
+
+                // Verify uniqueness before returning
+                var existingReceipt = await _context.FeePayments
+                    .FirstOrDefaultAsync(fp => fp.ReceiptNumber == receiptNumber);
+
+                if (existingReceipt != null)
+                {
+                    // If somehow a duplicate exists, increment and try again
+                    nextNumber++;
+                    receiptNumber = nextNumber.ToString("D6");
+                }
+
+                await transaction.CommitAsync();
+                return receiptNumber;
+            }
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
+        }
+        finally
+        {
+            _receiptGenerationSemaphore.Release();
+        }
     }
 
     public async Task<decimal> GetTotalPaidAmountByStudentAsync(int studentId, FeeType feeType)

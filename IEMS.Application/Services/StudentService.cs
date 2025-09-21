@@ -18,38 +18,32 @@ public class StudentService
     public async Task<IEnumerable<StudentDto>> GetAllStudentsAsync()
     {
         var students = await _studentRepository.GetAllAsync();
-        var studentDtos = new List<StudentDto>();
 
-        foreach (var student in students)
+        // Use LINQ projection to avoid N+1 queries - Class is already loaded via Include()
+        return students.Select(student => new StudentDto
         {
-            var classEntity = await _classRepository.GetByIdAsync(student.ClassId);
-            studentDtos.Add(new StudentDto
-            {
-                Id = student.Id,
-                SerialNo = student.SerialNo,
-                Standard = student.Standard,
-                ClassDivision = student.ClassDivision,
-                FirstName = student.FirstName,
-                FatherName = student.FatherName,
-                Surname = student.Surname,
-                DateOfBirth = student.DateOfBirth,
-                Gender = student.Gender,
-                MotherName = student.MotherName,
-                StudentNumber = student.StudentNumber,
-                AdmissionDate = student.AdmissionDate,
-                CasteCategory = student.CasteCategory,
-                Religion = student.Religion,
-                IsBPL = student.IsBPL,
-                IsSemiEnglish = student.IsSemiEnglish,
-                Address = student.Address,
-                CityVillage = student.CityVillage,
-                ParentMobileNumber = student.ParentMobileNumber,
-                ClassId = student.ClassId,
-                ClassName = classEntity?.Name ?? "Unknown"
-            });
-        }
-
-        return studentDtos;
+            Id = student.Id,
+            SerialNo = student.SerialNo,
+            Standard = student.Standard,
+            ClassDivision = student.ClassDivision,
+            FirstName = student.FirstName,
+            FatherName = student.FatherName,
+            Surname = student.Surname,
+            DateOfBirth = student.DateOfBirth,
+            Gender = student.Gender,
+            MotherName = student.MotherName,
+            StudentNumber = student.StudentNumber,
+            AdmissionDate = student.AdmissionDate,
+            CasteCategory = student.CasteCategory,
+            Religion = student.Religion,
+            IsBPL = student.IsBPL,
+            IsSemiEnglish = student.IsSemiEnglish,
+            Address = student.Address,
+            CityVillage = student.CityVillage,
+            ParentMobileNumber = student.ParentMobileNumber,
+            ClassId = student.ClassId,
+            ClassName = student.Class?.Name ?? "Unknown"
+        }).ToList();
     }
 
     public async Task<StudentDto?> GetStudentByIdAsync(int id)
@@ -57,7 +51,7 @@ public class StudentService
         var student = await _studentRepository.GetByIdAsync(id);
         if (student == null) return null;
 
-        var classEntity = await _classRepository.GetByIdAsync(student.ClassId);
+        // Class is already loaded via Include() in repository - no need for separate query
         return new StudentDto
         {
             Id = student.Id,
@@ -80,7 +74,7 @@ public class StudentService
             CityVillage = student.CityVillage,
             ParentMobileNumber = student.ParentMobileNumber,
             ClassId = student.ClassId,
-            ClassName = classEntity?.Name ?? "Unknown"
+            ClassName = student.Class?.Name ?? "Unknown"
         };
     }
 
