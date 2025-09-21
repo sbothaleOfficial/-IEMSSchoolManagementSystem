@@ -95,7 +95,7 @@ public partial class AddEditClassWindow : Window
             {
                 Id = _isEditMode ? _classToEdit!.Id : 0,
                 Name = cmbClassName.SelectedItem?.ToString() ?? "",
-                Section = txtSection.Text.Trim(),
+                Section = string.IsNullOrWhiteSpace(txtSection.Text) ? "" : txtSection.Text.Trim(),
                 TeacherId = (int)cmbTeacher.SelectedValue
             };
 
@@ -136,13 +136,6 @@ public partial class AddEditClassWindow : Window
         {
             ShowValidationError("Please select a class name.");
             cmbClassName.Focus();
-            return false;
-        }
-
-        if (string.IsNullOrWhiteSpace(txtSection.Text))
-        {
-            ShowValidationError("Section is required.");
-            txtSection.Focus();
             return false;
         }
 
