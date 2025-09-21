@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
 using IEMS.Core.Enums;
+using IEMS.WPF.Helpers;
 
 namespace IEMS.WPF;
 
@@ -38,9 +39,9 @@ public partial class AddEditFeePaymentWindow : Window
         }
     }
 
-    private async void AddEditFeePaymentWindow_Loaded(object sender, RoutedEventArgs e)
+    private void AddEditFeePaymentWindow_Loaded(object sender, RoutedEventArgs e)
     {
-        await LoadData();
+        AsyncHelper.SafeFireAndForget(async () => await LoadData(), "Fee Payment Window Loading Error");
     }
 
     private async Task LoadData()
@@ -115,27 +116,30 @@ public partial class AddEditFeePaymentWindow : Window
         cmbPaymentMethod.SelectedIndex = 0;
     }
 
-    private async void CmbStudent_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void CmbStudent_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (cmbStudent.SelectedValue != null && (int)cmbStudent.SelectedValue > 0)
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            var selectedStudent = _students.FirstOrDefault(s => s.Id == (int)cmbStudent.SelectedValue);
-            if (selectedStudent != null)
+            if (cmbStudent.SelectedValue != null && (int)cmbStudent.SelectedValue > 0)
             {
-                txtStudentInfo.Text = $"Name: {selectedStudent.FullName}\n" +
-                                    $"Class: {selectedStudent.ClassName}\n" +
-                                    $"Student Number: {selectedStudent.StudentNumber}\n" +
-                                    $"Parent Mobile: {selectedStudent.ParentMobileNumber}";
-                borderStudentInfo.Visibility = Visibility.Visible;
+                var selectedStudent = _students.FirstOrDefault(s => s.Id == (int)cmbStudent.SelectedValue);
+                if (selectedStudent != null)
+                {
+                    txtStudentInfo.Text = $"Name: {selectedStudent.FullName}\n" +
+                                        $"Class: {selectedStudent.ClassName}\n" +
+                                        $"Student Number: {selectedStudent.StudentNumber}\n" +
+                                        $"Parent Mobile: {selectedStudent.ParentMobileNumber}";
+                    borderStudentInfo.Visibility = Visibility.Visible;
 
-                await LoadFeeStructuresForStudent();
+                    await LoadFeeStructuresForStudent();
+                }
             }
-        }
-        else
-        {
-            borderStudentInfo.Visibility = Visibility.Collapsed;
-            borderFeeInfo.Visibility = Visibility.Collapsed;
-        }
+            else
+            {
+                borderStudentInfo.Visibility = Visibility.Collapsed;
+                borderFeeInfo.Visibility = Visibility.Collapsed;
+            }
+        }, "Student Selection Error");
     }
 
     private async Task LoadFeeStructuresForStudent()
@@ -150,9 +154,9 @@ public partial class AddEditFeePaymentWindow : Window
         }
     }
 
-    private async void CmbFeeType_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void CmbFeeType_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        await UpdateFeeInfo();
+        AsyncHelper.SafeFireAndForget(async () => await UpdateFeeInfo(), "Fee Type Selection Error");
     }
 
     private async Task UpdateFeeInfo()
@@ -278,42 +282,45 @@ public partial class AddEditFeePaymentWindow : Window
         }
     }
 
-    private async void BtnSave_Click(object sender, RoutedEventArgs e)
+    private void BtnSave_Click(object sender, RoutedEventArgs e)
     {
-        if (!ValidateInput()) return;
-
-        try
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            var createDto = new CreateFeePaymentDto
+            if (!ValidateInput()) return;
+
+            try
             {
-                StudentId = (int)cmbStudent.SelectedValue,
-                FeeType = (FeeType)cmbFeeType.SelectedValue,
-                AmountPaid = decimal.Parse(txtAmount.Text),
-                PaymentMethod = (PaymentMethod)cmbPaymentMethod.SelectedValue,
-                TransactionId = txtTransactionId.Text.Trim(),
-                ChequeNumber = txtTransactionId.Text.Trim(), // Same field for cheque/DD
-                BankName = txtBankName.Text.Trim(),
-                PaymentNotes = txtPaymentNotes.Text.Trim(),
-                LateFee = decimal.TryParse(txtLateFee.Text, out decimal late) ? late : 0,
-                Discount = decimal.TryParse(txtDiscount.Text, out decimal disc) ? disc : 0,
-                InstallmentNumber = int.TryParse(txtInstallmentNumber.Text, out int inst) ? inst : null,
-                NextDueDate = dpNextDueDate.SelectedDate,
-                AcademicYear = "2024-25", // Default academic year
-                GeneratedBy = Environment.UserName
-            };
+                var createDto = new CreateFeePaymentDto
+                {
+                    StudentId = (int)cmbStudent.SelectedValue,
+                    FeeType = (FeeType)cmbFeeType.SelectedValue,
+                    AmountPaid = decimal.Parse(txtAmount.Text),
+                    PaymentMethod = (PaymentMethod)cmbPaymentMethod.SelectedValue,
+                    TransactionId = txtTransactionId.Text.Trim(),
+                    ChequeNumber = txtTransactionId.Text.Trim(), // Same field for cheque/DD
+                    BankName = txtBankName.Text.Trim(),
+                    PaymentNotes = txtPaymentNotes.Text.Trim(),
+                    LateFee = decimal.TryParse(txtLateFee.Text, out decimal late) ? late : 0,
+                    Discount = decimal.TryParse(txtDiscount.Text, out decimal disc) ? disc : 0,
+                    InstallmentNumber = int.TryParse(txtInstallmentNumber.Text, out int inst) ? inst : null,
+                    NextDueDate = dpNextDueDate.SelectedDate,
+                    AcademicYear = "2024-25", // Default academic year
+                    GeneratedBy = Environment.UserName
+                };
 
-            var createdPayment = await _feePaymentService.CreateFeePaymentAsync(createDto);
+                var createdPayment = await _feePaymentService.CreateFeePaymentAsync(createDto);
 
-            MessageBox.Show($"Fee payment recorded successfully!\n\nReceipt Number: {createdPayment.ReceiptNumber}\nAmount: ₹{createdPayment.AmountPaid:F2}",
-                          "Payment Successful", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show($"Fee payment recorded successfully!\n\nReceipt Number: {createdPayment.ReceiptNumber}\nAmount: ₹{createdPayment.AmountPaid:F2}",
+                              "Payment Successful", MessageBoxButton.OK, MessageBoxImage.Information);
 
-            DialogResult = true;
-            Close();
-        }
-        catch (Exception ex)
-        {
-            ShowValidationError($"Error recording payment: {ex.Message}");
-        }
+                DialogResult = true;
+                Close();
+            }
+            catch (Exception ex)
+            {
+                ShowValidationError($"Error recording payment: {ex.Message}");
+            }
+        }, "Payment Save Error");
     }
 
     private bool ValidateInput()
