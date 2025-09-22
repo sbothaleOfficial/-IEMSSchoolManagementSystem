@@ -24,9 +24,7 @@ public class ClassProgressionValidator
         ["Class 7"] = 9,
         ["Class 8"] = 10,
         ["Class 9"] = 11,
-        ["Class 10"] = 12,
-        ["Class 11"] = 13,
-        ["Class 12"] = 14
+        ["Class 10"] = 12
     };
 
     public ClassProgressionValidator(BulkPromotionConfiguration config)
