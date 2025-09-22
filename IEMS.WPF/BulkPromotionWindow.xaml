@@ -34,12 +34,14 @@
 
                 <StackPanel Grid.Column="0" Margin="0,0,10,0">
                     <TextBlock Text="From Class" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                    <ComboBox x:Name="cmbFromClass" Height="35" DisplayMemberPath="Name" SelectedValuePath="Id" SelectionChanged="CmbFromClass_SelectionChanged"/>
+                    <TextBox x:Name="txtFromClass" Height="35" TextChanged="TxtFromClass_TextChanged"
+                             ToolTip="Enter class name (e.g., Nursery, KG1, KG2, Class 1, Class 2, etc.)"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Margin="10,0">
                     <TextBlock Text="To Class" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                    <ComboBox x:Name="cmbToClass" Height="35" DisplayMemberPath="Name" SelectedValuePath="Id" SelectionChanged="CmbToClass_SelectionChanged"/>
+                    <TextBox x:Name="txtToClass" Height="35" TextChanged="TxtToClass_TextChanged"
+                             ToolTip="Enter class name (e.g., Nursery, KG1, KG2, Class 1, Class 2, etc.)"/>
                 </StackPanel>
 
                 <StackPanel Grid.Column="2" Margin="10,0,0,0">

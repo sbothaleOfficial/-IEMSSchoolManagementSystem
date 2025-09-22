@@ -46,50 +46,16 @@ namespace IEMS.WPF
 
         private void LoadInitialData()
         {
-            Console.WriteLine("=== CLEAN REIMPLEMENTATION - LoadInitialData() ===");
+            Console.WriteLine("=== SIMPLIFIED IMPLEMENTATION - LoadInitialData() ===");
 
-            // Clean reimplement: Simple, direct class dropdown setup
-            SetupClassDropdowns();
-
-            // Load academic years (keep existing logic)
+            // Just load academic years - no class dropdown complexity needed
             LoadExtendedAcademicYears();
-        }
 
-        private void SetupClassDropdowns()
-        {
-            Console.WriteLine("=== Setting up clean class dropdowns ===");
+            // Set placeholder text for class inputs
+            txtFromClass.Text = "";
+            txtToClass.Text = "";
 
-            // Define simple class list - no database, no complexity
-            var classes = new List<ClassDto>
-            {
-                new ClassDto { Id = -1, Name = "-- Select Class --" },
-                new ClassDto { Id = 1, Name = "Nursery" },
-                new ClassDto { Id = 2, Name = "KG1" },
-                new ClassDto { Id = 3, Name = "KG2" },
-                new ClassDto { Id = 4, Name = "Class 1" },
-                new ClassDto { Id = 5, Name = "Class 2" },
-                new ClassDto { Id = 6, Name = "Class 3" },
-                new ClassDto { Id = 7, Name = "Class 4" },
-                new ClassDto { Id = 8, Name = "Class 5" },
-                new ClassDto { Id = 9, Name = "Class 6" },
-                new ClassDto { Id = 10, Name = "Class 7" },
-                new ClassDto { Id = 11, Name = "Class 8" },
-                new ClassDto { Id = 12, Name = "Class 9" },
-                new ClassDto { Id = 13, Name = "Class 10" }
-            };
-
-            // Direct assignment - no ItemsSource manipulation
-            cmbFromClass.ItemsSource = classes;
-            cmbToClass.ItemsSource = classes;
-
-            // Set to first item (-- Select Class --)
-            cmbFromClass.SelectedIndex = 0;
-            cmbToClass.SelectedIndex = 0;
-
-            // Store for later use
-            _allClasses = classes;
-
-            Console.WriteLine($"=== Class dropdowns setup complete with {classes.Count} items ===");
+            Console.WriteLine("=== Initialization complete - using simple text inputs ===");
         }
 
 
@@ -131,40 +97,41 @@ namespace IEMS.WPF
             cmbAcademicYear.SelectedItem = academicYears.FirstOrDefault(ay => ay.IsCurrent);
         }
 
-        private void CmbFromClass_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void TxtFromClass_TextChanged(object sender, TextChangedEventArgs e)
         {
             ValidatePromotionInputs();
         }
 
-        private void CmbToClass_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void TxtToClass_TextChanged(object sender, TextChangedEventArgs e)
         {
             ValidatePromotionInputs();
         }
 
         private void ValidatePromotionInputs()
         {
-            var fromClass = cmbFromClass.SelectedItem as ClassDto;
-            var toClass = cmbToClass.SelectedItem as ClassDto;
+            var fromClass = txtFromClass.Text?.Trim();
+            var toClass = txtToClass.Text?.Trim();
 
-            var hasValidSelection = fromClass != null && fromClass.Id != -1 &&
-                                  toClass != null && toClass.Id != -1 &&
-                                  cmbAcademicYear.SelectedItem != null &&
-                                  fromClass.Id != toClass.Id;
+            var hasValidInput = !string.IsNullOrWhiteSpace(fromClass) &&
+                               !string.IsNullOrWhiteSpace(toClass) &&
+                               cmbAcademicYear.SelectedItem != null &&
+                               !fromClass.Equals(toClass, StringComparison.OrdinalIgnoreCase);
 
-            btnLoadPreview.IsEnabled = hasValidSelection;
+            btnLoadPreview.IsEnabled = hasValidInput;
             btnExecutePromotion.IsEnabled = false;
 
-            if (fromClass != null && toClass != null && fromClass.Id == toClass.Id && fromClass.Id != -1)
+            if (!string.IsNullOrWhiteSpace(fromClass) && !string.IsNullOrWhiteSpace(toClass) &&
+                fromClass.Equals(toClass, StringComparison.OrdinalIgnoreCase))
             {
                 lblStatus.Text = "Source and target classes must be different";
             }
-            else if (hasValidSelection)
+            else if (hasValidInput)
             {
                 lblStatus.Text = "Ready to load preview";
             }
             else
             {
-                lblStatus.Text = "Please select source class, target class, and academic year";
+                lblStatus.Text = "Please enter source class, target class, and select academic year";
             }
         }
 
@@ -177,19 +144,20 @@ namespace IEMS.WPF
         {
             try
             {
-                var fromClass = cmbFromClass.SelectedItem as ClassDto;
-                var toClass = cmbToClass.SelectedItem as ClassDto;
+                var fromClassName = txtFromClass.Text?.Trim();
+                var toClassName = txtToClass.Text?.Trim();
 
-                if (fromClass == null || toClass == null || fromClass.Id == -1 || toClass.Id == -1)
+                if (string.IsNullOrWhiteSpace(fromClassName) || string.IsNullOrWhiteSpace(toClassName))
                 {
-                    MessageBox.Show("Please select both source and target classes.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Please enter both source and target class names.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
                 lblStatus.Text = "Loading promotion preview...";
 
-                var fromClassId = fromClass.Id;
-                var toClassId = toClass.Id;
+                // For simplicity, we'll use class names directly - the service can handle name-based lookups
+                var fromClassId = GetClassIdByName(fromClassName);
+                var toClassId = GetClassIdByName(toClassName);
 
                 var preview = await _bulkPromotionService.GetPromotionPreviewAsync(fromClassId, toClassId);
 
@@ -218,6 +186,19 @@ namespace IEMS.WPF
                 MessageBox.Show($"Error loading preview: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 lblStatus.Text = "Error loading preview";
             }
+        }
+
+        private int GetClassIdByName(string className)
+        {
+            // Simple mapping of class names to IDs
+            var classMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+            {
+                {"Nursery", 1}, {"KG1", 2}, {"KG2", 3},
+                {"Class 1", 4}, {"Class 2", 5}, {"Class 3", 6}, {"Class 4", 7}, {"Class 5", 8},
+                {"Class 6", 9}, {"Class 7", 10}, {"Class 8", 11}, {"Class 9", 12}, {"Class 10", 13}
+            };
+
+            return classMap.TryGetValue(className, out var id) ? id : -1;
         }
 
         private void UpdatePreviewGrid()
@@ -269,15 +250,15 @@ namespace IEMS.WPF
                 lblStatus.Text = "Executing bulk promotion...";
                 btnExecutePromotion.IsEnabled = false;
 
-                var fromClass = cmbFromClass.SelectedItem as ClassDto;
-                var toClass = cmbToClass.SelectedItem as ClassDto;
+                var fromClassName = txtFromClass.Text?.Trim();
+                var toClassName = txtToClass.Text?.Trim();
 
                 var selectedAcademicYear = cmbAcademicYear.SelectedItem as SimpleAcademicYear;
 
                 var request = new BulkPromotionRequest
                 {
-                    FromClassId = fromClass!.Id,
-                    ToClassId = toClass!.Id,
+                    FromClassId = GetClassIdByName(fromClassName!),
+                    ToClassId = GetClassIdByName(toClassName!),
                     AcademicYear = selectedAcademicYear!.Year.ToString(),
                     ExcludedStudentIds = _currentPreview.Where(p => p.IsExcluded).Select(p => p.StudentId).ToList(),
                     Reason = "Annual Promotion"
