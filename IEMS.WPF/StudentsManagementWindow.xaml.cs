@@ -26,7 +26,6 @@ public partial class StudentsManagementWindow : Window
     private List<StudentDto> _allStudents = new List<StudentDto>();
     private List<FeePaymentDto> _allFeePayments = new List<FeePaymentDto>();
     private List<ClassDto> _allClasses = new List<ClassDto>();
-    private List<StudentPromotionViewModel> _promotionPreview = new();
 
     public StudentsManagementWindow(StudentService studentService, ClassService classService, TeacherService teacherService, FeePaymentService feePaymentService, FeeStructureService feeStructureService, BulkPromotionService? bulkPromotionService = null, IAcademicYearRepository? academicYearRepository = null)
     {
@@ -203,6 +202,7 @@ public partial class StudentsManagementWindow : Window
         if (addWindow.ShowDialog() == true)
         {
             AsyncHelper.SafeFireAndForget(LoadClassesAsync);
+            AsyncHelper.SafeFireAndForget(LoadPromotionDataAsync); // Refresh promotion dropdowns
             AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync); // Refresh dashboard
         }
     }
@@ -215,6 +215,7 @@ public partial class StudentsManagementWindow : Window
             if (editWindow.ShowDialog() == true)
             {
                 AsyncHelper.SafeFireAndForget(LoadClassesAsync);
+                AsyncHelper.SafeFireAndForget(LoadPromotionDataAsync); // Refresh promotion dropdowns
                 AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync); // Refresh dashboard
             }
         }
@@ -1496,40 +1497,15 @@ public partial class StudentsManagementWindow : Window
             if (_bulkPromotionService == null || _academicYearRepository == null)
                 return;
 
-            // Load actual classes from database for promotion dropdowns
-            if (_allClasses != null && _allClasses.Any())
-            {
-                var classesForPromotion = _allClasses
-                    .Select(c => new { Id = c.Id, Name = c.Name })
-                    .OrderBy(c => GetClassOrder(c.Name))
-                    .ToList();
+            // Always load classes fresh from database for promotion dropdowns
+            var classes = await _classService.GetAllClassesAsync();
+            var classesForPromotion = classes
+                .Select(c => new { Id = c.Id, Name = c.Name })
+                .OrderBy(c => GetClassOrder(c.Name))
+                .ToList();
 
-                cmbPromotionFromClass.ItemsSource = classesForPromotion;
-                cmbPromotionToClass.ItemsSource = classesForPromotion;
-            }
-            else
-            {
-                // Fallback to predefined if no classes loaded yet
-                var predefinedClasses = new List<object>
-                {
-                    new { Id = 1, Name = "Nursery" },
-                    new { Id = 2, Name = "KG1" },
-                    new { Id = 3, Name = "KG2" },
-                    new { Id = 4, Name = "Class 1" },
-                    new { Id = 5, Name = "Class 2" },
-                    new { Id = 6, Name = "Class 3" },
-                    new { Id = 7, Name = "Class 4" },
-                    new { Id = 8, Name = "Class 5" },
-                    new { Id = 9, Name = "Class 6" },
-                    new { Id = 10, Name = "Class 7" },
-                    new { Id = 11, Name = "Class 8" },
-                    new { Id = 12, Name = "Class 9" },
-                    new { Id = 13, Name = "Class 10" }
-                };
-
-                cmbPromotionFromClass.ItemsSource = predefinedClasses;
-                cmbPromotionToClass.ItemsSource = predefinedClasses;
-            }
+            cmbPromotionFromClass.ItemsSource = classesForPromotion;
+            cmbPromotionToClass.ItemsSource = classesForPromotion;
 
             // Load academic years
             var academicYears = await _academicYearRepository.GetRecentAcademicYearsAsync();
@@ -1580,6 +1556,11 @@ public partial class StudentsManagementWindow : Window
         ValidatePromotionInputs();
     }
 
+    private void CmbPromotionAcademicYear_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        ValidatePromotionInputs();
+    }
+
     private void ValidatePromotionInputs()
     {
         var hasValidInput = cmbPromotionFromClass?.SelectedValue != null &&
@@ -1587,112 +1568,26 @@ public partial class StudentsManagementWindow : Window
                            cmbPromotionAcademicYear?.SelectedItem != null &&
                            !cmbPromotionFromClass.SelectedValue.Equals(cmbPromotionToClass.SelectedValue);
 
-        btnLoadPromotionPreview.IsEnabled = hasValidInput;
-        btnExecutePromotion.IsEnabled = false;
+        btnExecutePromotion.IsEnabled = hasValidInput;
 
         if (cmbPromotionFromClass?.SelectedValue != null && cmbPromotionToClass?.SelectedValue != null &&
             cmbPromotionFromClass.SelectedValue.Equals(cmbPromotionToClass.SelectedValue))
         {
             lblStatus.Text = "Source and target classes must be different";
+            txtPromotionSummary.Text = "Source and target classes must be different.";
         }
         else if (hasValidInput)
         {
-            lblStatus.Text = "Ready to load promotion preview";
+            lblStatus.Text = "Ready to execute bulk promotion";
+            txtPromotionSummary.Text = $"Ready to promote students from {cmbPromotionFromClass.Text} to {cmbPromotionToClass.Text} for academic year {((dynamic)cmbPromotionAcademicYear.SelectedItem).Year}.\n\nClick 'Execute Promotion' to proceed with bulk promotion.";
         }
         else
         {
             lblStatus.Text = "Please select source class, target class, and academic year";
+            txtPromotionSummary.Text = "Select source and target classes, then click 'Execute Promotion' to proceed with bulk promotion.";
         }
     }
 
-    private void BtnLoadPromotionPreview_Click(object sender, RoutedEventArgs e)
-    {
-        AsyncHelper.SafeFireAndForget(BtnLoadPromotionPreview_ClickAsync);
-    }
-
-    private async Task BtnLoadPromotionPreview_ClickAsync()
-    {
-        try
-        {
-            if (_bulkPromotionService == null)
-            {
-                MessageBox.Show("Bulk promotion service is not available.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                return;
-            }
-
-            if (cmbPromotionFromClass.SelectedValue == null || cmbPromotionToClass.SelectedValue == null)
-            {
-                MessageBox.Show("Please select both source and target classes.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            var fromClassId = (int)cmbPromotionFromClass.SelectedValue;
-            var toClassId = (int)cmbPromotionToClass.SelectedValue;
-
-            lblStatus.Text = "Loading promotion preview...";
-
-            if (fromClassId == toClassId)
-            {
-                MessageBox.Show("Source and target classes must be different.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            var preview = await _bulkPromotionService.GetPromotionPreviewAsync(fromClassId, toClassId);
-
-            _promotionPreview = preview.Select(p => new StudentPromotionViewModel
-            {
-                StudentId = p.StudentId,
-                StudentName = p.StudentName,
-                StudentNumber = p.StudentNumber,
-                CurrentClass = p.CurrentClass,
-                TargetClass = p.TargetClass,
-                IsEligible = p.IsEligible,
-                IneligibilityReason = p.IneligibilityReason,
-                HasPendingFees = p.HasPendingFees,
-                PendingAmount = p.PendingAmount,
-                IsExcluded = false
-            }).ToList();
-
-            UpdatePromotionPreviewGrid();
-            UpdatePromotionSummaryCards();
-
-            btnExecutePromotion.IsEnabled = _promotionPreview.Any(p => p.IsEligible && !p.IsExcluded);
-            lblStatus.Text = $"Loaded {_promotionPreview.Count} students for promotion preview";
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error loading preview: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            lblStatus.Text = "Error loading promotion preview";
-        }
-    }
-
-    private void UpdatePromotionPreviewGrid()
-    {
-        var filteredStudents = _promotionPreview.AsEnumerable();
-
-        if (chkPromotionShowOnlyEligible.IsChecked == true)
-        {
-            filteredStudents = filteredStudents.Where(s => s.IsEligible);
-        }
-
-        if (chkPromotionShowPendingFees.IsChecked == true)
-        {
-            filteredStudents = filteredStudents.Where(s => s.HasPendingFees);
-        }
-
-        dgPromotionPreview.ItemsSource = filteredStudents.ToList();
-    }
-
-    private void UpdatePromotionSummaryCards()
-    {
-        var total = _promotionPreview.Count;
-        var eligible = _promotionPreview.Count(p => p.IsEligible && !p.IsExcluded);
-        var excluded = _promotionPreview.Count(p => p.IsExcluded);
-
-        txtPromotionTotalStudents.Text = total.ToString();
-        txtPromotionEligibleStudents.Text = eligible.ToString();
-        txtPromotionExcludedStudents.Text = excluded.ToString();
-    }
 
     private void BtnExecutePromotion_Click(object sender, RoutedEventArgs e)
     {
@@ -1709,8 +1604,27 @@ public partial class StudentsManagementWindow : Window
                 return;
             }
 
+            if (cmbPromotionFromClass.SelectedValue == null || cmbPromotionToClass.SelectedValue == null || cmbPromotionAcademicYear.SelectedValue == null)
+            {
+                MessageBox.Show("Please select source class, target class, and academic year.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            var fromClassId = (int)cmbPromotionFromClass.SelectedValue;
+            var toClassId = (int)cmbPromotionToClass.SelectedValue;
+
+            if (fromClassId == toClassId)
+            {
+                MessageBox.Show("Source and target classes must be different.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // Get a preview first to show how many students will be promoted
+            var preview = await _bulkPromotionService.GetPromotionPreviewAsync(fromClassId, toClassId);
+            var eligibleStudents = preview.Count(p => p.IsEligible);
+
             var result = MessageBox.Show(
-                $"Are you sure you want to promote {_promotionPreview.Count(p => p.IsEligible && !p.IsExcluded)} students?\n\nThis action cannot be easily undone.",
+                $"Are you sure you want to promote {eligibleStudents} eligible students from {cmbPromotionFromClass.Text} to {cmbPromotionToClass.Text}?\n\nThis action cannot be easily undone.",
                 "Confirm Bulk Promotion",
                 MessageBoxButton.YesNo,
                 MessageBoxImage.Question);
@@ -1723,85 +1637,65 @@ public partial class StudentsManagementWindow : Window
 
             var request = new BulkPromotionRequest
             {
-                FromClassId = (int)cmbPromotionFromClass.SelectedValue,
-                ToClassId = (int)cmbPromotionToClass.SelectedValue,
-                AcademicYear = ((dynamic)cmbPromotionAcademicYear.SelectedItem).Year,
-                ExcludedStudentIds = _promotionPreview.Where(p => p.IsExcluded).Select(p => p.StudentId).ToList(),
+                FromClassId = fromClassId,
+                ToClassId = toClassId,
+                AcademicYear = cmbPromotionAcademicYear.SelectedValue.ToString(),
+                ExcludedStudentIds = new List<int>(), // No exclusions since no preview
                 Reason = "Annual Promotion"
             };
 
             var promotionResult = await _bulkPromotionService.ExecuteBulkPromotionAsync(request);
 
-            // Show results
-            DisplayPromotionResults(promotionResult);
+            // Update summary and show results
+            if (promotionResult.IsSuccess)
+            {
+                txtPromotionSummary.Text = $"✅ Promotion Completed Successfully!\n\nPromoted: {promotionResult.PromotedStudents} students\nFrom: {cmbPromotionFromClass.Text}\nTo: {cmbPromotionToClass.Text}\nAcademic Year: {request.AcademicYear}\nDate: {promotionResult.PromotionDate:yyyy-MM-dd HH:mm:ss}";
+                MessageBox.Show($"Bulk promotion completed successfully!\n\nPromoted: {promotionResult.PromotedStudents} students from {cmbPromotionFromClass.Text} to {cmbPromotionToClass.Text}",
+                               "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else
+            {
+                txtPromotionSummary.Text = $"⚠️ Promotion Completed with Errors\n\nPromoted: {promotionResult.PromotedStudents} students\nFailed: {promotionResult.FailedPromotions} students\nFrom: {cmbPromotionFromClass.Text}\nTo: {cmbPromotionToClass.Text}\nAcademic Year: {request.AcademicYear}\nDate: {promotionResult.PromotionDate:yyyy-MM-dd HH:mm:ss}";
+                var errorDetails = string.Join("\n", promotionResult.Errors.Take(5).Select(e => $"• {e.StudentName}: {e.Error}"));
+                if (promotionResult.Errors.Count > 5)
+                    errorDetails += $"\n... and {promotionResult.Errors.Count - 5} more errors";
+
+                MessageBox.Show($"Bulk promotion completed with errors.\n\nPromoted: {promotionResult.PromotedStudents}\nFailed: {promotionResult.FailedPromotions}\n\nSample errors:\n{errorDetails}",
+                               "Partial Success", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
 
             lblStatus.Text = promotionResult.IsSuccess
                 ? $"Successfully promoted {promotionResult.PromotedStudents} students"
                 : $"Promotion completed with {promotionResult.FailedPromotions} errors";
 
-            // Refresh students list
-            AsyncHelper.SafeFireAndForget(LoadStudentsAsync);
+            // Refresh students list and apply filters after loading
+            await LoadStudentsAsync();
+            FilterStudents();
+
+            // Refresh classes to update student counts and dashboard
+            AsyncHelper.SafeFireAndForget(LoadClassesAsync);
+            AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync);
         }
         catch (Exception ex)
         {
             MessageBox.Show($"Error executing promotion: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             lblStatus.Text = "Error executing promotion";
+        }
+        finally
+        {
             btnExecutePromotion.IsEnabled = true;
         }
     }
 
-    private void DisplayPromotionResults(BulkPromotionResult result)
-    {
-        tabPromotionResults.IsSelected = true;
-        borderPromotionResultsSummary.Visibility = Visibility.Visible;
-
-        txtPromotionResultsSummary.Text = $"Promoted: {result.PromotedStudents} | Failed: {result.FailedPromotions} | Total: {result.TotalStudents}";
-        txtPromotionDate.Text = $"Promotion Date: {result.PromotionDate:yyyy-MM-dd HH:mm:ss} | Academic Year: {result.AcademicYear}";
-
-        dgPromotionErrors.ItemsSource = result.Errors;
-
-        if (result.IsSuccess)
-        {
-            borderPromotionResultsSummary.Background = new SolidColorBrush(Color.FromRgb(232, 245, 233)); // Light green
-            MessageBox.Show($"Bulk promotion completed successfully!\n\nPromoted: {result.PromotedStudents} students",
-                           "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-        else
-        {
-            borderPromotionResultsSummary.Background = new SolidColorBrush(Color.FromRgb(255, 243, 224)); // Light orange
-            MessageBox.Show($"Bulk promotion completed with errors.\n\nPromoted: {result.PromotedStudents}\nFailed: {result.FailedPromotions}\n\nCheck the Results tab for details.",
-                           "Partial Success", MessageBoxButton.OK, MessageBoxImage.Warning);
-        }
-    }
-
-    private void ChkPromotionShowOnlyEligible_Checked(object sender, RoutedEventArgs e)
-    {
-        UpdatePromotionPreviewGrid();
-    }
-
-    private void ChkPromotionShowOnlyEligible_Unchecked(object sender, RoutedEventArgs e)
-    {
-        UpdatePromotionPreviewGrid();
-    }
-
-    private void ChkPromotionShowPendingFees_Checked(object sender, RoutedEventArgs e)
-    {
-        UpdatePromotionPreviewGrid();
-    }
-
-    private void ChkPromotionShowPendingFees_Unchecked(object sender, RoutedEventArgs e)
-    {
-        UpdatePromotionPreviewGrid();
-    }
 
     private void BtnCancelPromotion_Click(object sender, RoutedEventArgs e)
     {
-        // Reset the promotion preview
-        _promotionPreview.Clear();
-        dgPromotionPreview.ItemsSource = null;
-        UpdatePromotionSummaryCards();
-        btnExecutePromotion.IsEnabled = false;
-        lblStatus.Text = "Promotion preview cleared";
+        // Reset the promotion form
+        cmbPromotionFromClass.SelectedValue = null;
+        cmbPromotionToClass.SelectedValue = null;
+        cmbPromotionAcademicYear.SelectedValue = null;
+        txtPromotionSummary.Text = "Select source and target classes, then click 'Execute Promotion' to proceed with bulk promotion.";
+        lblStatus.Text = "Promotion form reset";
     }
 
     #endregion

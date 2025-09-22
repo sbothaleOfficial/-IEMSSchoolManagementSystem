@@ -41,10 +41,7 @@ public class BulkPromotionService
 
         foreach (var student in students)
         {
-            var pendingFees = await GetPendingFeesForStudent(student.Id);
-
-            var eligibilityResult = await _eligibilityValidator.ValidateStudentAsync(student, pendingFees);
-
+            // Simplified: All students are eligible for promotion (basic class update)
             result.Add(new StudentPromotionDto
             {
                 StudentId = student.Id,
@@ -52,10 +49,10 @@ public class BulkPromotionService
                 StudentNumber = student.StudentNumber,
                 CurrentClass = fromClass?.Name ?? "Unknown",
                 TargetClass = toClass?.Name ?? "Unknown",
-                IsEligible = eligibilityResult.IsEligible,
-                IneligibilityReason = eligibilityResult.Reason,
-                HasPendingFees = pendingFees > 0,
-                PendingAmount = pendingFees
+                IsEligible = true, // All students eligible for simple class update
+                IneligibilityReason = string.Empty,
+                HasPendingFees = false, // Not checking fees for simple promotion
+                PendingAmount = 0
             });
         }
 
@@ -75,7 +72,7 @@ public class BulkPromotionService
             // Get source students
             var allStudents = (await _studentRepository.GetStudentsByClassIdAsync(request.FromClassId)).ToList();
 
-            // Get class details
+            // Get class details for validation
             var fromClass = await _classRepository.GetByIdAsync(request.FromClassId);
             var toClass = await _classRepository.GetByIdAsync(request.ToClassId);
 
@@ -90,15 +87,14 @@ public class BulkPromotionService
                 return result;
             }
 
-            // Validate class progression
-            var progressionValidation = _progressionValidator.ValidateProgression(fromClass.Name, toClass.Name);
-            if (!progressionValidation.IsValid)
+            // Simple validation: just check if classes exist and are different
+            if (request.FromClassId == request.ToClassId)
             {
                 result.Errors.Add(new PromotionError
                 {
                     StudentId = 0,
                     StudentName = "System",
-                    Error = $"Class progression validation failed: {progressionValidation.ErrorMessage}"
+                    Error = "Source and target classes must be different"
                 });
                 return result;
             }
@@ -110,44 +106,20 @@ public class BulkPromotionService
 
             result.TotalStudents = studentsToPromote.Count;
 
-            // Validate promotion using domain service
-            var promotionRequest = new StudentPromotionService.PromotionRequest
-            {
-                FromClass = fromClass,
-                ToClass = toClass,
-                Students = studentsToPromote,
-                ExcludedStudentIds = request.ExcludedStudentIds,
-                AcademicYear = request.AcademicYear,
-                Reason = request.Reason
-            };
-
-            var validation = _promotionService.ValidatePromotion(promotionRequest);
-
-            if (!validation.IsValid)
-            {
-                foreach (var error in validation.ValidationErrors)
-                {
-                    result.Errors.Add(new PromotionError
-                    {
-                        StudentId = 0,
-                        StudentName = "Validation",
-                        Error = error
-                    });
-                }
-                return result;
-            }
-
-            // Execute promotion for eligible students
-            var eligibleStudents = validation.EligibleStudents;
-
-            if (eligibleStudents.Any())
+            // Simple execution: Just update the ClassId for all students
+            if (studentsToPromote.Any())
             {
                 try
                 {
-                    _promotionService.ExecutePromotion(eligibleStudents, request.ToClassId, request.AcademicYear);
-                    await _studentRepository.UpdateMultipleStudentsAsync(eligibleStudents);
+                    // Simple class update - no complex validations
+                    foreach (var student in studentsToPromote)
+                    {
+                        student.ClassId = request.ToClassId;
+                        student.UpdatedAt = DateTime.UtcNow;
+                    }
 
-                    result.PromotedStudents = eligibleStudents.Count;
+                    await _studentRepository.UpdateMultipleStudentsAsync(studentsToPromote);
+                    result.PromotedStudents = studentsToPromote.Count;
                 }
                 catch (Exception ex)
                 {
@@ -158,18 +130,6 @@ public class BulkPromotionService
                         Error = $"Failed to update students: {ex.Message}"
                     });
                 }
-            }
-
-            // Add errors for ineligible students
-            foreach (var student in validation.IneligibleStudents)
-            {
-                result.Errors.Add(new PromotionError
-                {
-                    StudentId = student.Id,
-                    StudentName = student.FullName,
-                    Error = "Student not eligible for promotion"
-                });
-                result.FailedPromotions++;
             }
         }
         catch (Exception ex)
@@ -223,23 +183,5 @@ public class BulkPromotionService
         return result;
     }
 
-    private async Task<decimal> GetPendingFeesForStudent(int studentId)
-    {
-        try
-        {
-            var feePayments = await _feePaymentRepository.GetAllAsync();
-            var studentPayments = feePayments.Where(fp => fp.StudentId == studentId);
-
-            // Calculate pending fees based on remaining balance from latest payment
-            // In this system, RemainingBalance represents what's still owed
-            var latestPayment = studentPayments.OrderByDescending(fp => fp.PaymentDate).FirstOrDefault();
-
-            return latestPayment?.RemainingBalance ?? 0;
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidOperationException($"Unable to calculate pending fees for student {studentId}: {ex.Message}", ex);
-        }
-    }
 
 }
