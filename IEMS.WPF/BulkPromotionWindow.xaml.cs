@@ -56,65 +56,57 @@ namespace IEMS.WPF
         {
             try
             {
-                // Load actual classes from database
-                var databaseClasses = await _classService.GetAllClassesAsync();
+                System.Diagnostics.Debug.WriteLine("=== BULK PROMOTION - LOADING CLASSES (SIMPLIFIED) ===");
 
-                // Create a clean, ordered list with the required classes
-                var orderedClasses = new List<ClassDto>
+                // For bulk promotion, use a clean, predefined list to ensure no duplicates
+                // This is simpler and more reliable than trying to deduplicate database classes
+                var cleanClasses = new List<ClassDto>
                 {
-                    new ClassDto { Id = -1, Name = "-- Select Class --" }
+                    new ClassDto { Id = -1, Name = "-- Select Class --" },
+                    new ClassDto { Id = 1, Name = "Nursery" },
+                    new ClassDto { Id = 2, Name = "KG1" },
+                    new ClassDto { Id = 3, Name = "KG2" },
+                    new ClassDto { Id = 4, Name = "Class 1" },
+                    new ClassDto { Id = 5, Name = "Class 2" },
+                    new ClassDto { Id = 6, Name = "Class 3" },
+                    new ClassDto { Id = 7, Name = "Class 4" },
+                    new ClassDto { Id = 8, Name = "Class 5" },
+                    new ClassDto { Id = 9, Name = "Class 6" },
+                    new ClassDto { Id = 10, Name = "Class 7" },
+                    new ClassDto { Id = 11, Name = "Class 8" },
+                    new ClassDto { Id = 12, Name = "Class 9" },
+                    new ClassDto { Id = 13, Name = "Class 10" }
                 };
 
-                // Define the required class order for promotion
-                var requiredClasses = new[]
+                System.Diagnostics.Debug.WriteLine($"=== CLEAN DROPDOWN CLASSES ({cleanClasses.Count}) ===");
+                foreach (var cleanClass in cleanClasses)
                 {
-                    "Nursery", "KG1", "KG2", "Class 1", "Class 2", "Class 3",
-                    "Class 4", "Class 5", "Class 6", "Class 7", "Class 8",
-                    "Class 9", "Class 10"
-                };
-
-                // Get unique class names from database (ignore sections)
-                var uniqueClassNames = databaseClasses
-                    .Select(c => c.Name.Trim())
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-                // Add classes in the correct order only if they exist in database
-                foreach (var requiredClass in requiredClasses)
-                {
-                    if (uniqueClassNames.Contains(requiredClass))
-                    {
-                        // Find the first database class with this name (pick any section)
-                        var dbClass = databaseClasses.FirstOrDefault(c =>
-                            c.Name.Equals(requiredClass, StringComparison.OrdinalIgnoreCase));
-
-                        if (dbClass != null)
-                        {
-                            // Create a standardized entry for the dropdown
-                            orderedClasses.Add(new ClassDto
-                            {
-                                Id = dbClass.Id, // Use actual database ID
-                                Name = requiredClass, // Use standardized name
-                                Section = dbClass.Section, // Preserve section info if needed
-                                TeacherId = dbClass.TeacherId
-                            });
-                        }
-                    }
+                    System.Diagnostics.Debug.WriteLine($"Clean: ID={cleanClass.Id}, Name='{cleanClass.Name}'");
                 }
 
-                _allClasses = orderedClasses;
+                _allClasses = cleanClasses;
+
+                // Clear existing bindings first to prevent caching issues
+                cmbFromClass.ItemsSource = null;
+                cmbToClass.ItemsSource = null;
+
+                // Set new bindings
                 cmbFromClass.ItemsSource = _allClasses;
                 cmbToClass.ItemsSource = _allClasses;
 
                 // Set default selection to first item (-- Select Class --)
                 cmbFromClass.SelectedIndex = 0;
                 cmbToClass.SelectedIndex = 0;
+
+                System.Diagnostics.Debug.WriteLine("=== BULK PROMOTION - CLEAN CLASSES LOADED SUCCESSFULLY ===");
             }
             catch (Exception ex)
             {
-                // Fallback to predefined classes if database load fails
+                System.Diagnostics.Debug.WriteLine($"=== ERROR LOADING CLEAN CLASSES: {ex.Message} ===");
+
+                // Fallback to predefined classes if this fails
                 LoadPredefinedClasses();
-                MessageBox.Show($"Warning: Could not load classes from database. Using predefined classes.\nError: {ex.Message}",
+                MessageBox.Show($"Warning: Could not load classes. Using fallback classes.\nError: {ex.Message}",
                                "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }

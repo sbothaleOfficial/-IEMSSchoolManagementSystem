@@ -4,6 +4,7 @@ using IEMS.Application.DTOs;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Documents;
+using IEMS.WPF.Helpers;
 
 namespace IEMS.WPF;
 
@@ -26,9 +27,9 @@ public partial class StaffManagementWindow : Window
         _staffService = staffService;
 
         SetupSearchControls();
-        LoadTeachers();
-        LoadStaff();
-        LoadDashboardData();
+        AsyncHelper.SafeFireAndForget(LoadTeachersAsync);
+        AsyncHelper.SafeFireAndForget(LoadStaffAsync);
+        AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync);
         lblStatus.Text = "Staff Management loaded successfully";
     }
 
@@ -40,7 +41,7 @@ public partial class StaffManagementWindow : Window
     }
 
     // Teachers Tab Methods
-    private async void LoadTeachers()
+    private async Task LoadTeachersAsync()
     {
         try
         {
@@ -80,86 +81,95 @@ public partial class StaffManagementWindow : Window
         lblStatus.Text = $"Showing {filteredTeachers.Count()} of {_allTeachers.Count} teachers";
     }
 
-    private async void BtnAddTeacher_Click(object sender, RoutedEventArgs e)
+    private void BtnAddTeacher_Click(object sender, RoutedEventArgs e)
     {
-        try
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            var addEditWindow = new AddEditTeacherWindow(_teacherService);
-            if (addEditWindow.ShowDialog() == true)
+            try
             {
-                LoadTeachers();
-                UpdateDashboard();
-                lblStatus.Text = "Teacher added successfully";
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error opening Add Teacher window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
-
-    private async void BtnEditTeacher_Click(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            if (dgTeachers.SelectedItem is TeacherDto selectedTeacher)
-            {
-                var addEditWindow = new AddEditTeacherWindow(_teacherService, selectedTeacher);
+                var addEditWindow = new AddEditTeacherWindow(_teacherService);
                 if (addEditWindow.ShowDialog() == true)
                 {
-                    LoadTeachers();
+                    await LoadTeachersAsync();
                     UpdateDashboard();
-                    lblStatus.Text = "Teacher updated successfully";
+                    lblStatus.Text = "Teacher added successfully";
                 }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Please select a teacher to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"Error opening Add Teacher window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error opening Edit Teacher window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+        });
     }
 
-    private async void BtnDeleteTeacher_Click(object sender, RoutedEventArgs e)
+    private void BtnEditTeacher_Click(object sender, RoutedEventArgs e)
     {
-        try
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            if (dgTeachers.SelectedItem is TeacherDto selectedTeacher)
+            try
             {
-                var result = MessageBox.Show($"Are you sure you want to delete teacher '{selectedTeacher.FullName}'?\n\nThis action cannot be undone.",
-                                           "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-                if (result == MessageBoxResult.Yes)
+                if (dgTeachers.SelectedItem is TeacherDto selectedTeacher)
                 {
-                    await _teacherService.DeleteTeacherAsync(selectedTeacher.Id);
-                    LoadTeachers();
-                    UpdateDashboard();
-                    lblStatus.Text = "Teacher deleted successfully";
-                    MessageBox.Show("Teacher deleted successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    var addEditWindow = new AddEditTeacherWindow(_teacherService, selectedTeacher);
+                    if (addEditWindow.ShowDialog() == true)
+                    {
+                        await LoadTeachersAsync();
+                        UpdateDashboard();
+                        lblStatus.Text = "Teacher updated successfully";
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please select a teacher to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Please select a teacher to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"Error opening Edit Teacher window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-        catch (Exception ex)
+        });
+    }
+
+    private void BtnDeleteTeacher_Click(object sender, RoutedEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            MessageBox.Show($"Error deleting teacher: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            lblStatus.Text = "Error deleting teacher";
-        }
+            try
+            {
+                if (dgTeachers.SelectedItem is TeacherDto selectedTeacher)
+                {
+                    var result = MessageBox.Show($"Are you sure you want to delete teacher '{selectedTeacher.FullName}'?\n\nThis action cannot be undone.",
+                                               "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        await _teacherService.DeleteTeacherAsync(selectedTeacher.Id);
+                        await LoadTeachersAsync();
+                        UpdateDashboard();
+                        lblStatus.Text = "Teacher deleted successfully";
+                        MessageBox.Show("Teacher deleted successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please select a teacher to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error deleting teacher: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                lblStatus.Text = "Error deleting teacher";
+            }
+        });
     }
 
     private void BtnRefreshTeachers_Click(object sender, RoutedEventArgs e)
     {
-        LoadTeachers();
+        AsyncHelper.SafeFireAndForget(LoadTeachersAsync);
     }
 
     // Staff Tab Methods
-    private async void LoadStaff()
+    private async Task LoadStaffAsync()
     {
         try
         {
@@ -208,82 +218,91 @@ public partial class StaffManagementWindow : Window
         lblStatus.Text = $"Showing {filteredStaff.Count()} of {_allStaff.Count} staff members";
     }
 
-    private async void BtnAddStaff_Click(object sender, RoutedEventArgs e)
+    private void BtnAddStaff_Click(object sender, RoutedEventArgs e)
     {
-        try
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            var addEditWindow = new AddEditStaffWindow(_staffService);
-            if (addEditWindow.ShowDialog() == true)
+            try
             {
-                LoadStaff();
-                UpdateDashboard();
-                lblStatus.Text = "Staff member added successfully";
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error opening Add Staff window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
-
-    private async void BtnEditStaff_Click(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            if (dgStaff.SelectedItem is StaffDto selectedStaff)
-            {
-                var addEditWindow = new AddEditStaffWindow(_staffService, selectedStaff);
+                var addEditWindow = new AddEditStaffWindow(_staffService);
                 if (addEditWindow.ShowDialog() == true)
                 {
-                    LoadStaff();
+                    await LoadStaffAsync();
                     UpdateDashboard();
-                    lblStatus.Text = "Staff member updated successfully";
+                    lblStatus.Text = "Staff member added successfully";
                 }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Please select a staff member to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"Error opening Add Staff window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error opening Edit Staff window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+        });
     }
 
-    private async void BtnDeleteStaff_Click(object sender, RoutedEventArgs e)
+    private void BtnEditStaff_Click(object sender, RoutedEventArgs e)
     {
-        try
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            if (dgStaff.SelectedItem is StaffDto selectedStaff)
+            try
             {
-                var result = MessageBox.Show($"Are you sure you want to delete staff member '{selectedStaff.FullName}'?\n\nThis action cannot be undone.",
-                                           "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-                if (result == MessageBoxResult.Yes)
+                if (dgStaff.SelectedItem is StaffDto selectedStaff)
                 {
-                    await _staffService.DeleteStaffAsync(selectedStaff.Id);
-                    LoadStaff();
-                    UpdateDashboard();
-                    lblStatus.Text = "Staff member deleted successfully";
-                    MessageBox.Show("Staff member deleted successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    var addEditWindow = new AddEditStaffWindow(_staffService, selectedStaff);
+                    if (addEditWindow.ShowDialog() == true)
+                    {
+                        await LoadStaffAsync();
+                        UpdateDashboard();
+                        lblStatus.Text = "Staff member updated successfully";
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please select a staff member to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Please select a staff member to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show($"Error opening Edit Staff window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-        }
-        catch (Exception ex)
+        });
+    }
+
+    private void BtnDeleteStaff_Click(object sender, RoutedEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            MessageBox.Show($"Error deleting staff member: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            lblStatus.Text = "Error deleting staff member";
-        }
+            try
+            {
+                if (dgStaff.SelectedItem is StaffDto selectedStaff)
+                {
+                    var result = MessageBox.Show($"Are you sure you want to delete staff member '{selectedStaff.FullName}'?\n\nThis action cannot be undone.",
+                                               "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        await _staffService.DeleteStaffAsync(selectedStaff.Id);
+                        await LoadStaffAsync();
+                        UpdateDashboard();
+                        lblStatus.Text = "Staff member deleted successfully";
+                        MessageBox.Show("Staff member deleted successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Please select a staff member to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error deleting staff member: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                lblStatus.Text = "Error deleting staff member";
+            }
+        });
     }
 
     private void BtnRefreshStaff_Click(object sender, RoutedEventArgs e)
     {
-        LoadStaff();
+        AsyncHelper.SafeFireAndForget(LoadStaffAsync);
     }
 
     // Search Event Handlers
@@ -316,7 +335,7 @@ public partial class StaffManagementWindow : Window
     }
 
     // Dashboard Methods
-    private async void LoadDashboardData()
+    private async Task LoadDashboardDataAsync()
     {
         try
         {
@@ -409,7 +428,7 @@ public partial class StaffManagementWindow : Window
     // Update dashboard when data changes
     private void UpdateDashboard()
     {
-        LoadDashboardData();
+        AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync);
     }
 
     // Helper method to check if both teachers and staff are loaded

@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
 using IEMS.Core.Enums;
+using IEMS.WPF.Helpers;
 
 namespace IEMS.WPF;
 
@@ -27,7 +28,7 @@ public partial class AddEditTransportExpenseWindow : Window
             _existingExpense = existingExpense;
             _isEditMode = existingExpense != null;
 
-            this.Loaded += AddEditTransportExpenseWindow_Loaded;
+            this.Loaded += (s, e) => AsyncHelper.SafeFireAndForget(LoadWindowAsync);
         }
         catch (Exception ex)
         {
@@ -36,7 +37,7 @@ public partial class AddEditTransportExpenseWindow : Window
         }
     }
 
-    private async void AddEditTransportExpenseWindow_Loaded(object sender, RoutedEventArgs e)
+    private async Task LoadWindowAsync()
     {
         await LoadComboBoxData();
 
@@ -169,7 +170,12 @@ public partial class AddEditTransportExpenseWindow : Window
         }
     }
 
-    private async void BtnSave_Click(object sender, RoutedEventArgs e)
+    private void BtnSave_Click(object sender, RoutedEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(SaveAsync);
+    }
+
+    private async Task SaveAsync()
     {
         if (!ValidateInput()) return;
 

@@ -394,41 +394,47 @@ namespace IEMS.WPF
             });
         }
 
-        private async void BtnDeleteElectricityBill_Click(object sender, RoutedEventArgs e)
+        private void BtnDeleteElectricityBill_Click(object sender, RoutedEventArgs e)
         {
-            try
+            AsyncHelper.SafeFireAndForget(async () =>
             {
-                if (sender is Button button && button.Tag is int billId)
+                try
                 {
-                    var result = MessageBox.Show("Are you sure you want to delete this electricity bill?",
-                        "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-
-                    if (result == MessageBoxResult.Yes)
+                    if (sender is Button button && button.Tag is int billId)
                     {
-                        await _electricityBillService.DeleteAsync(billId);
-                        await LoadElectricityBills();
-                        await RefreshExpenseDashboard();
-                        lblStatus.Text = "Electricity bill deleted successfully";
+                        var result = MessageBox.Show("Are you sure you want to delete this electricity bill?",
+                            "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            await _electricityBillService.DeleteAsync(billId);
+                            await LoadElectricityBills();
+                            await RefreshExpenseDashboard();
+                            lblStatus.Text = "Electricity bill deleted successfully";
+                        }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error deleting electricity bill: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error deleting electricity bill: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }, "Delete Electricity Bill Error");
         }
 
-        private async void DgElectricityBills_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        private void DgElectricityBills_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            if (dgElectricityBills.SelectedItem is ElectricityBillDto selectedBill)
+            AsyncHelper.SafeFireAndForget(async () =>
             {
-                var editWindow = new AddEditElectricityBillWindow(_electricityBillService, selectedBill.Id);
-                if (editWindow.ShowDialog() == true)
+                if (dgElectricityBills.SelectedItem is ElectricityBillDto selectedBill)
                 {
-                    await LoadElectricityBills();
-                    await RefreshExpenseDashboard();
+                    var editWindow = new AddEditElectricityBillWindow(_electricityBillService, selectedBill.Id);
+                    if (editWindow.ShowDialog() == true)
+                    {
+                        await LoadElectricityBills();
+                        await RefreshExpenseDashboard();
+                    }
                 }
-            }
+            }, "Electricity Bill Double Click Error");
         }
 
         #endregion
@@ -460,126 +466,150 @@ namespace IEMS.WPF
             cmbCategoryFilter.SelectedIndex = 0;
         }
 
-        private async void CmbCategoryFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void CmbCategoryFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            try
+            AsyncHelper.SafeFireAndForget(async () =>
             {
-                if (cmbCategoryFilter.SelectedItem is string selectedCategory && selectedCategory != "All Categories")
+                try
                 {
-                    var category = Enum.Parse<OtherExpenseCategory>(selectedCategory.Replace(" ", "_"));
-                    var filteredExpenses = await _otherExpenseService.GetByCategoryAsync(category);
-
-                    _otherExpenses.Clear();
-                    foreach (var expense in filteredExpenses)
+                    if (cmbCategoryFilter.SelectedItem is string selectedCategory && selectedCategory != "All Categories")
                     {
-                        _otherExpenses.Add(expense);
+                        var category = Enum.Parse<OtherExpenseCategory>(selectedCategory.Replace(" ", "_"));
+                        var filteredExpenses = await _otherExpenseService.GetByCategoryAsync(category);
+
+                        _otherExpenses.Clear();
+                        foreach (var expense in filteredExpenses)
+                        {
+                            _otherExpenses.Add(expense);
+                        }
+                    }
+                    else
+                    {
+                        await LoadOtherExpenses();
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    await LoadOtherExpenses();
+                    MessageBox.Show($"Error filtering expenses: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error filtering expenses: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            }, "Category Filter Selection Error");
         }
 
-        private async void BtnClearFilter_Click(object sender, RoutedEventArgs e)
+        private void BtnClearFilter_Click(object sender, RoutedEventArgs e)
         {
-            cmbCategoryFilter.SelectedIndex = 0;
-            await LoadOtherExpenses();
+            AsyncHelper.SafeFireAndForget(async () =>
+            {
+                cmbCategoryFilter.SelectedIndex = 0;
+                await LoadOtherExpenses();
+            }, "Clear Filter Error");
         }
 
-        private async void BtnAddOtherExpense_Click(object sender, RoutedEventArgs e)
+        private void BtnAddOtherExpense_Click(object sender, RoutedEventArgs e)
         {
-            try
+            AsyncHelper.SafeFireAndForget(async () =>
             {
-                var addWindow = new AddEditOtherExpenseWindow(_otherExpenseService);
-                if (addWindow.ShowDialog() == true)
+                try
                 {
-                    await LoadOtherExpenses();
-                    await RefreshExpenseDashboard();
-                    lblStatus.Text = "Other expense added successfully";
+                    var addWindow = new AddEditOtherExpenseWindow(_otherExpenseService);
+                    if (addWindow.ShowDialog() == true)
+                    {
+                        await LoadOtherExpenses();
+                        await RefreshExpenseDashboard();
+                        lblStatus.Text = "Other expense added successfully";
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error opening add other expense window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error opening add other expense window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }, "Add Other Expense Error");
         }
 
-        private async void BtnEditOtherExpense_Click(object sender, RoutedEventArgs e)
+        private void BtnEditOtherExpense_Click(object sender, RoutedEventArgs e)
         {
-            try
+            AsyncHelper.SafeFireAndForget(async () =>
             {
-                if (sender is Button button && button.Tag is int expenseId)
+                try
                 {
-                    var editWindow = new AddEditOtherExpenseWindow(_otherExpenseService, expenseId);
+                    if (sender is Button button && button.Tag is int expenseId)
+                    {
+                        var editWindow = new AddEditOtherExpenseWindow(_otherExpenseService, expenseId);
+                        if (editWindow.ShowDialog() == true)
+                        {
+                            await LoadOtherExpenses();
+                            await RefreshExpenseDashboard();
+                            lblStatus.Text = "Other expense updated successfully";
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error opening edit other expense window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }, "Edit Other Expense Error");
+        }
+
+        private void BtnDeleteOtherExpense_Click(object sender, RoutedEventArgs e)
+        {
+            AsyncHelper.SafeFireAndForget(async () =>
+            {
+                try
+                {
+                    if (sender is Button button && button.Tag is int expenseId)
+                    {
+                        var result = MessageBox.Show("Are you sure you want to delete this expense?",
+                            "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            await _otherExpenseService.DeleteAsync(expenseId);
+                            await LoadOtherExpenses();
+                            await RefreshExpenseDashboard();
+                            lblStatus.Text = "Other expense deleted successfully";
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error deleting other expense: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }, "Delete Other Expense Error");
+        }
+
+        private void DgOtherExpenses_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            AsyncHelper.SafeFireAndForget(async () =>
+            {
+                if (dgOtherExpenses.SelectedItem is OtherExpenseDto selectedExpense)
+                {
+                    var editWindow = new AddEditOtherExpenseWindow(_otherExpenseService, selectedExpense.Id);
                     if (editWindow.ShowDialog() == true)
                     {
                         await LoadOtherExpenses();
                         await RefreshExpenseDashboard();
-                        lblStatus.Text = "Other expense updated successfully";
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error opening edit other expense window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private async void BtnDeleteOtherExpense_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                if (sender is Button button && button.Tag is int expenseId)
-                {
-                    var result = MessageBox.Show("Are you sure you want to delete this expense?",
-                        "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
-
-                    if (result == MessageBoxResult.Yes)
-                    {
-                        await _otherExpenseService.DeleteAsync(expenseId);
-                        await LoadOtherExpenses();
-                        await RefreshExpenseDashboard();
-                        lblStatus.Text = "Other expense deleted successfully";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error deleting other expense: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-
-        private async void DgOtherExpenses_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            if (dgOtherExpenses.SelectedItem is OtherExpenseDto selectedExpense)
-            {
-                var editWindow = new AddEditOtherExpenseWindow(_otherExpenseService, selectedExpense.Id);
-                if (editWindow.ShowDialog() == true)
-                {
-                    await LoadOtherExpenses();
-                    await RefreshExpenseDashboard();
-                }
-            }
+            }, "Other Expense Double Click Error");
         }
 
         #endregion
 
         #region Expense Analytics Tab
 
-        private async void ViewRadioButton_Checked(object sender, RoutedEventArgs e)
+        private void ViewRadioButton_Checked(object sender, RoutedEventArgs e)
         {
-            await RefreshExpenseDashboard();
+            AsyncHelper.SafeFireAndForget(async () =>
+            {
+                await RefreshExpenseDashboard();
+            }, "View Radio Button Error");
         }
 
-        private async void BtnRefreshDashboard_Click(object sender, RoutedEventArgs e)
+        private void BtnRefreshDashboard_Click(object sender, RoutedEventArgs e)
         {
-            await RefreshExpenseDashboard();
+            AsyncHelper.SafeFireAndForget(async () =>
+            {
+                await RefreshExpenseDashboard();
+            }, "Refresh Dashboard Error");
         }
 
         private async Task RefreshExpenseDashboard()

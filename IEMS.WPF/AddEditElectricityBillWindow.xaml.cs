@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using IEMS.Application.DTOs;
 using IEMS.Application.Services;
 using IEMS.Core.Enums;
+using IEMS.WPF.Helpers;
 
 namespace IEMS.WPF;
 
@@ -18,10 +19,10 @@ public partial class AddEditElectricityBillWindow : Window
         _electricityBillService = electricityBillService;
         _billId = billId;
 
-        InitializeWindow();
+        AsyncHelper.SafeFireAndForget(InitializeWindowAsync);
     }
 
-    private async void InitializeWindow()
+    private async Task InitializeWindowAsync()
     {
         try
         {
@@ -147,7 +148,12 @@ public partial class AddEditElectricityBillWindow : Window
         }
     }
 
-    private async void BtnSave_Click(object sender, RoutedEventArgs e)
+    private void BtnSave_Click(object sender, RoutedEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(SaveAsync);
+    }
+
+    private async Task SaveAsync()
     {
         try
         {

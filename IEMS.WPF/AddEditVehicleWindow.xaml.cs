@@ -3,6 +3,7 @@ using System.Windows;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
 using IEMS.Core.Enums;
+using IEMS.WPF.Helpers;
 
 namespace IEMS.WPF;
 
@@ -73,7 +74,12 @@ public partial class AddEditVehicleWindow : Window
         }
     }
 
-    private async void BtnSave_Click(object sender, RoutedEventArgs e)
+    private void BtnSave_Click(object sender, RoutedEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(SaveAsync);
+    }
+
+    private async Task SaveAsync()
     {
         if (!ValidateInput()) return;
 
