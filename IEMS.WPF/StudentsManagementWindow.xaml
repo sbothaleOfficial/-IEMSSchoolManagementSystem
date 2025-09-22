@@ -197,8 +197,6 @@
                                 Click="BtnDeleteStudent_Click" Style="{StaticResource DangerButtonStyle}"/>
                         <Button x:Name="btnRefreshStudents" Content="Refresh" Width="100" Height="35" Margin="0,0,10,0"
                                 Click="BtnRefreshStudents_Click" Style="{StaticResource SecondaryButtonStyle}"/>
-                        <Button x:Name="btnBulkPromotion" Content="Bulk Promotion" Width="130" Height="35" Margin="0,0,10,0"
-                                Click="BtnBulkPromotion_Click" Style="{StaticResource WarningButtonStyle}"/>
                         <Separator Width="20"/>
                         <TextBlock Text="Search:" VerticalAlignment="Center" Margin="10,0,5,0" Foreground="{StaticResource TextPrimaryBrush}"/>
                         <TextBox x:Name="txtSearchStudents" Width="200" Height="25" VerticalAlignment="Center"

@@ -1486,29 +1486,6 @@ public partial class StudentsManagementWindow : Window
         return result;
     }
 
-    private void BtnBulkPromotion_Click(object sender, RoutedEventArgs e)
-    {
-        try
-        {
-            // Show information about bulk promotion and direct user to main dashboard
-            var result = MessageBox.Show(
-                "Bulk Promotion allows you to promote multiple students from one class to another at once.\n\n" +
-                "This feature is available from the main dashboard to ensure proper access to all required services.\n\n" +
-                "Would you like to close this window and access it from the main dashboard?",
-                "Bulk Promotion Feature",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Information);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                Close();
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
 
     #region Bulk Promotion Methods
 

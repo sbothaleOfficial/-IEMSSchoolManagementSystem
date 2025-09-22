@@ -7,6 +7,7 @@ using IEMS.Core.Interfaces;
 using IEMS.Infrastructure.Repositories;
 using IEMS.Application.Services;
 using IEMS.Core.Services;
+using IEMS.Core.Configuration;
 
 namespace IEMS.WPF;
 
@@ -36,10 +37,31 @@ public partial class App : System.Windows.Application
                     services.AddScoped<IOtherExpenseRepository, OtherExpenseRepository>();
                     services.AddScoped<IAcademicYearRepository, AcademicYearRepository>();
 
+                    // Configuration
+                    var bulkPromotionConfig = new BulkPromotionConfiguration
+                    {
+                        EligibilityRules = new EligibilityRulesConfiguration
+                        {
+                            MaxPendingFees = 1000m,
+                            MinAttendancePercentage = 75,
+                            RequireTeacherApproval = false,
+                            AllowPromotionWithPendingFees = false
+                        },
+                        ClassProgression = new ClassProgressionConfiguration
+                        {
+                            AllowSameGradePromotion = true,
+                            AllowSkipGrade = false,
+                            StrictProgressionOnly = true
+                        }
+                    };
+                    services.AddSingleton(bulkPromotionConfig);
+
                     // Domain Services (will be used by FeePaymentService)
                     services.AddScoped<FeeCalculationService>();
                     services.AddScoped<AmountToWordsService>();
                     services.AddScoped<StudentPromotionService>();
+                    services.AddScoped<StudentEligibilityValidator>();
+                    services.AddScoped<ClassProgressionValidator>();
 
                     // Application Services
                     services.AddScoped<StudentService>();

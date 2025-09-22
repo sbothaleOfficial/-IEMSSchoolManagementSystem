@@ -2,6 +2,7 @@ using IEMS.Application.DTOs;
 using IEMS.Core.Interfaces;
 using IEMS.Core.Services;
 using IEMS.Core.Entities;
+using IEMS.Core.Configuration;
 
 namespace IEMS.Application.Services;
 
@@ -11,17 +12,23 @@ public class BulkPromotionService
     private readonly IClassRepository _classRepository;
     private readonly IFeePaymentRepository _feePaymentRepository;
     private readonly StudentPromotionService _promotionService;
+    private readonly StudentEligibilityValidator _eligibilityValidator;
+    private readonly ClassProgressionValidator _progressionValidator;
 
     public BulkPromotionService(
         IStudentRepository studentRepository,
         IClassRepository classRepository,
         IFeePaymentRepository feePaymentRepository,
-        StudentPromotionService promotionService)
+        StudentPromotionService promotionService,
+        StudentEligibilityValidator eligibilityValidator,
+        ClassProgressionValidator progressionValidator)
     {
         _studentRepository = studentRepository;
         _classRepository = classRepository;
         _feePaymentRepository = feePaymentRepository;
         _promotionService = promotionService;
+        _eligibilityValidator = eligibilityValidator;
+        _progressionValidator = progressionValidator;
     }
 
     public async Task<List<StudentPromotionDto>> GetPromotionPreviewAsync(int fromClassId, int toClassId)
@@ -36,6 +43,8 @@ public class BulkPromotionService
         {
             var pendingFees = await GetPendingFeesForStudent(student.Id);
 
+            var eligibilityResult = await _eligibilityValidator.ValidateStudentAsync(student, pendingFees);
+
             result.Add(new StudentPromotionDto
             {
                 StudentId = student.Id,
@@ -43,8 +52,8 @@ public class BulkPromotionService
                 StudentNumber = student.StudentNumber,
                 CurrentClass = fromClass?.Name ?? "Unknown",
                 TargetClass = toClass?.Name ?? "Unknown",
-                IsEligible = IsStudentEligibleForPromotion(student, pendingFees),
-                IneligibilityReason = GetIneligibilityReason(student, pendingFees),
+                IsEligible = eligibilityResult.IsEligible,
+                IneligibilityReason = eligibilityResult.Reason,
                 HasPendingFees = pendingFees > 0,
                 PendingAmount = pendingFees
             });
@@ -77,6 +86,19 @@ public class BulkPromotionService
                     StudentId = 0,
                     StudentName = "System",
                     Error = "Invalid source or target class"
+                });
+                return result;
+            }
+
+            // Validate class progression
+            var progressionValidation = _progressionValidator.ValidateProgression(fromClass.Name, toClass.Name);
+            if (!progressionValidation.IsValid)
+            {
+                result.Errors.Add(new PromotionError
+                {
+                    StudentId = 0,
+                    StudentName = "System",
+                    Error = $"Class progression validation failed: {progressionValidation.ErrorMessage}"
                 });
                 return result;
             }
@@ -214,27 +236,10 @@ public class BulkPromotionService
 
             return latestPayment?.RemainingBalance ?? 0;
         }
-        catch
+        catch (Exception ex)
         {
-            return 0; // Default to no pending fees if calculation fails
+            throw new InvalidOperationException($"Unable to calculate pending fees for student {studentId}: {ex.Message}", ex);
         }
     }
 
-    private bool IsStudentEligibleForPromotion(Student student, decimal pendingFees)
-    {
-        // Basic eligibility rules
-        if (pendingFees > 1000) // Arbitrary threshold
-            return false;
-
-        // Add other business rules as needed
-        return true;
-    }
-
-    private string GetIneligibilityReason(Student student, decimal pendingFees)
-    {
-        if (pendingFees > 1000)
-            return $"Pending fees: ₹{pendingFees:N2}";
-
-        return string.Empty;
-    }
 }

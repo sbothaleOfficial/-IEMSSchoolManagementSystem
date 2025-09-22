@@ -80,8 +80,18 @@ public class StudentRepository : IStudentRepository
         if (students == null || !students.Any())
             return;
 
-        _context.Students.UpdateRange(students);
-        await _context.SaveChangesAsync();
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        try
+        {
+            _context.Students.UpdateRange(students);
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
     public async Task<IEnumerable<Student>> GetStudentsWithPendingFeesAsync(int classId)
