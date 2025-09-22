@@ -1496,9 +1496,7 @@ public partial class StudentsManagementWindow : Window
             if (_bulkPromotionService == null || _academicYearRepository == null)
                 return;
 
-            // Load classes for promotion dropdowns
-            cmbPromotionFromClass.ItemsSource = _allClasses;
-            cmbPromotionToClass.ItemsSource = _allClasses;
+            // Text inputs are ready - no need to load dropdown data
 
             // Load academic years
             var academicYears = await _academicYearRepository.GetRecentAcademicYearsAsync();
@@ -1511,29 +1509,54 @@ public partial class StudentsManagementWindow : Window
         }
     }
 
-    private void CmbPromotionFromClass_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private int GetClassIdByName(string className)
+    {
+        // Simple mapping of class names to IDs
+        var classMap = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+        {
+            {"Nursery", 1}, {"KG1", 2}, {"KG2", 3},
+            {"Class 1", 4}, {"Class 2", 5}, {"Class 3", 6}, {"Class 4", 7}, {"Class 5", 8},
+            {"Class 6", 9}, {"Class 7", 10}, {"Class 8", 11}, {"Class 9", 12}, {"Class 10", 13}
+        };
+
+        return classMap.TryGetValue(className, out var id) ? id : -1;
+    }
+
+    private void TxtPromotionFromClass_TextChanged(object sender, TextChangedEventArgs e)
     {
         ValidatePromotionInputs();
     }
 
-    private void CmbPromotionToClass_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void TxtPromotionToClass_TextChanged(object sender, TextChangedEventArgs e)
     {
         ValidatePromotionInputs();
     }
 
     private void ValidatePromotionInputs()
     {
-        var hasValidSelection = cmbPromotionFromClass.SelectedItem != null &&
-                              cmbPromotionToClass.SelectedItem != null &&
-                              cmbPromotionAcademicYear.SelectedItem != null &&
-                              !cmbPromotionFromClass.SelectedItem.Equals(cmbPromotionToClass.SelectedItem);
+        var fromClass = txtPromotionFromClass?.Text?.Trim();
+        var toClass = txtPromotionToClass?.Text?.Trim();
 
-        btnLoadPromotionPreview.IsEnabled = hasValidSelection;
+        var hasValidInput = !string.IsNullOrWhiteSpace(fromClass) &&
+                           !string.IsNullOrWhiteSpace(toClass) &&
+                           cmbPromotionAcademicYear?.SelectedItem != null &&
+                           !fromClass.Equals(toClass, StringComparison.OrdinalIgnoreCase);
+
+        btnLoadPromotionPreview.IsEnabled = hasValidInput;
         btnExecutePromotion.IsEnabled = false;
 
-        if (cmbPromotionFromClass.SelectedItem != null && cmbPromotionFromClass.SelectedItem.Equals(cmbPromotionToClass.SelectedItem))
+        if (!string.IsNullOrWhiteSpace(fromClass) && !string.IsNullOrWhiteSpace(toClass) &&
+            fromClass.Equals(toClass, StringComparison.OrdinalIgnoreCase))
         {
             lblStatus.Text = "Source and target classes must be different";
+        }
+        else if (hasValidInput)
+        {
+            lblStatus.Text = "Ready to load promotion preview";
+        }
+        else
+        {
+            lblStatus.Text = "Please enter source class, target class, and select academic year";
         }
     }
 
@@ -1552,16 +1575,25 @@ public partial class StudentsManagementWindow : Window
                 return;
             }
 
-            if (cmbPromotionFromClass.SelectedValue == null || cmbPromotionToClass.SelectedValue == null)
+            var fromClassName = txtPromotionFromClass?.Text?.Trim();
+            var toClassName = txtPromotionToClass?.Text?.Trim();
+
+            if (string.IsNullOrWhiteSpace(fromClassName) || string.IsNullOrWhiteSpace(toClassName))
             {
-                MessageBox.Show("Please select both source and target classes.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("Please enter both source and target class names.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             lblStatus.Text = "Loading promotion preview...";
 
-            var fromClassId = (int)cmbPromotionFromClass.SelectedValue;
-            var toClassId = (int)cmbPromotionToClass.SelectedValue;
+            var fromClassId = GetClassIdByName(fromClassName);
+            var toClassId = GetClassIdByName(toClassName);
+
+            if (fromClassId == -1 || toClassId == -1)
+            {
+                MessageBox.Show($"Invalid class name(s). Please use: Nursery, KG1, KG2, Class 1, Class 2, etc.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
 
             var preview = await _bulkPromotionService.GetPromotionPreviewAsync(fromClassId, toClassId);
 
@@ -1649,8 +1681,8 @@ public partial class StudentsManagementWindow : Window
 
             var request = new BulkPromotionRequest
             {
-                FromClassId = (int)cmbPromotionFromClass.SelectedValue,
-                ToClassId = (int)cmbPromotionToClass.SelectedValue,
+                FromClassId = GetClassIdByName(txtPromotionFromClass.Text.Trim()),
+                ToClassId = GetClassIdByName(txtPromotionToClass.Text.Trim()),
                 AcademicYear = ((dynamic)cmbPromotionAcademicYear.SelectedItem).Year,
                 ExcludedStudentIds = _promotionPreview.Where(p => p.IsExcluded).Select(p => p.StudentId).ToList(),
                 Reason = "Annual Promotion"
