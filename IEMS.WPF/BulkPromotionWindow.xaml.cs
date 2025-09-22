@@ -65,7 +65,7 @@ namespace IEMS.WPF
                     new ClassDto { Id = -1, Name = "-- Select Class --" }
                 };
 
-                // Define the required class order
+                // Define the required class order for promotion
                 var requiredClasses = new[]
                 {
                     "Nursery", "KG1", "KG2", "Class 1", "Class 2", "Class 3",
@@ -73,22 +73,32 @@ namespace IEMS.WPF
                     "Class 9", "Class 10"
                 };
 
-                // Add classes in the correct order, removing duplicates
+                // Get unique class names from database (ignore sections)
+                var uniqueClassNames = databaseClasses
+                    .Select(c => c.Name.Trim())
+                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                // Add classes in the correct order only if they exist in database
                 foreach (var requiredClass in requiredClasses)
                 {
-                    var dbClass = databaseClasses.FirstOrDefault(c => c.Name.Equals(requiredClass, StringComparison.OrdinalIgnoreCase));
-                    if (dbClass != null)
+                    if (uniqueClassNames.Contains(requiredClass))
                     {
-                        orderedClasses.Add(dbClass);
-                    }
-                    else
-                    {
-                        // Create a placeholder if class doesn't exist in database
-                        orderedClasses.Add(new ClassDto
+                        // Find the first database class with this name (pick any section)
+                        var dbClass = databaseClasses.FirstOrDefault(c =>
+                            c.Name.Equals(requiredClass, StringComparison.OrdinalIgnoreCase));
+
+                        if (dbClass != null)
                         {
-                            Id = orderedClasses.Count,
-                            Name = requiredClass
-                        });
+                            // Create a standardized entry for the dropdown
+                            orderedClasses.Add(new ClassDto
+                            {
+                                Id = dbClass.Id, // Use actual database ID
+                                Name = requiredClass, // Use standardized name
+                                Section = dbClass.Section, // Preserve section info if needed
+                                TeacherId = dbClass.TeacherId
+                            });
+                        }
                     }
                 }
 
