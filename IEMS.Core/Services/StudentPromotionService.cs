@@ -52,11 +52,8 @@ public class StudentPromotionService
             result.ValidationErrors.Add("No students found in the source class");
         }
 
-        // Validate class progression logic
-        if (!IsValidClassProgression(request.FromClass?.Name, request.ToClass?.Name))
-        {
-            result.ValidationErrors.Add($"Invalid class progression from {request.FromClass?.Name} to {request.ToClass?.Name}");
-        }
+        // Class progression is validated in ClassProgressionValidator service
+        // No need to duplicate validation here
 
         // Filter eligible students
         foreach (var student in request.Students)
@@ -100,35 +97,6 @@ public class StudentPromotionService
         }
     }
 
-    private bool IsValidClassProgression(string? fromClass, string? toClass)
-    {
-        if (string.IsNullOrEmpty(fromClass) || string.IsNullOrEmpty(toClass))
-            return false;
-
-        // Extract numeric part from class names (assuming format like "5th", "6th", etc.)
-        var fromGrade = ExtractGradeNumber(fromClass);
-        var toGrade = ExtractGradeNumber(toClass);
-
-        if (fromGrade.HasValue && toGrade.HasValue)
-        {
-            // Allow promotion to next grade or same grade (for different sections)
-            return toGrade.Value >= fromGrade.Value && toGrade.Value <= fromGrade.Value + 1;
-        }
-
-        // If we can't parse grades, allow the promotion (manual review required)
-        return true;
-    }
-
-    private int? ExtractGradeNumber(string className)
-    {
-        // Try to extract number from class name
-        var digits = new string(className.Where(char.IsDigit).ToArray());
-        if (int.TryParse(digits, out int grade))
-        {
-            return grade;
-        }
-        return null;
-    }
 
     private bool IsStudentEligibleForPromotion(Student student)
     {

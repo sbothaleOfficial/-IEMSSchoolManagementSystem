@@ -1496,26 +1496,40 @@ public partial class StudentsManagementWindow : Window
             if (_bulkPromotionService == null || _academicYearRepository == null)
                 return;
 
-            // Load predefined classes for promotion dropdowns
-            var predefinedClasses = new List<object>
+            // Load actual classes from database for promotion dropdowns
+            if (_allClasses != null && _allClasses.Any())
             {
-                new { Id = 1, Name = "Nursery" },
-                new { Id = 2, Name = "KG1" },
-                new { Id = 3, Name = "KG2" },
-                new { Id = 4, Name = "Class 1" },
-                new { Id = 5, Name = "Class 2" },
-                new { Id = 6, Name = "Class 3" },
-                new { Id = 7, Name = "Class 4" },
-                new { Id = 8, Name = "Class 5" },
-                new { Id = 9, Name = "Class 6" },
-                new { Id = 10, Name = "Class 7" },
-                new { Id = 11, Name = "Class 8" },
-                new { Id = 12, Name = "Class 9" },
-                new { Id = 13, Name = "Class 10" }
-            };
+                var classesForPromotion = _allClasses
+                    .Select(c => new { Id = c.Id, Name = c.Name })
+                    .OrderBy(c => GetClassOrder(c.Name))
+                    .ToList();
 
-            cmbPromotionFromClass.ItemsSource = predefinedClasses;
-            cmbPromotionToClass.ItemsSource = predefinedClasses;
+                cmbPromotionFromClass.ItemsSource = classesForPromotion;
+                cmbPromotionToClass.ItemsSource = classesForPromotion;
+            }
+            else
+            {
+                // Fallback to predefined if no classes loaded yet
+                var predefinedClasses = new List<object>
+                {
+                    new { Id = 1, Name = "Nursery" },
+                    new { Id = 2, Name = "KG1" },
+                    new { Id = 3, Name = "KG2" },
+                    new { Id = 4, Name = "Class 1" },
+                    new { Id = 5, Name = "Class 2" },
+                    new { Id = 6, Name = "Class 3" },
+                    new { Id = 7, Name = "Class 4" },
+                    new { Id = 8, Name = "Class 5" },
+                    new { Id = 9, Name = "Class 6" },
+                    new { Id = 10, Name = "Class 7" },
+                    new { Id = 11, Name = "Class 8" },
+                    new { Id = 12, Name = "Class 9" },
+                    new { Id = 13, Name = "Class 10" }
+                };
+
+                cmbPromotionFromClass.ItemsSource = predefinedClasses;
+                cmbPromotionToClass.ItemsSource = predefinedClasses;
+            }
 
             // Load academic years
             var academicYears = await _academicYearRepository.GetRecentAcademicYearsAsync();
@@ -1526,6 +1540,21 @@ public partial class StudentsManagementWindow : Window
         {
             lblStatus.Text = $"Error loading promotion data: {ex.Message}";
         }
+    }
+
+    private int GetClassOrder(string className)
+    {
+        // Define order for sorting classes logically
+        var classOrder = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase)
+        {
+            {"Nursery", 0}, {"KG1", 1}, {"KG2", 2},
+            {"Class 1", 3}, {"Class 2", 4}, {"Class 3", 5},
+            {"Class 4", 6}, {"Class 5", 7}, {"Class 6", 8},
+            {"Class 7", 9}, {"Class 8", 10}, {"Class 9", 11},
+            {"Class 10", 12}
+        };
+
+        return classOrder.TryGetValue(className, out var order) ? order : 99;
     }
 
     private int GetClassIdByName(string className)
