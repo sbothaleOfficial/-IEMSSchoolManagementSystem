@@ -38,15 +38,15 @@ public partial class StudentsManagementWindow : Window
         _feeStructureService = feeStructureService;
         _bulkPromotionService = bulkPromotionService;
         _academicYearRepository = academicYearRepository;
-        LoadStudents();
-        LoadClasses();
-        LoadFeePayments();
-        LoadBonafideStudents();
-        LoadDashboardData();
-        LoadPromotionData();
+        AsyncHelper.SafeFireAndForget(LoadStudentsAsync);
+        AsyncHelper.SafeFireAndForget(LoadClassesAsync);
+        AsyncHelper.SafeFireAndForget(LoadFeePaymentsAsync);
+        AsyncHelper.SafeFireAndForget(LoadBonafideStudentsAsync);
+        AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync);
+        AsyncHelper.SafeFireAndForget(LoadPromotionDataAsync);
     }
 
-    private async void LoadStudents()
+    private async Task LoadStudentsAsync()
     {
         try
         {
@@ -65,10 +65,10 @@ public partial class StudentsManagementWindow : Window
             toastNotification.Show();
 
             // Refresh dashboard after loading students
-            LoadDashboardData();
+            await LoadDashboardDataAsync();
 
             // Load leaving certificate students dropdown after students data is loaded
-            LoadLeavingCertificateStudents();
+            await LoadLeavingCertificateStudentsAsync();
         }
         catch (Exception ex)
         {
@@ -84,7 +84,7 @@ public partial class StudentsManagementWindow : Window
         }
     }
 
-    private async void LoadClasses()
+    private async Task LoadClassesAsync()
     {
         try
         {
@@ -95,7 +95,7 @@ public partial class StudentsManagementWindow : Window
             lblStatus.Text = $"Loaded {classes.Count()} classes";
 
             // Refresh dashboard after loading classes
-            LoadDashboardData();
+            await LoadDashboardDataAsync();
         }
         catch (Exception ex)
         {
@@ -111,11 +111,11 @@ public partial class StudentsManagementWindow : Window
         if (addWindow.ShowDialog() == true)
         {
             var currentSearch = txtSearchStudents.Text;
-            LoadStudents();
-            LoadClasses(); // Refresh to update student counts in classes
+            AsyncHelper.SafeFireAndForget(LoadStudentsAsync);
+            AsyncHelper.SafeFireAndForget(LoadClassesAsync); // Refresh to update student counts in classes
             txtSearchStudents.Text = currentSearch; // Restore search after refresh
             FilterStudents();
-            LoadDashboardData(); // Refresh dashboard
+            AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync); // Refresh dashboard
         }
     }
 
@@ -127,11 +127,11 @@ public partial class StudentsManagementWindow : Window
             if (editWindow.ShowDialog() == true)
             {
                 var currentSearch = txtSearchStudents.Text;
-                LoadStudents();
-                LoadClasses(); // Refresh to update student counts in classes
+                AsyncHelper.SafeFireAndForget(LoadStudentsAsync);
+                AsyncHelper.SafeFireAndForget(LoadClassesAsync); // Refresh to update student counts in classes
                 txtSearchStudents.Text = currentSearch; // Restore search after refresh
                 FilterStudents();
-                LoadDashboardData(); // Refresh dashboard
+                AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync); // Refresh dashboard
             }
         }
         else
@@ -158,15 +158,15 @@ public partial class StudentsManagementWindow : Window
 
                         await _studentService.DeleteStudentAsync(selectedStudent.Id);
                         var currentSearch = txtSearchStudents.Text;
-                        LoadStudents();
-                        LoadClasses(); // Refresh to update student counts in classes
+                        AsyncHelper.SafeFireAndForget(LoadStudentsAsync);
+                        AsyncHelper.SafeFireAndForget(LoadClassesAsync); // Refresh to update student counts in classes
                         txtSearchStudents.Text = currentSearch; // Restore search after refresh
 
                         toastNotification.Message = $"Student {selectedStudent.FullName} deleted successfully";
                         toastNotification.ToastType = ToastType.Success;
                         toastNotification.Show();
                         FilterStudents();
-                        LoadDashboardData(); // Refresh dashboard
+                        AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync); // Refresh dashboard
                         lblStatus.Text = "Student deleted successfully";
                     }
                     catch (Exception ex)
@@ -191,9 +191,9 @@ public partial class StudentsManagementWindow : Window
 
     private void BtnRefreshStudents_Click(object sender, RoutedEventArgs e)
     {
-        LoadStudents();
+        AsyncHelper.SafeFireAndForget(LoadStudentsAsync);
         txtSearchStudents.Text = ""; // Clear search when refreshing
-        LoadDashboardData(); // Refresh dashboard
+        AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync); // Refresh dashboard
     }
 
     // Class Management Events
@@ -202,8 +202,8 @@ public partial class StudentsManagementWindow : Window
         var addWindow = new AddEditClassWindow(_classService, _teacherService);
         if (addWindow.ShowDialog() == true)
         {
-            LoadClasses();
-            LoadDashboardData(); // Refresh dashboard
+            AsyncHelper.SafeFireAndForget(LoadClassesAsync);
+            AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync); // Refresh dashboard
         }
     }
 
@@ -214,8 +214,8 @@ public partial class StudentsManagementWindow : Window
             var editWindow = new AddEditClassWindow(_classService, _teacherService, selectedClass);
             if (editWindow.ShowDialog() == true)
             {
-                LoadClasses();
-                LoadDashboardData(); // Refresh dashboard
+                AsyncHelper.SafeFireAndForget(LoadClassesAsync);
+                AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync); // Refresh dashboard
             }
         }
         else
@@ -224,65 +224,71 @@ public partial class StudentsManagementWindow : Window
         }
     }
 
-    private async void BtnDeleteClass_Click(object sender, RoutedEventArgs e)
+    private void BtnDeleteClass_Click(object sender, RoutedEventArgs e)
     {
-        if (dgClasses.SelectedItem is ClassDto selectedClass)
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            var result = MessageBox.Show($"Are you sure you want to delete class {selectedClass.DisplayName}?",
-                                       "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
+            if (dgClasses.SelectedItem is ClassDto selectedClass)
             {
-                try
+                var result = MessageBox.Show($"Are you sure you want to delete class {selectedClass.DisplayName}?",
+                                           "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
                 {
-                    await _classService.DeleteClassAsync(selectedClass.Id);
-                    LoadClasses();
-                    LoadDashboardData(); // Refresh dashboard
-                    lblStatus.Text = "Class deleted successfully";
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error deleting class: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    try
+                    {
+                        await _classService.DeleteClassAsync(selectedClass.Id);
+                        await LoadClassesAsync();
+                        await LoadDashboardDataAsync(); // Refresh dashboard
+                        lblStatus.Text = "Class deleted successfully";
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show($"Error deleting class: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
                 }
             }
-        }
-        else
-        {
-            MessageBox.Show("Please select a class to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
+            else
+            {
+                MessageBox.Show("Please select a class to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        });
     }
 
     private void BtnRefreshClasses_Click(object sender, RoutedEventArgs e)
     {
-        LoadClasses();
-        LoadDashboardData(); // Refresh dashboard
+        AsyncHelper.SafeFireAndForget(LoadClassesAsync);
+        AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync); // Refresh dashboard
     }
 
-    private async void BtnViewClassStudents_Click(object sender, RoutedEventArgs e)
+    private void BtnViewClassStudents_Click(object sender, RoutedEventArgs e)
     {
-        if (dgClasses.SelectedItem is ClassDto selectedClass)
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            try
+            if (dgClasses.SelectedItem is ClassDto selectedClass)
             {
-                var students = await _studentService.GetAllStudentsAsync();
-                var classStudents = students.Where(s => s.ClassId == selectedClass.Id).ToList();
+                try
+                {
+                    var students = await _studentService.GetAllStudentsAsync();
+                    var classStudents = students.Where(s => s.ClassId == selectedClass.Id).ToList();
 
-                var message = classStudents.Any()
-                    ? $"Students in {selectedClass.DisplayName}:\n\n" +
-                      string.Join("\n", classStudents.Select(s => $"• {s.StudentNumber} - {s.FullName}"))
-                    : $"No students enrolled in {selectedClass.DisplayName}";
+                    var message = classStudents.Any()
+                        ? $"Students in {selectedClass.DisplayName}:\n\n" +
+                          string.Join("\n", classStudents.Select(s => $"• {s.StudentNumber} - {s.FullName}"))
+                        : $"No students enrolled in {selectedClass.DisplayName}";
 
-                MessageBox.Show(message, $"Students in {selectedClass.DisplayName}", MessageBoxButton.OK, MessageBoxImage.Information);
+                    MessageBox.Show(message, $"Students in {selectedClass.DisplayName}", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error loading students: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Error loading students: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show("Please select a class to view students.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-        }
-        else
-        {
-            MessageBox.Show("Please select a class to view students.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
+        });
     }
 
     // Search Functionality
@@ -326,7 +332,7 @@ public partial class StudentsManagementWindow : Window
     }
 
     // Fee Payment Management
-    private async void LoadFeePayments()
+    private async Task LoadFeePaymentsAsync()
     {
         try
         {
@@ -368,7 +374,7 @@ public partial class StudentsManagementWindow : Window
             var addFeePaymentWindow = new AddEditFeePaymentWindow(_feePaymentService, _feeStructureService, _studentService);
             if (addFeePaymentWindow.ShowDialog() == true)
             {
-                LoadFeePayments(); // Refresh fee payments list
+                AsyncHelper.SafeFireAndForget(LoadFeePaymentsAsync); // Refresh fee payments list
                 lblStatus.Text = "Fee payment recorded successfully";
             }
         }
@@ -378,62 +384,68 @@ public partial class StudentsManagementWindow : Window
         }
     }
 
-    private async void BtnViewReceipt_Click(object sender, RoutedEventArgs e)
+    private void BtnViewReceipt_Click(object sender, RoutedEventArgs e)
     {
-        if (dgFeePayments.SelectedItem is FeePaymentDto selectedPayment)
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            try
+            if (dgFeePayments.SelectedItem is FeePaymentDto selectedPayment)
             {
-                lblStatus.Text = "Generating receipt...";
-                var receipt = await _feePaymentService.GenerateReceiptAsync(selectedPayment.Id);
-                var receiptWindow = new FeeReceiptWindow(receipt, _feePaymentService);
-                receiptWindow.ShowDialog();
-                lblStatus.Text = "Receipt displayed";
+                try
+                {
+                    lblStatus.Text = "Generating receipt...";
+                    var receipt = await _feePaymentService.GenerateReceiptAsync(selectedPayment.Id);
+                    var receiptWindow = new FeeReceiptWindow(receipt, _feePaymentService);
+                    receiptWindow.ShowDialog();
+                    lblStatus.Text = "Receipt displayed";
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error generating receipt: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    lblStatus.Text = "Error generating receipt";
+                }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Error generating receipt: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                lblStatus.Text = "Error generating receipt";
+                MessageBox.Show("Please select a fee payment to view receipt.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-        }
-        else
-        {
-            MessageBox.Show("Please select a fee payment to view receipt.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
+        });
     }
 
-    private async void BtnPrintReceipt_Click(object sender, RoutedEventArgs e)
+    private void BtnPrintReceipt_Click(object sender, RoutedEventArgs e)
     {
-        if (dgFeePayments.SelectedItem is FeePaymentDto selectedPayment)
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            try
+            if (dgFeePayments.SelectedItem is FeePaymentDto selectedPayment)
             {
-                lblStatus.Text = "Preparing receipt for printing...";
-                var receipt = await _feePaymentService.GenerateReceiptAsync(selectedPayment.Id);
-                var receiptWindow = new FeeReceiptWindow(receipt, _feePaymentService);
-                receiptWindow.Show();
+                try
+                {
+                    lblStatus.Text = "Preparing receipt for printing...";
+                    var receipt = await _feePaymentService.GenerateReceiptAsync(selectedPayment.Id);
+                    var receiptWindow = new FeeReceiptWindow(receipt, _feePaymentService);
+                    receiptWindow.Show();
 
-                // Automatically trigger print dialog
-                var printButton = receiptWindow.FindName("btnPrint") as System.Windows.Controls.Button;
-                printButton?.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
+                    // Automatically trigger print dialog
+                    var printButton = receiptWindow.FindName("btnPrint") as System.Windows.Controls.Button;
+                    printButton?.RaiseEvent(new RoutedEventArgs(System.Windows.Controls.Primitives.ButtonBase.ClickEvent));
 
-                lblStatus.Text = "Receipt ready for printing";
+                    lblStatus.Text = "Receipt ready for printing";
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error printing receipt: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    lblStatus.Text = "Error printing receipt";
+                }
             }
-            catch (Exception ex)
+            else
             {
-                MessageBox.Show($"Error printing receipt: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                lblStatus.Text = "Error printing receipt";
+                MessageBox.Show("Please select a fee payment to print receipt.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
             }
-        }
-        else
-        {
-            MessageBox.Show("Please select a fee payment to print receipt.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
-        }
+        });
     }
 
     private void BtnRefreshFeePayments_Click(object sender, RoutedEventArgs e)
     {
-        LoadFeePayments();
+        AsyncHelper.SafeFireAndForget(LoadFeePaymentsAsync);
         txtSearchFeePayments.Text = ""; // Clear search when refreshing
     }
 
@@ -472,47 +484,50 @@ public partial class StudentsManagementWindow : Window
     }
 
     // Bonafide Certificate Event Handlers
-    private async void BtnGenerateBonafide_Click(object sender, RoutedEventArgs e)
+    private void BtnGenerateBonafide_Click(object sender, RoutedEventArgs e)
     {
-        try
+        AsyncHelper.SafeFireAndForget(async () =>
         {
-            if (dgBonafideStudents.SelectedItem is StudentDto selectedStudentDto)
+            try
             {
-                // Get the full student entity from the service
-                var student = await _studentService.GetStudentEntityByIdAsync(selectedStudentDto.Id);
-                if (student != null)
+                if (dgBonafideStudents.SelectedItem is StudentDto selectedStudentDto)
                 {
-                    var bonafideWindow = new BonafideCertificateWindow(student);
-                    bonafideWindow.ShowDialog();
+                    // Get the full student entity from the service
+                    var student = await _studentService.GetStudentEntityByIdAsync(selectedStudentDto.Id);
+                    if (student != null)
+                    {
+                        var bonafideWindow = new BonafideCertificateWindow(student);
+                        bonafideWindow.ShowDialog();
+                    }
+                    else
+                    {
+                        toastNotification.Message = "Student not found!";
+                        toastNotification.ToastType = ToastType.Error;
+                        toastNotification.Show();
+                    }
                 }
                 else
                 {
-                    toastNotification.Message = "Student not found!";
-                    toastNotification.ToastType = ToastType.Error;
+                    toastNotification.Message = "Please select a student to generate Bonafide certificate.";
+                    toastNotification.ToastType = ToastType.Warning;
                     toastNotification.Show();
                 }
             }
-            else
+            catch (Exception ex)
             {
-                toastNotification.Message = "Please select a student to generate Bonafide certificate.";
-                toastNotification.ToastType = ToastType.Warning;
+                toastNotification.Message = $"Error generating certificate: {ex.Message}";
+                toastNotification.ToastType = ToastType.Error;
                 toastNotification.Show();
             }
-        }
-        catch (Exception ex)
-        {
-            toastNotification.Message = $"Error generating certificate: {ex.Message}";
-            toastNotification.ToastType = ToastType.Error;
-            toastNotification.Show();
-        }
+        });
     }
 
     private void BtnRefreshBonafide_Click(object sender, RoutedEventArgs e)
     {
-        LoadBonafideStudents();
+        AsyncHelper.SafeFireAndForget(LoadBonafideStudentsAsync);
     }
 
-    private void LoadBonafideStudents()
+    private async Task LoadBonafideStudentsAsync()
     {
         try
         {
@@ -565,7 +580,7 @@ public partial class StudentsManagementWindow : Window
     }
 
     // Dashboard Data Loading and Statistics Methods
-    private async void LoadDashboardData()
+    private async Task LoadDashboardDataAsync()
     {
         if (_allStudents == null || !_allStudents.Any() || _allClasses == null || !_allClasses.Any())
             return;
@@ -690,7 +705,7 @@ public partial class StudentsManagementWindow : Window
     }
 
     // Leaving Certificate Event Handlers
-    private void LoadLeavingCertificateStudents()
+    private async Task LoadLeavingCertificateStudentsAsync()
     {
         try
         {
@@ -1497,7 +1512,7 @@ public partial class StudentsManagementWindow : Window
 
     #region Bulk Promotion Methods
 
-    private async void LoadPromotionData()
+    private async Task LoadPromotionDataAsync()
     {
         try
         {
@@ -1545,7 +1560,12 @@ public partial class StudentsManagementWindow : Window
         }
     }
 
-    private async void BtnLoadPromotionPreview_Click(object sender, RoutedEventArgs e)
+    private void BtnLoadPromotionPreview_Click(object sender, RoutedEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(BtnLoadPromotionPreview_ClickAsync);
+    }
+
+    private async Task BtnLoadPromotionPreview_ClickAsync()
     {
         try
         {
@@ -1623,7 +1643,12 @@ public partial class StudentsManagementWindow : Window
         txtPromotionExcludedStudents.Text = excluded.ToString();
     }
 
-    private async void BtnExecutePromotion_Click(object sender, RoutedEventArgs e)
+    private void BtnExecutePromotion_Click(object sender, RoutedEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(BtnExecutePromotion_ClickAsync);
+    }
+
+    private async Task BtnExecutePromotion_ClickAsync()
     {
         try
         {
@@ -1664,7 +1689,7 @@ public partial class StudentsManagementWindow : Window
                 : $"Promotion completed with {promotionResult.FailedPromotions} errors";
 
             // Refresh students list
-            LoadStudents();
+            AsyncHelper.SafeFireAndForget(LoadStudentsAsync);
         }
         catch (Exception ex)
         {

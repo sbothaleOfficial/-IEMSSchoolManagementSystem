@@ -349,29 +349,34 @@ namespace IEMS.WPF
             }
         }
 
-        private async void BtnAddElectricityBill_Click(object sender, RoutedEventArgs e)
+        private void BtnAddElectricityBill_Click(object sender, RoutedEventArgs e)
         {
-            try
+            AsyncHelper.SafeFireAndForget(async () =>
             {
-                var addWindow = new AddEditElectricityBillWindow(_electricityBillService);
-                if (addWindow.ShowDialog() == true)
+                try
                 {
-                    await LoadElectricityBills();
-                    await RefreshExpenseDashboard();
-                    lblStatus.Text = "Electricity bill added successfully";
+                    var addWindow = new AddEditElectricityBillWindow(_electricityBillService);
+                    if (addWindow.ShowDialog() == true)
+                    {
+                        await LoadElectricityBills();
+                        await RefreshExpenseDashboard();
+                        lblStatus.Text = "Electricity bill added successfully";
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error opening add electricity bill window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error opening add electricity bill window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            });
         }
 
-        private async void BtnEditElectricityBill_Click(object sender, RoutedEventArgs e)
+        private void BtnEditElectricityBill_Click(object sender, RoutedEventArgs e)
         {
-            try
+            AsyncHelper.SafeFireAndForget(async () =>
             {
-                if (sender is Button button && button.Tag is int billId)
+                try
+                {
+                    if (sender is Button button && button.Tag is int billId)
                 {
                     var editWindow = new AddEditElectricityBillWindow(_electricityBillService, billId);
                     if (editWindow.ShowDialog() == true)
@@ -381,11 +386,12 @@ namespace IEMS.WPF
                         lblStatus.Text = "Electricity bill updated successfully";
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error opening edit electricity bill window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error opening edit electricity bill window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            });
         }
 
         private async void BtnDeleteElectricityBill_Click(object sender, RoutedEventArgs e)
