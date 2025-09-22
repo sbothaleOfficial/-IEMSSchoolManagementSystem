@@ -988,14 +988,12 @@
 
                             <StackPanel Grid.Column="0" Margin="0,0,10,0">
                                 <TextBlock Text="From Class" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                                <TextBox x:Name="txtPromotionFromClass" Height="35" TextChanged="TxtPromotionFromClass_TextChanged"
-                                         ToolTip="Enter class name (e.g., Nursery, KG1, KG2, Class 1, Class 2, etc.)"/>
+                                <ComboBox x:Name="cmbPromotionFromClass" Height="35" DisplayMemberPath="Name" SelectedValuePath="Id" SelectionChanged="CmbPromotionFromClass_SelectionChanged"/>
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Margin="10,0">
                                 <TextBlock Text="To Class" FontWeight="SemiBold" Margin="0,0,0,5"/>
-                                <TextBox x:Name="txtPromotionToClass" Height="35" TextChanged="TxtPromotionToClass_TextChanged"
-                                         ToolTip="Enter class name (e.g., Nursery, KG1, KG2, Class 1, Class 2, etc.)"/>
+                                <ComboBox x:Name="cmbPromotionToClass" Height="35" DisplayMemberPath="Name" SelectedValuePath="Id" SelectionChanged="CmbPromotionToClass_SelectionChanged"/>
                             </StackPanel>
 
                             <StackPanel Grid.Column="2" Margin="10,0,0,0">
