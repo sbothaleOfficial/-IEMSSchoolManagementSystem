@@ -46,239 +46,21 @@ namespace IEMS.WPF
 
         private void LoadInitialData()
         {
-            Console.WriteLine("=== LoadInitialData() CALLED - FORCE OVERRIDE ===");
+            Console.WriteLine("=== CLEAN REIMPLEMENTATION - LoadInitialData() ===");
 
-            // FORCE OVERRIDE: Completely bypass all existing logic and directly populate ComboBoxes
-            try
-            {
-                Console.WriteLine("=== FORCING PREDEFINED CLASSES OVERRIDE ===");
+            // Clean reimplement: Simple, direct class dropdown setup
+            SetupClassDropdowns();
 
-                var predefinedClasses = new List<ClassDto>
-                {
-                    new ClassDto { Id = -1, Name = "-- Select Class --" },
-                    new ClassDto { Id = 1, Name = "Nursery" },
-                    new ClassDto { Id = 2, Name = "KG1" },
-                    new ClassDto { Id = 3, Name = "KG2" },
-                    new ClassDto { Id = 4, Name = "Class 1" },
-                    new ClassDto { Id = 5, Name = "Class 2" },
-                    new ClassDto { Id = 6, Name = "Class 3" },
-                    new ClassDto { Id = 7, Name = "Class 4" },
-                    new ClassDto { Id = 8, Name = "Class 5" },
-                    new ClassDto { Id = 9, Name = "Class 6" },
-                    new ClassDto { Id = 10, Name = "Class 7" },
-                    new ClassDto { Id = 11, Name = "Class 8" },
-                    new ClassDto { Id = 12, Name = "Class 9" },
-                    new ClassDto { Id = 13, Name = "Class 10" }
-                };
-
-                Console.WriteLine($"=== FORCE OVERRIDE: Created {predefinedClasses.Count} classes ===");
-
-                // Force clear and repopulate ComboBoxes
-                cmbFromClass.ItemsSource = null;
-                cmbToClass.ItemsSource = null;
-                cmbFromClass.Items.Clear();
-                cmbToClass.Items.Clear();
-
-                // Set ItemsSource to our predefined list
-                cmbFromClass.ItemsSource = predefinedClasses.ToList();
-                cmbToClass.ItemsSource = predefinedClasses.ToList();
-
-                // Set default selection
-                cmbFromClass.SelectedIndex = 0;
-                cmbToClass.SelectedIndex = 0;
-
-                Console.WriteLine("=== FORCE OVERRIDE: ComboBoxes populated successfully ===");
-                _allClasses = predefinedClasses;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"=== FORCE OVERRIDE ERROR: {ex.Message} ===");
-                MessageBox.Show($"Error in force override: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-
-            // Load extended academic years (past 10 years + current + future 40 years)
+            // Load academic years (keep existing logic)
             LoadExtendedAcademicYears();
         }
 
-        private void LoadPredefinedClassesDirectly()
+        private void SetupClassDropdowns()
         {
-            try
-            {
-                System.Diagnostics.Debug.WriteLine("=== BULK PROMOTION - LOADING PREDEFINED CLASSES DIRECTLY ===");
-                Console.WriteLine("=== BULK PROMOTION - LOADING PREDEFINED CLASSES DIRECTLY ===");
+            Console.WriteLine("=== Setting up clean class dropdowns ===");
 
-                // Use a clean, predefined list with proper class hierarchy
-                var cleanClasses = new List<ClassDto>
-                {
-                    new ClassDto { Id = -1, Name = "-- Select Class --" },
-                    new ClassDto { Id = 1, Name = "Nursery" },
-                    new ClassDto { Id = 2, Name = "KG1" },
-                    new ClassDto { Id = 3, Name = "KG2" },
-                    new ClassDto { Id = 4, Name = "Class 1" },
-                    new ClassDto { Id = 5, Name = "Class 2" },
-                    new ClassDto { Id = 6, Name = "Class 3" },
-                    new ClassDto { Id = 7, Name = "Class 4" },
-                    new ClassDto { Id = 8, Name = "Class 5" },
-                    new ClassDto { Id = 9, Name = "Class 6" },
-                    new ClassDto { Id = 10, Name = "Class 7" },
-                    new ClassDto { Id = 11, Name = "Class 8" },
-                    new ClassDto { Id = 12, Name = "Class 9" },
-                    new ClassDto { Id = 13, Name = "Class 10" }
-                };
-
-                System.Diagnostics.Debug.WriteLine($"=== PREDEFINED CLASSES COUNT: {cleanClasses.Count} ===");
-                foreach (var cls in cleanClasses)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Predefined: ID={cls.Id}, Name='{cls.Name}'");
-                }
-
-                _allClasses = cleanClasses;
-
-                // Clear and set ComboBox items directly
-                cmbFromClass.Items.Clear();
-                cmbToClass.Items.Clear();
-                cmbFromClass.ItemsSource = null;
-                cmbToClass.ItemsSource = null;
-
-                // Create separate lists for each ComboBox to avoid binding issues
-                var fromClassList = new List<ClassDto>(_allClasses);
-                var toClassList = new List<ClassDto>(_allClasses);
-
-                // Set new bindings with separate lists
-                cmbFromClass.ItemsSource = fromClassList;
-                cmbToClass.ItemsSource = toClassList;
-
-                // Force refresh of the ComboBoxes
-                cmbFromClass.UpdateLayout();
-                cmbToClass.UpdateLayout();
-
-                // Set default selection to first item (-- Select Class --)
-                cmbFromClass.SelectedIndex = 0;
-                cmbToClass.SelectedIndex = 0;
-
-                // Debug: Verify what's actually in the ComboBoxes
-                System.Diagnostics.Debug.WriteLine("=== VERIFYING DIRECT COMBOBOX CONTENTS ===");
-                System.Diagnostics.Debug.WriteLine($"FromClass ComboBox has {cmbFromClass.Items.Count} items:");
-                for (int i = 0; i < cmbFromClass.Items.Count; i++)
-                {
-                    var item = cmbFromClass.Items[i] as ClassDto;
-                    System.Diagnostics.Debug.WriteLine($"  FromClass[{i}]: ID={item?.Id}, Name='{item?.Name}'");
-                }
-
-                System.Diagnostics.Debug.WriteLine($"ToClass ComboBox has {cmbToClass.Items.Count} items:");
-                for (int i = 0; i < cmbToClass.Items.Count; i++)
-                {
-                    var item = cmbToClass.Items[i] as ClassDto;
-                    System.Diagnostics.Debug.WriteLine($"  ToClass[{i}]: ID={item?.Id}, Name='{item?.Name}'");
-                }
-
-                System.Diagnostics.Debug.WriteLine("=== BULK PROMOTION - PREDEFINED CLASSES LOADED SUCCESSFULLY ===");
-                Console.WriteLine("=== BULK PROMOTION - PREDEFINED CLASSES LOADED SUCCESSFULLY ===");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"=== ERROR LOADING PREDEFINED CLASSES: {ex.Message} ===");
-                Console.WriteLine($"=== ERROR LOADING PREDEFINED CLASSES: {ex.Message} ===");
-
-                // Fallback to the old predefined classes method
-                LoadPredefinedClasses();
-                MessageBox.Show($"Warning: Could not load predefined classes. Using fallback.\nError: {ex.Message}",
-                               "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-        private async Task LoadClassesAsync()
-        {
-            try
-            {
-                System.Diagnostics.Debug.WriteLine("=== BULK PROMOTION - LOADING CLASSES (FIXED) ===");
-
-                // Use a clean, predefined list with proper class hierarchy
-                // Fixed spelling: "Nursery" not "Nursary"
-                var cleanClasses = new List<ClassDto>
-                {
-                    new ClassDto { Id = -1, Name = "-- Select Class --" },
-                    new ClassDto { Id = 1, Name = "Nursery" },
-                    new ClassDto { Id = 2, Name = "KG1" },
-                    new ClassDto { Id = 3, Name = "KG2" },
-                    new ClassDto { Id = 4, Name = "Class 1" },
-                    new ClassDto { Id = 5, Name = "Class 2" },
-                    new ClassDto { Id = 6, Name = "Class 3" },
-                    new ClassDto { Id = 7, Name = "Class 4" },
-                    new ClassDto { Id = 8, Name = "Class 5" },
-                    new ClassDto { Id = 9, Name = "Class 6" },
-                    new ClassDto { Id = 10, Name = "Class 7" },
-                    new ClassDto { Id = 11, Name = "Class 8" },
-                    new ClassDto { Id = 12, Name = "Class 9" },
-                    new ClassDto { Id = 13, Name = "Class 10" }
-                };
-
-                System.Diagnostics.Debug.WriteLine($"=== CLEAN DROPDOWN CLASSES ({cleanClasses.Count}) ===");
-                foreach (var cleanClass in cleanClasses)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Clean: ID={cleanClass.Id}, Name='{cleanClass.Name}'");
-                }
-
-                _allClasses = cleanClasses;
-
-                // Update UI on the dispatcher thread to ensure proper binding
-                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
-                {
-                    // Clear existing items and bindings
-                    cmbFromClass.Items.Clear();
-                    cmbToClass.Items.Clear();
-                    cmbFromClass.ItemsSource = null;
-                    cmbToClass.ItemsSource = null;
-
-                    // Create separate lists for each ComboBox to avoid binding issues
-                    var fromClassList = new List<ClassDto>(_allClasses);
-                    var toClassList = new List<ClassDto>(_allClasses);
-
-                    // Set new bindings with separate lists
-                    cmbFromClass.ItemsSource = fromClassList;
-                    cmbToClass.ItemsSource = toClassList;
-
-                    // Force refresh of the ComboBoxes
-                    cmbFromClass.UpdateLayout();
-                    cmbToClass.UpdateLayout();
-
-                    // Set default selection to first item (-- Select Class --)
-                    cmbFromClass.SelectedIndex = 0;
-                    cmbToClass.SelectedIndex = 0;
-
-                    // Debug: Verify what's actually in the ComboBoxes
-                    System.Diagnostics.Debug.WriteLine("=== VERIFYING COMBOBOX CONTENTS ===");
-                    System.Diagnostics.Debug.WriteLine($"FromClass ComboBox has {cmbFromClass.Items.Count} items:");
-                    for (int i = 0; i < cmbFromClass.Items.Count; i++)
-                    {
-                        var item = cmbFromClass.Items[i] as ClassDto;
-                        System.Diagnostics.Debug.WriteLine($"  FromClass[{i}]: ID={item?.Id}, Name='{item?.Name}'");
-                    }
-
-                    System.Diagnostics.Debug.WriteLine($"ToClass ComboBox has {cmbToClass.Items.Count} items:");
-                    for (int i = 0; i < cmbToClass.Items.Count; i++)
-                    {
-                        var item = cmbToClass.Items[i] as ClassDto;
-                        System.Diagnostics.Debug.WriteLine($"  ToClass[{i}]: ID={item?.Id}, Name='{item?.Name}'");
-                    }
-                });
-
-                System.Diagnostics.Debug.WriteLine("=== BULK PROMOTION - CLEAN CLASSES LOADED SUCCESSFULLY ===");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"=== ERROR LOADING CLEAN CLASSES: {ex.Message} ===");
-
-                // Fallback to predefined classes if this fails
-                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() => LoadPredefinedClasses());
-                MessageBox.Show($"Warning: Could not load classes. Using fallback classes.\nError: {ex.Message}",
-                               "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
-        }
-
-        private void LoadPredefinedClasses()
-        {
-            var predefinedClasses = new List<ClassDto>
+            // Define simple class list - no database, no complexity
+            var classes = new List<ClassDto>
             {
                 new ClassDto { Id = -1, Name = "-- Select Class --" },
                 new ClassDto { Id = 1, Name = "Nursery" },
@@ -296,30 +78,20 @@ namespace IEMS.WPF
                 new ClassDto { Id = 13, Name = "Class 10" }
             };
 
-            _allClasses = predefinedClasses;
+            // Direct assignment - no ItemsSource manipulation
+            cmbFromClass.ItemsSource = classes;
+            cmbToClass.ItemsSource = classes;
 
-            // Clear existing items and bindings
-            cmbFromClass.Items.Clear();
-            cmbToClass.Items.Clear();
-            cmbFromClass.ItemsSource = null;
-            cmbToClass.ItemsSource = null;
-
-            // Create separate lists for each ComboBox to avoid binding issues
-            var fromClassList = new List<ClassDto>(_allClasses);
-            var toClassList = new List<ClassDto>(_allClasses);
-
-            // Set new bindings with separate lists
-            cmbFromClass.ItemsSource = fromClassList;
-            cmbToClass.ItemsSource = toClassList;
-
-            // Force refresh of the ComboBoxes
-            cmbFromClass.UpdateLayout();
-            cmbToClass.UpdateLayout();
-
-            // Set default selection to first item (-- Select Class --)
+            // Set to first item (-- Select Class --)
             cmbFromClass.SelectedIndex = 0;
             cmbToClass.SelectedIndex = 0;
+
+            // Store for later use
+            _allClasses = classes;
+
+            Console.WriteLine($"=== Class dropdowns setup complete with {classes.Count} items ===");
         }
+
 
         private void LoadExtendedAcademicYears()
         {
