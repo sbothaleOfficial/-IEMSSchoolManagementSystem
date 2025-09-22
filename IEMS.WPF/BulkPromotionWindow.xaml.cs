@@ -56,10 +56,10 @@ namespace IEMS.WPF
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine("=== BULK PROMOTION - LOADING CLASSES (SIMPLIFIED) ===");
+                System.Diagnostics.Debug.WriteLine("=== BULK PROMOTION - LOADING CLASSES (FIXED) ===");
 
-                // For bulk promotion, use a clean, predefined list to ensure no duplicates
-                // This is simpler and more reliable than trying to deduplicate database classes
+                // Use a clean, predefined list with proper class hierarchy
+                // Fixed spelling: "Nursery" not "Nursary"
                 var cleanClasses = new List<ClassDto>
                 {
                     new ClassDto { Id = -1, Name = "-- Select Class --" },
@@ -86,17 +86,31 @@ namespace IEMS.WPF
 
                 _allClasses = cleanClasses;
 
-                // Clear existing bindings first to prevent caching issues
-                cmbFromClass.ItemsSource = null;
-                cmbToClass.ItemsSource = null;
+                // Update UI on the dispatcher thread to ensure proper binding
+                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() =>
+                {
+                    // Clear existing items and bindings
+                    cmbFromClass.Items.Clear();
+                    cmbToClass.Items.Clear();
+                    cmbFromClass.ItemsSource = null;
+                    cmbToClass.ItemsSource = null;
 
-                // Set new bindings
-                cmbFromClass.ItemsSource = _allClasses;
-                cmbToClass.ItemsSource = _allClasses;
+                    // Create separate lists for each ComboBox to avoid binding issues
+                    var fromClassList = new List<ClassDto>(_allClasses);
+                    var toClassList = new List<ClassDto>(_allClasses);
 
-                // Set default selection to first item (-- Select Class --)
-                cmbFromClass.SelectedIndex = 0;
-                cmbToClass.SelectedIndex = 0;
+                    // Set new bindings with separate lists
+                    cmbFromClass.ItemsSource = fromClassList;
+                    cmbToClass.ItemsSource = toClassList;
+
+                    // Force refresh of the ComboBoxes
+                    cmbFromClass.UpdateLayout();
+                    cmbToClass.UpdateLayout();
+
+                    // Set default selection to first item (-- Select Class --)
+                    cmbFromClass.SelectedIndex = 0;
+                    cmbToClass.SelectedIndex = 0;
+                });
 
                 System.Diagnostics.Debug.WriteLine("=== BULK PROMOTION - CLEAN CLASSES LOADED SUCCESSFULLY ===");
             }
@@ -105,7 +119,7 @@ namespace IEMS.WPF
                 System.Diagnostics.Debug.WriteLine($"=== ERROR LOADING CLEAN CLASSES: {ex.Message} ===");
 
                 // Fallback to predefined classes if this fails
-                LoadPredefinedClasses();
+                await System.Windows.Application.Current.Dispatcher.InvokeAsync(() => LoadPredefinedClasses());
                 MessageBox.Show($"Warning: Could not load classes. Using fallback classes.\nError: {ex.Message}",
                                "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
@@ -132,8 +146,24 @@ namespace IEMS.WPF
             };
 
             _allClasses = predefinedClasses;
-            cmbFromClass.ItemsSource = _allClasses;
-            cmbToClass.ItemsSource = _allClasses;
+
+            // Clear existing items and bindings
+            cmbFromClass.Items.Clear();
+            cmbToClass.Items.Clear();
+            cmbFromClass.ItemsSource = null;
+            cmbToClass.ItemsSource = null;
+
+            // Create separate lists for each ComboBox to avoid binding issues
+            var fromClassList = new List<ClassDto>(_allClasses);
+            var toClassList = new List<ClassDto>(_allClasses);
+
+            // Set new bindings with separate lists
+            cmbFromClass.ItemsSource = fromClassList;
+            cmbToClass.ItemsSource = toClassList;
+
+            // Force refresh of the ComboBoxes
+            cmbFromClass.UpdateLayout();
+            cmbToClass.UpdateLayout();
 
             // Set default selection to first item (-- Select Class --)
             cmbFromClass.SelectedIndex = 0;
