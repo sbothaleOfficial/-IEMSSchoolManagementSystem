@@ -2,6 +2,7 @@ using IEMS.Core.Entities;
 using IEMS.Core.Enums;
 using IEMS.Core.Interfaces;
 using IEMS.Application.DTOs;
+using IEMS.Core.Services;
 
 namespace IEMS.Application.Services;
 
@@ -11,17 +12,23 @@ public class FeePaymentService
     private readonly IFeeStructureRepository _feeStructureRepository;
     private readonly IStudentRepository _studentRepository;
     private readonly IClassRepository _classRepository;
+    private readonly FeeCalculationService _feeCalculationService;
+    private readonly AmountToWordsService _amountToWordsService;
 
     public FeePaymentService(
         IFeePaymentRepository feePaymentRepository,
         IFeeStructureRepository feeStructureRepository,
         IStudentRepository studentRepository,
-        IClassRepository classRepository)
+        IClassRepository classRepository,
+        FeeCalculationService feeCalculationService,
+        AmountToWordsService amountToWordsService)
     {
         _feePaymentRepository = feePaymentRepository;
         _feeStructureRepository = feeStructureRepository;
         _studentRepository = studentRepository;
         _classRepository = classRepository;
+        _feeCalculationService = feeCalculationService;
+        _amountToWordsService = amountToWordsService;
     }
 
     public async Task<IEnumerable<FeePaymentDto>> GetAllFeePaymentsAsync()

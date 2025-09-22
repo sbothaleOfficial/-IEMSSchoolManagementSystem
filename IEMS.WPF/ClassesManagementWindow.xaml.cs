@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
+using IEMS.WPF.Helpers;
 
 namespace IEMS.WPF;
 
@@ -17,23 +18,15 @@ public partial class ClassesManagementWindow : Window
         _classService = classService;
         _teacherService = teacherService;
         _studentService = studentService;
-        LoadClasses();
+        AsyncHelper.SafeFireAndForget(LoadClassesAsync, "Classes Management Error");
     }
 
-    private async void LoadClasses()
+    private async Task LoadClassesAsync()
     {
-        try
-        {
-            lblStatus.Text = "Loading classes...";
-            var classes = await _classService.GetAllClassesAsync();
-            dgClasses.ItemsSource = classes;
-            lblStatus.Text = $"Loaded {classes.Count()} classes";
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error loading classes: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            lblStatus.Text = "Error loading classes";
-        }
+        lblStatus.Text = "Loading classes...";
+        var classes = await _classService.GetAllClassesAsync();
+        dgClasses.ItemsSource = classes;
+        lblStatus.Text = $"Loaded {classes.Count()} classes";
     }
 
     private void BtnAddClass_Click(object sender, RoutedEventArgs e)
@@ -41,7 +34,7 @@ public partial class ClassesManagementWindow : Window
         var addWindow = new AddEditClassWindow(_classService, _teacherService);
         if (addWindow.ShowDialog() == true)
         {
-            LoadClasses();
+            AsyncHelper.SafeFireAndForget(LoadClassesAsync, "Classes Management Error");
         }
     }
 
@@ -52,7 +45,7 @@ public partial class ClassesManagementWindow : Window
             var editWindow = new AddEditClassWindow(_classService, _teacherService, selectedClass);
             if (editWindow.ShowDialog() == true)
             {
-                LoadClasses();
+                AsyncHelper.SafeFireAndForget(LoadClassesAsync, "Classes Management Error");
             }
         }
         else
@@ -61,26 +54,11 @@ public partial class ClassesManagementWindow : Window
         }
     }
 
-    private async void BtnDeleteClass_Click(object sender, RoutedEventArgs e)
+    private void BtnDeleteClass_Click(object sender, RoutedEventArgs e)
     {
         if (dgClasses.SelectedItem is ClassDto selectedClass)
         {
-            var result = MessageBox.Show($"Are you sure you want to delete class {selectedClass.DisplayName}?",
-                                       "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                try
-                {
-                    await _classService.DeleteClassAsync(selectedClass.Id);
-                    LoadClasses();
-                    lblStatus.Text = "Class deleted successfully";
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error deleting class: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }
+            AsyncHelper.SafeFireAndForget(async () => await DeleteClassAsync(selectedClass), "Delete Class Error");
         }
         else
         {
@@ -88,35 +66,46 @@ public partial class ClassesManagementWindow : Window
         }
     }
 
-    private void BtnRefreshClasses_Click(object sender, RoutedEventArgs e)
+    private async Task DeleteClassAsync(ClassDto selectedClass)
     {
-        LoadClasses();
+        var result = MessageBox.Show($"Are you sure you want to delete class {selectedClass.DisplayName}?",
+                                   "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+        if (result == MessageBoxResult.Yes)
+        {
+            await _classService.DeleteClassAsync(selectedClass.Id);
+            await LoadClassesAsync();
+            lblStatus.Text = "Class deleted successfully";
+        }
     }
 
-    private async void BtnViewStudents_Click(object sender, RoutedEventArgs e)
+    private void BtnRefreshClasses_Click(object sender, RoutedEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(LoadClassesAsync, "Classes Management Error");
+    }
+
+    private void BtnViewStudents_Click(object sender, RoutedEventArgs e)
     {
         if (dgClasses.SelectedItem is ClassDto selectedClass)
         {
-            try
-            {
-                var students = await _studentService.GetAllStudentsAsync();
-                var classStudents = students.Where(s => s.ClassId == selectedClass.Id).ToList();
-
-                var message = classStudents.Any()
-                    ? $"Students in {selectedClass.DisplayName}:\n\n" +
-                      string.Join("\n", classStudents.Select(s => $"• {s.StudentNumber} - {s.FullName}"))
-                    : $"No students enrolled in {selectedClass.DisplayName}";
-
-                MessageBox.Show(message, $"Students in {selectedClass.DisplayName}", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading students: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            AsyncHelper.SafeFireAndForget(async () => await ViewStudentsAsync(selectedClass), "View Students Error");
         }
         else
         {
             MessageBox.Show("Please select a class to view students.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+    }
+
+    private async Task ViewStudentsAsync(ClassDto selectedClass)
+    {
+        var students = await _studentService.GetAllStudentsAsync();
+        var classStudents = students.Where(s => s.ClassId == selectedClass.Id).ToList();
+
+        var message = classStudents.Any()
+            ? $"Students in {selectedClass.DisplayName}:\n\n" +
+              string.Join("\n", classStudents.Select(s => $"• {s.StudentNumber} - {s.FullName}"))
+            : $"No students enrolled in {selectedClass.DisplayName}";
+
+        MessageBox.Show(message, $"Students in {selectedClass.DisplayName}", MessageBoxButton.OK, MessageBoxImage.Information);
     }
 }

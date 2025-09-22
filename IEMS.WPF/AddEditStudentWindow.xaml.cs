@@ -2,6 +2,7 @@ using System.Windows;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
 using IEMS.Core.Interfaces;
+using IEMS.WPF.Helpers;
 
 namespace IEMS.WPF;
 
@@ -18,29 +19,22 @@ public partial class AddEditStudentWindow : Window
         _classService = classService;
         _studentToEdit = studentToEdit;
 
-        LoadClasses();
+        AsyncHelper.SafeFireAndForget(LoadClassesAsync, "Load Classes Error");
         LoadStudentData();
 
         Title = studentToEdit == null ? "Add Student" : "Edit Student";
     }
 
-    private async void LoadClasses()
+    private async Task LoadClassesAsync()
     {
-        try
+        var classes = await _classService.GetAllClassesAsync();
+        var classList = classes.Select(c => new
         {
-            var classes = await _classService.GetAllClassesAsync();
-            var classList = classes.Select(c => new
-            {
-                Id = c.Id,
-                Name = c.DisplayName
-            }).ToList();
+            Id = c.Id,
+            Name = c.DisplayName
+        }).ToList();
 
-            cmbClass.ItemsSource = classList;
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error loading classes: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+        cmbClass.ItemsSource = classList;
     }
 
     private void LoadStudentData()
@@ -77,55 +71,53 @@ public partial class AddEditStudentWindow : Window
         }
     }
 
-    private async void BtnSave_Click(object sender, RoutedEventArgs e)
+    private void BtnSave_Click(object sender, RoutedEventArgs e)
     {
         if (!ValidateInput())
             return;
 
-        try
-        {
-            var studentDto = new StudentDto
-            {
-                Id = _studentToEdit?.Id ?? 0,
-                SerialNo = int.Parse(txtSerialNo.Text.Trim()),
-                Standard = txtStandard.Text.Trim(),
-                ClassDivision = txtClassDivision.Text.Trim(),
-                FirstName = txtFirstName.Text.Trim(),
-                FatherName = txtFatherName.Text.Trim(),
-                Surname = txtSurname.Text.Trim(),
-                DateOfBirth = dpDateOfBirth.SelectedDate ?? DateTime.Today,
-                Gender = cmbGender.Text,
-                MotherName = txtMotherName.Text.Trim(),
-                StudentNumber = txtStudentNumber.Text.Trim(),
-                AdmissionDate = dpAdmissionDate.SelectedDate ?? DateTime.Today,
-                CasteCategory = cmbCasteCategory.Text,
-                Religion = cmbReligion.Text,
-                IsBPL = chkBPL.IsChecked ?? false,
-                IsSemiEnglish = chkSemiEnglish.IsChecked ?? false,
-                Address = txtAddress.Text.Trim(),
-                CityVillage = txtCityVillage.Text.Trim(),
-                ParentMobileNumber = txtParentMobile.Text.Trim(),
-                ClassId = (int)cmbClass.SelectedValue
-            };
+        AsyncHelper.SafeFireAndForget(SaveStudentAsync, "Save Student Error");
+    }
 
-            if (_studentToEdit == null)
-            {
-                await _studentService.AddStudentAsync(studentDto);
-                MessageBox.Show("Student added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            else
-            {
-                await _studentService.UpdateStudentAsync(studentDto);
-                MessageBox.Show("Student updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-
-            DialogResult = true;
-            Close();
-        }
-        catch (Exception ex)
+    private async Task SaveStudentAsync()
+    {
+        var studentDto = new StudentDto
         {
-            MessageBox.Show($"Error saving student: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            Id = _studentToEdit?.Id ?? 0,
+            SerialNo = int.Parse(txtSerialNo.Text.Trim()),
+            Standard = txtStandard.Text.Trim(),
+            ClassDivision = txtClassDivision.Text.Trim(),
+            FirstName = txtFirstName.Text.Trim(),
+            FatherName = txtFatherName.Text.Trim(),
+            Surname = txtSurname.Text.Trim(),
+            DateOfBirth = dpDateOfBirth.SelectedDate ?? DateTime.Today,
+            Gender = cmbGender.Text,
+            MotherName = txtMotherName.Text.Trim(),
+            StudentNumber = txtStudentNumber.Text.Trim(),
+            AdmissionDate = dpAdmissionDate.SelectedDate ?? DateTime.Today,
+            CasteCategory = cmbCasteCategory.Text,
+            Religion = cmbReligion.Text,
+            IsBPL = chkBPL.IsChecked ?? false,
+            IsSemiEnglish = chkSemiEnglish.IsChecked ?? false,
+            Address = txtAddress.Text.Trim(),
+            CityVillage = txtCityVillage.Text.Trim(),
+            ParentMobileNumber = txtParentMobile.Text.Trim(),
+            ClassId = (int)cmbClass.SelectedValue
+        };
+
+        if (_studentToEdit == null)
+        {
+            await _studentService.AddStudentAsync(studentDto);
+            MessageBox.Show("Student added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
         }
+        else
+        {
+            await _studentService.UpdateStudentAsync(studentDto);
+            MessageBox.Show("Student updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        DialogResult = true;
+        Close();
     }
 
     private void BtnCancel_Click(object sender, RoutedEventArgs e)

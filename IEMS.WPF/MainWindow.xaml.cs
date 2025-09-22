@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
+using IEMS.Core.Interfaces;
 
 namespace IEMS.WPF;
 
@@ -17,8 +18,10 @@ public partial class MainWindow : Window
     private readonly TransportExpenseService _transportExpenseService;
     private readonly ElectricityBillService _electricityBillService;
     private readonly OtherExpenseService _otherExpenseService;
+    private readonly BulkPromotionService _bulkPromotionService;
+    private readonly IAcademicYearRepository _academicYearRepository;
 
-    public MainWindow(StudentService studentService, TeacherService teacherService, ClassService classService, StaffService staffService, FeePaymentService feePaymentService, FeeStructureService feeStructureService, VehicleService vehicleService, TransportExpenseService transportExpenseService, ElectricityBillService electricityBillService, OtherExpenseService otherExpenseService)
+    public MainWindow(StudentService studentService, TeacherService teacherService, ClassService classService, StaffService staffService, FeePaymentService feePaymentService, FeeStructureService feeStructureService, VehicleService vehicleService, TransportExpenseService transportExpenseService, ElectricityBillService electricityBillService, OtherExpenseService otherExpenseService, BulkPromotionService bulkPromotionService, IAcademicYearRepository academicYearRepository)
     {
         InitializeComponent();
         _studentService = studentService;
@@ -31,6 +34,8 @@ public partial class MainWindow : Window
         _transportExpenseService = transportExpenseService;
         _electricityBillService = electricityBillService;
         _otherExpenseService = otherExpenseService;
+        _bulkPromotionService = bulkPromotionService;
+        _academicYearRepository = academicYearRepository;
 
         lblStatus.Text = "Dashboard loaded successfully";
     }
@@ -42,8 +47,8 @@ public partial class MainWindow : Window
     {
         try
         {
-            // Use existing StudentsManagementWindow for now
-            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService, _feePaymentService, _feeStructureService);
+            // Direct access to general student management - no confusing popup
+            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService, _feePaymentService, _feeStructureService, _bulkPromotionService, _academicYearRepository);
             studentsWindow.ShowDialog();
             lblStatus.Text = "Student Management module accessed";
         }
@@ -104,7 +109,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService, _feePaymentService, _feeStructureService);
+            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService, _feePaymentService, _feeStructureService, _bulkPromotionService, _academicYearRepository);
             studentsWindow.ShowDialog();
             lblStatus.Text = "Students Management module accessed";
         }
@@ -194,7 +199,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService, _feePaymentService, _feeStructureService);
+            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService, _feePaymentService, _feeStructureService, _bulkPromotionService, _academicYearRepository);
             studentsWindow.ShowDialog();
             lblStatus.Text = "Student Fees Management module accessed";
         }

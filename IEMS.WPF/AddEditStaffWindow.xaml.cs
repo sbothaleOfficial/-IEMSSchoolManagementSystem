@@ -1,6 +1,7 @@
 using System.Windows;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
+using IEMS.WPF.Helpers;
 
 namespace IEMS.WPF;
 
@@ -44,56 +45,54 @@ public partial class AddEditStaffWindow : Window
         }
     }
 
-    private async void BtnSave_Click(object sender, RoutedEventArgs e)
+    private void BtnSave_Click(object sender, RoutedEventArgs e)
     {
         if (!ValidateInput())
             return;
 
-        try
+        AsyncHelper.SafeFireAndForget(SaveStaffAsync, "Save Staff Error");
+    }
+
+    private async Task SaveStaffAsync()
+    {
+        var staffDto = new StaffDto
         {
-            var staffDto = new StaffDto
-            {
-                Id = _staffToEdit?.Id ?? 0,
-                EmployeeId = txtEmployeeId.Text.Trim(),
-                FirstName = txtFirstName.Text.Trim(),
-                LastName = txtLastName.Text.Trim(),
-                PhoneNumber = txtPhoneNumber.Text.Trim(),
-                Address = txtAddress.Text.Trim(),
-                JoiningDate = dpJoiningDate.SelectedDate ?? DateTime.Today,
-                MonthlySalary = decimal.TryParse(txtMonthlySalary.Text.Trim(), out var salary) ? salary : 0,
-                Position = cmbPosition.Text.Trim(),
-                Email = string.IsNullOrWhiteSpace(txtEmail.Text) ? null : txtEmail.Text.Trim(),
-                BankAccountNumber = string.IsNullOrWhiteSpace(txtBankAccount.Text) ? null : txtBankAccount.Text.Trim(),
-                AadharNumber = string.IsNullOrWhiteSpace(txtAadharNumber.Text) ? null : txtAadharNumber.Text.Trim(),
-                PANNumber = string.IsNullOrWhiteSpace(txtPANNumber.Text) ? null : txtPANNumber.Text.Trim()
-            };
+            Id = _staffToEdit?.Id ?? 0,
+            EmployeeId = txtEmployeeId.Text.Trim(),
+            FirstName = txtFirstName.Text.Trim(),
+            LastName = txtLastName.Text.Trim(),
+            PhoneNumber = txtPhoneNumber.Text.Trim(),
+            Address = txtAddress.Text.Trim(),
+            JoiningDate = dpJoiningDate.SelectedDate ?? DateTime.Today,
+            MonthlySalary = decimal.TryParse(txtMonthlySalary.Text.Trim(), out var salary) ? salary : 0,
+            Position = cmbPosition.Text.Trim(),
+            Email = string.IsNullOrWhiteSpace(txtEmail.Text) ? null : txtEmail.Text.Trim(),
+            BankAccountNumber = string.IsNullOrWhiteSpace(txtBankAccount.Text) ? null : txtBankAccount.Text.Trim(),
+            AadharNumber = string.IsNullOrWhiteSpace(txtAadharNumber.Text) ? null : txtAadharNumber.Text.Trim(),
+            PANNumber = string.IsNullOrWhiteSpace(txtPANNumber.Text) ? null : txtPANNumber.Text.Trim()
+        };
 
-            // Check for unique employee ID
-            if (!await _staffService.IsEmployeeIdUniqueAsync(staffDto.EmployeeId, staffDto.Id == 0 ? null : staffDto.Id))
-            {
-                MessageBox.Show("Employee ID already exists. Please choose a different one.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                txtEmployeeId.Focus();
-                return;
-            }
-
-            if (_staffToEdit == null)
-            {
-                await _staffService.CreateStaffAsync(staffDto);
-                MessageBox.Show("Staff member added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            else
-            {
-                await _staffService.UpdateStaffAsync(staffDto);
-                MessageBox.Show("Staff member updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-
-            DialogResult = true;
-            Close();
-        }
-        catch (Exception ex)
+        // Check for unique employee ID
+        if (!await _staffService.IsEmployeeIdUniqueAsync(staffDto.EmployeeId, staffDto.Id == 0 ? null : staffDto.Id))
         {
-            MessageBox.Show($"Error saving staff member: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Employee ID already exists. Please choose a different one.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtEmployeeId.Focus();
+            return;
         }
+
+        if (_staffToEdit == null)
+        {
+            await _staffService.CreateStaffAsync(staffDto);
+            MessageBox.Show("Staff member added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        else
+        {
+            await _staffService.UpdateStaffAsync(staffDto);
+            MessageBox.Show("Staff member updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        DialogResult = true;
+        Close();
     }
 
     private void BtnCancel_Click(object sender, RoutedEventArgs e)

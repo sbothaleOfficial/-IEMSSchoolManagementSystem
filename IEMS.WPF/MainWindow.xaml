@@ -11,7 +11,7 @@
         </Grid.RowDefinitions>
 
         <!-- Header Section -->
-        <Grid Grid.Row="0" Background="{StaticResource PrimaryBrush}" Height="100">
+        <Grid Grid.Row="0" Background="{StaticResource PrimaryBrush}" Height="80">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
@@ -19,7 +19,7 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
-                <Image Source="Exact_color_logo.png" Width="95" Height="95" Margin="0,0,15,0"
+                <Image Source="Exact_color_logo.png" Width="70" Height="70" Margin="0,0,15,0"
                        RenderOptions.BitmapScalingMode="HighQuality"
                        RenderOptions.EdgeMode="Aliased"
                        Stretch="Uniform"/>
@@ -158,7 +158,7 @@
                         </StackPanel>
                     </Border>
 
-                    <!-- Expense Management Card -->
+                    <!-- Finance Management Card -->
                     <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource CardStyle}">
                         <Border.Effect>
                             <DropShadowEffect Color="#000000" ShadowDepth="2" BlurRadius="6" Opacity="0.1"/>

@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
+using IEMS.WPF.Helpers;
 
 namespace IEMS.WPF;
 
@@ -22,7 +23,7 @@ public partial class AddEditClassWindow : Window
 
         Title = _isEditMode ? "Edit Class" : "Add Class";
         LoadClassNames();
-        LoadTeachers();
+        AsyncHelper.SafeFireAndForget(LoadTeachersAsync, "Load Teachers Error");
 
         if (_isEditMode && _classToEdit != null)
         {
@@ -54,26 +55,19 @@ public partial class AddEditClassWindow : Window
         cmbClassName.SelectedIndex = 0;
     }
 
-    private async void LoadTeachers()
+    private async Task LoadTeachersAsync()
     {
-        try
+        var teachers = await _classService.GetAvailableTeachersAsync();
+        var teacherList = teachers.Select(t => new
         {
-            var teachers = await _classService.GetAvailableTeachersAsync();
-            var teacherList = teachers.Select(t => new
-            {
-                Id = t.Id,
-                DisplayName = $"{t.FirstName} {t.LastName} (ID: {t.EmployeeId})"
-            }).ToList();
+            Id = t.Id,
+            DisplayName = $"{t.FirstName} {t.LastName} (ID: {t.EmployeeId})"
+        }).ToList();
 
-            teacherList.Insert(0, new { Id = 0, DisplayName = "-- Select Teacher --" });
+        teacherList.Insert(0, new { Id = 0, DisplayName = "-- Select Teacher --" });
 
-            cmbTeacher.ItemsSource = teacherList;
-            cmbTeacher.SelectedValue = 0;
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error loading teachers: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
+        cmbTeacher.ItemsSource = teacherList;
+        cmbTeacher.SelectedValue = 0;
     }
 
     private void PopulateFields()
@@ -85,49 +79,47 @@ public partial class AddEditClassWindow : Window
         cmbTeacher.SelectedValue = _classToEdit.TeacherId;
     }
 
-    private async void BtnSave_Click(object sender, RoutedEventArgs e)
+    private void BtnSave_Click(object sender, RoutedEventArgs e)
     {
         if (!ValidateInput()) return;
 
-        try
+        AsyncHelper.SafeFireAndForget(SaveClassAsync, "Save Class Error");
+    }
+
+    private async Task SaveClassAsync()
+    {
+        var classDto = new ClassDto
         {
-            var classDto = new ClassDto
-            {
-                Id = _isEditMode ? _classToEdit!.Id : 0,
-                Name = cmbClassName.SelectedItem?.ToString() ?? "",
-                Section = string.IsNullOrWhiteSpace(txtSection.Text) ? "" : txtSection.Text.Trim(),
-                TeacherId = (int)cmbTeacher.SelectedValue
-            };
+            Id = _isEditMode ? _classToEdit!.Id : 0,
+            Name = cmbClassName.SelectedItem?.ToString() ?? "",
+            Section = string.IsNullOrWhiteSpace(txtSection.Text) ? "" : txtSection.Text.Trim(),
+            TeacherId = (int)cmbTeacher.SelectedValue
+        };
 
-            var isUnique = await _classService.IsClassNameSectionUniqueAsync(
-                classDto.Name,
-                classDto.Section,
-                _isEditMode ? classDto.Id : null);
+        var isUnique = await _classService.IsClassNameSectionUniqueAsync(
+            classDto.Name,
+            classDto.Section,
+            _isEditMode ? classDto.Id : null);
 
-            if (!isUnique)
-            {
-                ShowValidationError("A class with this name and section already exists.");
-                return;
-            }
-
-            if (_isEditMode)
-            {
-                await _classService.UpdateClassAsync(classDto);
-                MessageBox.Show("Class updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            else
-            {
-                await _classService.AddClassAsync(classDto);
-                MessageBox.Show("Class added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-
-            DialogResult = true;
-            Close();
-        }
-        catch (Exception ex)
+        if (!isUnique)
         {
-            MessageBox.Show($"Error saving class: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            ShowValidationError("A class with this name and section already exists.");
+            return;
         }
+
+        if (_isEditMode)
+        {
+            await _classService.UpdateClassAsync(classDto);
+            MessageBox.Show("Class updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        else
+        {
+            await _classService.AddClassAsync(classDto);
+            MessageBox.Show("Class added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        DialogResult = true;
+        Close();
     }
 
     private bool ValidateInput()

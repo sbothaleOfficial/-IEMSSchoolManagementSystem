@@ -34,10 +34,16 @@
         <!-- Semantic Colors -->
         <SolidColorBrush x:Key="DangerBrush" Color="#EF4444"/>
         <SolidColorBrush x:Key="DangerDarkBrush" Color="#DC2626"/>
+        <SolidColorBrush x:Key="DangerLightBrush" Color="#FEE2E2"/>
         <SolidColorBrush x:Key="WarningBrush" Color="#F59E0B"/>
         <SolidColorBrush x:Key="WarningDarkBrush" Color="#D97706"/>
+        <SolidColorBrush x:Key="WarningLightBrush" Color="#FEF3C7"/>
         <SolidColorBrush x:Key="SuccessBrush" Color="#10B981"/>
+        <SolidColorBrush x:Key="SuccessDarkBrush" Color="#059669"/>
+        <SolidColorBrush x:Key="SuccessLightBrush" Color="#D1FAE5"/>
         <SolidColorBrush x:Key="InfoBrush" Color="#3B82F6"/>
+        <SolidColorBrush x:Key="InfoDarkBrush" Color="#2563EB"/>
+        <SolidColorBrush x:Key="InfoLightBrush" Color="#DBEAFE"/>
 
         <!-- Border Colors - Microsoft Fluent Design -->
         <SolidColorBrush x:Key="BorderBrush" Color="#edebe9"/>

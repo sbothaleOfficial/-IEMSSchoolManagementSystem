@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
+using IEMS.WPF.Helpers;
 
 namespace IEMS.WPF;
 
@@ -15,46 +16,31 @@ public partial class SupportStaffManagementWindow : Window
     {
         InitializeComponent();
         _staffService = staffService;
-        LoadStaff();
-        LoadFilters();
+        AsyncHelper.SafeFireAndForget(LoadStaffAsync, "Staff Management Error");
+        AsyncHelper.SafeFireAndForget(LoadFiltersAsync, "Staff Management Error");
     }
 
-    private async void LoadStaff()
+    private async Task LoadStaffAsync()
     {
-        try
-        {
-            lblStatus.Text = "Loading staff...";
-            var staff = await _staffService.GetAllStaffAsync();
-            _allStaff = staff.ToList();
-            _filteredStaff = _allStaff.ToList();
-            dgStaff.ItemsSource = _filteredStaff;
+        lblStatus.Text = "Loading staff...";
+        var staff = await _staffService.GetAllStaffAsync();
+        _allStaff = staff.ToList();
+        _filteredStaff = _allStaff.ToList();
+        dgStaff.ItemsSource = _filteredStaff;
 
-            UpdateStatusCounts();
-            lblStatus.Text = $"Loaded {staff.Count()} staff members";
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error loading staff: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            lblStatus.Text = "Error loading staff";
-        }
+        UpdateStatusCounts();
+        lblStatus.Text = $"Loaded {staff.Count()} staff members";
     }
 
-    private async void LoadFilters()
+    private async Task LoadFiltersAsync()
     {
-        try
-        {
-            var positions = await _staffService.GetPositionsAsync();
+        var positions = await _staffService.GetPositionsAsync();
 
-            cmbPositionFilter.Items.Clear();
-            cmbPositionFilter.Items.Add(new ComboBoxItem { Content = "All Positions", IsSelected = true });
-            foreach (var position in positions)
-            {
-                cmbPositionFilter.Items.Add(new ComboBoxItem { Content = position });
-            }
-        }
-        catch (Exception ex)
+        cmbPositionFilter.Items.Clear();
+        cmbPositionFilter.Items.Add(new ComboBoxItem { Content = "All Positions", IsSelected = true });
+        foreach (var position in positions)
         {
-            MessageBox.Show($"Error loading filters: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            cmbPositionFilter.Items.Add(new ComboBoxItem { Content = position });
         }
     }
 
@@ -105,80 +91,74 @@ public partial class SupportStaffManagementWindow : Window
         ApplyFilters();
     }
 
-    private async void BtnAddStaff_Click(object sender, RoutedEventArgs e)
+    private void BtnAddStaff_Click(object sender, RoutedEventArgs e)
     {
-        try
+        AsyncHelper.SafeFireAndForget(async () => await AddStaffAsync(), "Add Staff Error");
+    }
+
+    private async Task AddStaffAsync()
+    {
+        var addWindow = new AddEditStaffWindow(_staffService);
+        if (addWindow.ShowDialog() == true)
         {
-            var addWindow = new AddEditStaffWindow(_staffService);
-            if (addWindow.ShowDialog() == true)
-            {
-                LoadStaff();
-                lblStatus.Text = "Staff member added successfully";
-            }
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error opening add staff window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            await LoadStaffAsync();
+            lblStatus.Text = "Staff member added successfully";
         }
     }
 
-    private async void BtnEditStaff_Click(object sender, RoutedEventArgs e)
+    private void BtnEditStaff_Click(object sender, RoutedEventArgs e)
     {
-        try
+        if (dgStaff.SelectedItem is StaffDto selectedStaff)
         {
-            if (dgStaff.SelectedItem is StaffDto selectedStaff)
-            {
-                var editWindow = new AddEditStaffWindow(_staffService, selectedStaff);
-                if (editWindow.ShowDialog() == true)
-                {
-                    LoadStaff();
-                    lblStatus.Text = "Staff member updated successfully";
-                }
-            }
-            else
-            {
-                MessageBox.Show("Please select a staff member to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
+            AsyncHelper.SafeFireAndForget(async () => await EditStaffAsync(selectedStaff), "Edit Staff Error");
         }
-        catch (Exception ex)
+        else
         {
-            MessageBox.Show($"Error opening edit staff window: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Please select a staff member to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
-    private async void BtnDeleteStaff_Click(object sender, RoutedEventArgs e)
+    private async Task EditStaffAsync(StaffDto selectedStaff)
     {
-        try
+        var editWindow = new AddEditStaffWindow(_staffService, selectedStaff);
+        if (editWindow.ShowDialog() == true)
         {
-            if (dgStaff.SelectedItem is StaffDto selectedStaff)
-            {
-                var result = MessageBox.Show(
-                    $"Are you sure you want to delete {selectedStaff.FullName}?",
-                    "Confirm Delete",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
-
-                if (result == MessageBoxResult.Yes)
-                {
-                    await _staffService.DeleteStaffAsync(selectedStaff.Id);
-                    LoadStaff();
-                    lblStatus.Text = "Staff member deleted successfully";
-                }
-            }
-            else
-            {
-                MessageBox.Show("Please select a staff member to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
-            }
+            await LoadStaffAsync();
+            lblStatus.Text = "Staff member updated successfully";
         }
-        catch (Exception ex)
+    }
+
+    private void BtnDeleteStaff_Click(object sender, RoutedEventArgs e)
+    {
+        if (dgStaff.SelectedItem is StaffDto selectedStaff)
         {
-            MessageBox.Show($"Error deleting staff member: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            AsyncHelper.SafeFireAndForget(async () => await DeleteStaffAsync(selectedStaff), "Delete Staff Error");
+        }
+        else
+        {
+            MessageBox.Show("Please select a staff member to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
+        }
+    }
+
+    private async Task DeleteStaffAsync(StaffDto selectedStaff)
+    {
+        var result = MessageBox.Show(
+            $"Are you sure you want to delete {selectedStaff.FullName}?",
+            "Confirm Delete",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+
+        if (result == MessageBoxResult.Yes)
+        {
+            await _staffService.DeleteStaffAsync(selectedStaff.Id);
+            await LoadStaffAsync();
+            lblStatus.Text = "Staff member deleted successfully";
         }
     }
 
     private void BtnRefresh_Click(object sender, RoutedEventArgs e)
     {
-        LoadStaff();
+        AsyncHelper.SafeFireAndForget(LoadStaffAsync, "Staff Management Error");
     }
 
     private void BtnClearSearch_Click(object sender, RoutedEventArgs e)

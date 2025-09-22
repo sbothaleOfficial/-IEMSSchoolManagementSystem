@@ -1,6 +1,7 @@
 using System.Windows;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
+using IEMS.WPF.Helpers;
 
 namespace IEMS.WPF;
 
@@ -43,55 +44,53 @@ public partial class AddEditTeacherWindow : Window
         }
     }
 
-    private async void BtnSave_Click(object sender, RoutedEventArgs e)
+    private void BtnSave_Click(object sender, RoutedEventArgs e)
     {
         if (!ValidateInput())
             return;
 
-        try
+        AsyncHelper.SafeFireAndForget(SaveTeacherAsync, "Save Teacher Error");
+    }
+
+    private async Task SaveTeacherAsync()
+    {
+        var teacherDto = new TeacherDto
         {
-            var teacherDto = new TeacherDto
-            {
-                Id = _teacherToEdit?.Id ?? 0,
-                EmployeeId = txtEmployeeId.Text.Trim(),
-                FirstName = txtFirstName.Text.Trim(),
-                LastName = txtLastName.Text.Trim(),
-                PhoneNumber = txtPhoneNumber.Text.Trim(),
-                Address = txtAddress.Text.Trim(),
-                JoiningDate = dpJoiningDate.SelectedDate ?? DateTime.Today,
-                MonthlySalary = decimal.TryParse(txtMonthlySalary.Text.Trim(), out var salary) ? salary : 0,
-                Email = string.IsNullOrWhiteSpace(txtEmail.Text) ? null : txtEmail.Text.Trim(),
-                BankAccountNumber = string.IsNullOrWhiteSpace(txtBankAccount.Text) ? null : txtBankAccount.Text.Trim(),
-                AadharNumber = string.IsNullOrWhiteSpace(txtAadharNumber.Text) ? null : txtAadharNumber.Text.Trim(),
-                PANNumber = string.IsNullOrWhiteSpace(txtPANNumber.Text) ? null : txtPANNumber.Text.Trim()
-            };
+            Id = _teacherToEdit?.Id ?? 0,
+            EmployeeId = txtEmployeeId.Text.Trim(),
+            FirstName = txtFirstName.Text.Trim(),
+            LastName = txtLastName.Text.Trim(),
+            PhoneNumber = txtPhoneNumber.Text.Trim(),
+            Address = txtAddress.Text.Trim(),
+            JoiningDate = dpJoiningDate.SelectedDate ?? DateTime.Today,
+            MonthlySalary = decimal.TryParse(txtMonthlySalary.Text.Trim(), out var salary) ? salary : 0,
+            Email = string.IsNullOrWhiteSpace(txtEmail.Text) ? null : txtEmail.Text.Trim(),
+            BankAccountNumber = string.IsNullOrWhiteSpace(txtBankAccount.Text) ? null : txtBankAccount.Text.Trim(),
+            AadharNumber = string.IsNullOrWhiteSpace(txtAadharNumber.Text) ? null : txtAadharNumber.Text.Trim(),
+            PANNumber = string.IsNullOrWhiteSpace(txtPANNumber.Text) ? null : txtPANNumber.Text.Trim()
+        };
 
-            // Check for unique employee ID
-            if (!await _teacherService.IsEmployeeIdUniqueAsync(teacherDto.EmployeeId, teacherDto.Id == 0 ? null : teacherDto.Id))
-            {
-                MessageBox.Show("Employee ID already exists. Please choose a different one.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                txtEmployeeId.Focus();
-                return;
-            }
-
-            if (_teacherToEdit == null)
-            {
-                await _teacherService.AddTeacherAsync(teacherDto);
-                MessageBox.Show("Class Teacher added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            else
-            {
-                await _teacherService.UpdateTeacherAsync(teacherDto);
-                MessageBox.Show("Class Teacher updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-
-            DialogResult = true;
-            Close();
-        }
-        catch (Exception ex)
+        // Check for unique employee ID
+        if (!await _teacherService.IsEmployeeIdUniqueAsync(teacherDto.EmployeeId, teacherDto.Id == 0 ? null : teacherDto.Id))
         {
-            MessageBox.Show($"Error saving class teacher: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show("Employee ID already exists. Please choose a different one.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtEmployeeId.Focus();
+            return;
         }
+
+        if (_teacherToEdit == null)
+        {
+            await _teacherService.AddTeacherAsync(teacherDto);
+            MessageBox.Show("Class Teacher added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+        else
+        {
+            await _teacherService.UpdateTeacherAsync(teacherDto);
+            MessageBox.Show("Class Teacher updated successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+        }
+
+        DialogResult = true;
+        Close();
     }
 
     private void BtnCancel_Click(object sender, RoutedEventArgs e)
