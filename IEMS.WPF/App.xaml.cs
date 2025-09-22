@@ -42,10 +42,10 @@ public partial class App : System.Windows.Application
                     {
                         EligibilityRules = new EligibilityRulesConfiguration
                         {
-                            MaxPendingFees = 1000m,
+                            MaxPendingFees = 0m,  // Set to 0 since we don't allow any pending fees
                             MinAttendancePercentage = 75,
                             RequireTeacherApproval = false,
-                            AllowPromotionWithPendingFees = false
+                            AllowPromotionWithPendingFees = false  // No pending fees allowed
                         },
                         ClassProgression = new ClassProgressionConfiguration
                         {
