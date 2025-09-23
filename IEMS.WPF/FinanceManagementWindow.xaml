@@ -275,14 +275,14 @@
                             <DataGridTextColumn Header="Due Date" Binding="{Binding FormattedDueDate}" Width="100"/>
                             <DataGridTextColumn Header="Status" Binding="{Binding PaymentStatus}" Width="80"/>
                             <DataGridTextColumn Header="Paid Date" Binding="{Binding FormattedPaidDate}" Width="100"/>
-                            <DataGridTemplateColumn Header="Actions" Width="120">
+                            <DataGridTemplateColumn Header="Actions" Width="140">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                             <Button Content="Edit" Tag="{Binding Id}" Click="BtnEditElectricityBill_Click"
-                                                    Style="{StaticResource SecondaryButtonStyle}" Width="50" Height="25" FontSize="10" Margin="2"/>
+                                                    Style="{StaticResource SecondaryButtonStyle}" Width="60" Height="25" FontSize="10" Margin="2"/>
                                             <Button Content="Delete" Tag="{Binding Id}" Click="BtnDeleteElectricityBill_Click"
-                                                    Style="{StaticResource DangerButtonStyle}" Width="50" Height="25" FontSize="10" Margin="2"/>
+                                                    Style="{StaticResource DangerButtonStyle}" Width="60" Height="25" FontSize="10" Margin="2"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -345,14 +345,14 @@
                             <DataGridTextColumn Header="Date" Binding="{Binding FormattedExpenseDate}" Width="100"/>
                             <DataGridTextColumn Header="Vendor" Binding="{Binding VendorName}" Width="120"/>
                             <DataGridTextColumn Header="Invoice #" Binding="{Binding InvoiceNumber}" Width="100"/>
-                            <DataGridTemplateColumn Header="Actions" Width="120">
+                            <DataGridTemplateColumn Header="Actions" Width="140">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                             <Button Content="Edit" Tag="{Binding Id}" Click="BtnEditOtherExpense_Click"
-                                                    Style="{StaticResource SecondaryButtonStyle}" Width="50" Height="25" FontSize="10" Margin="2"/>
+                                                    Style="{StaticResource SecondaryButtonStyle}" Width="60" Height="25" FontSize="10" Margin="2"/>
                                             <Button Content="Delete" Tag="{Binding Id}" Click="BtnDeleteOtherExpense_Click"
-                                                    Style="{StaticResource DangerButtonStyle}" Width="50" Height="25" FontSize="10" Margin="2"/>
+                                                    Style="{StaticResource DangerButtonStyle}" Width="60" Height="25" FontSize="10" Margin="2"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>

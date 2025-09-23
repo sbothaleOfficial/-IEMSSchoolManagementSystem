@@ -55,7 +55,9 @@ public partial class StudentsManagementWindow : Window
 
             var students = await _studentService.GetAllStudentsAsync();
             _allStudents = students.ToList();
-            dgStudents.ItemsSource = _allStudents;
+
+            // Apply class filter if one is selected
+            ApplyStudentFilters();
 
             lblStatus.Text = $"Loaded {students.Count()} students";
 
@@ -92,6 +94,9 @@ public partial class StudentsManagementWindow : Window
             _allClasses = classes.ToList();
             dgClasses.ItemsSource = _allClasses;
             lblStatus.Text = $"Loaded {classes.Count()} classes";
+
+            // Populate class filter dropdown
+            PopulateClassFilter();
 
             // Refresh dashboard after loading classes
             await LoadDashboardDataAsync();
@@ -298,38 +303,91 @@ public partial class StudentsManagementWindow : Window
         FilterStudents();
     }
 
+    private void CmbStudentClassFilter_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+    {
+        ApplyStudentFilters();
+    }
+
+    private void PopulateClassFilter()
+    {
+        if (cmbStudentClassFilter == null) return;
+
+        var filterOptions = new List<ClassDto>();
+
+        // Add "All Classes" option
+        filterOptions.Add(new ClassDto { Id = 0, Name = "All Classes", Section = "" });
+
+        // Add all actual classes
+        if (_allClasses != null)
+        {
+            filterOptions.AddRange(_allClasses.OrderBy(c => GetClassOrder(c.Name)));
+        }
+
+        cmbStudentClassFilter.ItemsSource = null; // Force refresh
+        cmbStudentClassFilter.ItemsSource = filterOptions;
+        cmbStudentClassFilter.SelectedValue = 0; // Default to "All Classes"
+
+        // Trigger initial filter application
+        ApplyStudentFilters();
+    }
+
     private void FilterStudents()
+    {
+        ApplyStudentFilters();
+    }
+
+    private void ApplyStudentFilters()
     {
         if (_allStudents == null || !_allStudents.Any())
             return;
 
-        var searchText = txtSearchStudents.Text.Trim().ToLower();
+        var searchText = txtSearchStudents?.Text?.Trim()?.ToLower() ?? "";
+        var selectedClassId = cmbStudentClassFilter?.SelectedValue as int?;
 
-        if (string.IsNullOrEmpty(searchText))
+        // Start with all students
+        var filteredStudents = _allStudents.AsEnumerable();
+
+        // Apply class filter if selected (and not "All Classes")
+        if (selectedClassId.HasValue && selectedClassId.Value > 0)
         {
-            // Show all students if search is empty
-            dgStudents.ItemsSource = _allStudents;
-            lblStatus.Text = $"Showing all {_allStudents.Count} students";
-            return;
+            filteredStudents = filteredStudents.Where(s => s.ClassId == selectedClassId.Value);
         }
 
-        // Filter students based on multiple criteria
-        var filteredStudents = _allStudents.Where(student =>
-            student.FirstName.ToLower().Contains(searchText) ||
-            student.Surname.ToLower().Contains(searchText) ||
-            student.FullName.ToLower().Contains(searchText) ||
-            student.FatherName.ToLower().Contains(searchText) ||
-            student.MotherName.ToLower().Contains(searchText) ||
-            student.StudentNumber.ToLower().Contains(searchText) ||
-            student.ParentMobileNumber.ToLower().Contains(searchText) ||
-            student.Standard.ToLower().Contains(searchText) ||
-            student.ClassDivision.ToLower().Contains(searchText) ||
-            student.Address.ToLower().Contains(searchText) ||
-            student.CityVillage.ToLower().Contains(searchText)
-        ).ToList();
+        // Apply text search filter
+        if (!string.IsNullOrEmpty(searchText))
+        {
+            filteredStudents = filteredStudents.Where(student =>
+                student.FirstName.ToLower().Contains(searchText) ||
+                student.Surname.ToLower().Contains(searchText) ||
+                student.FullName.ToLower().Contains(searchText) ||
+                student.FatherName.ToLower().Contains(searchText) ||
+                student.MotherName.ToLower().Contains(searchText) ||
+                student.StudentNumber.ToLower().Contains(searchText) ||
+                student.ParentMobileNumber.ToLower().Contains(searchText) ||
+                student.Standard.ToLower().Contains(searchText) ||
+                student.ClassDivision.ToLower().Contains(searchText) ||
+                student.Address.ToLower().Contains(searchText) ||
+                student.CityVillage.ToLower().Contains(searchText)
+            );
+        }
 
-        dgStudents.ItemsSource = filteredStudents;
-        lblStatus.Text = $"Found {filteredStudents.Count} students matching '{txtSearchStudents.Text}'";
+        var resultList = filteredStudents.ToList();
+        dgStudents.ItemsSource = null; // Force refresh
+        dgStudents.ItemsSource = resultList;
+        dgStudents.Items.Refresh(); // Explicitly refresh the view
+
+        // Update status message
+        var statusMessage = $"Showing {resultList.Count} students";
+        if (selectedClassId.HasValue && selectedClassId.Value > 0)
+        {
+            var className = _allClasses?.FirstOrDefault(c => c.Id == selectedClassId.Value)?.DisplayName ?? "Unknown";
+            statusMessage += $" from {className}";
+        }
+        if (!string.IsNullOrEmpty(searchText))
+        {
+            statusMessage += $" matching '{searchText}'";
+        }
+        lblStatus.Text = statusMessage;
     }
 
     // Fee Payment Management
@@ -1668,12 +1726,25 @@ public partial class StudentsManagementWindow : Window
                 ? $"Successfully promoted {promotionResult.PromotedStudents} students"
                 : $"Promotion completed with {promotionResult.FailedPromotions} errors";
 
-            // Refresh students list and apply filters after loading
-            await LoadStudentsAsync();
-            FilterStudents();
+            // Remember current class filter selection
+            var currentClassFilter = cmbStudentClassFilter?.SelectedValue as int?;
 
-            // Refresh classes to update student counts and dashboard
-            AsyncHelper.SafeFireAndForget(LoadClassesAsync);
+            // Refresh students list
+            await LoadStudentsAsync();
+
+            // Refresh classes to update student counts and dropdown
+            await LoadClassesAsync();
+
+            // Restore the class filter selection if it was set
+            if (currentClassFilter.HasValue && cmbStudentClassFilter != null)
+            {
+                cmbStudentClassFilter.SelectedValue = currentClassFilter.Value;
+            }
+
+            // Apply filters to show updated list
+            ApplyStudentFilters();
+
+            // Refresh dashboard
             AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync);
         }
         catch (Exception ex)
