@@ -361,6 +361,12 @@
                                         <Button x:Name="btnAddStudentFeeStructure" Content="➕ Add Fee Structure"
                                                 Style="{StaticResource PrimaryButtonStyle}"
                                                 Margin="0,0,10,0" Click="BtnAddStudentFeeStructure_Click" Height="35" Padding="15,0"/>
+                                        <Button x:Name="btnEditStudentFeeStructure" Content="✏️ Edit Fee Structure"
+                                                Style="{StaticResource SecondaryButtonStyle}" IsEnabled="False"
+                                                Margin="0,0,10,0" Click="BtnEditStudentFeeStructure_Click" Height="35" Padding="10,0"/>
+                                        <Button x:Name="btnDeleteStudentFeeStructure" Content="🗑️ Delete Fee Structure"
+                                                Style="{StaticResource DangerButtonStyle}" IsEnabled="False"
+                                                Margin="0,0,10,0" Click="BtnDeleteStudentFeeStructure_Click" Height="35" Padding="10,0"/>
                                         <Button x:Name="btnRefreshStudentFeeStructures" Content="🔄 Refresh"
                                                 Style="{StaticResource SecondaryButtonStyle}"
                                                 Click="BtnRefreshStudentFeeStructures_Click" Height="35" Padding="10,0"/>
@@ -430,14 +436,15 @@
                                               AlternatingRowBackground="#F8F9FA"
                                               BorderThickness="0"
                                               SelectionMode="Single"
+                                              SelectionChanged="DgStudentFeeStructures_SelectionChanged"
                                               MouseDoubleClick="DgStudentFeeStructures_MouseDoubleClick">
 
                                         <DataGrid.Columns>
-                                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
-                                            <DataGridTextColumn Header="Academic Year" Binding="{Binding AcademicYear}" Width="120"/>
-                                            <DataGridTextColumn Header="Class" Binding="{Binding ClassName}" Width="150"/>
-                                            <DataGridTextColumn Header="Fee Type" Binding="{Binding FeeType}" Width="120"/>
-                                            <DataGridTextColumn Header="Amount (₹)" Binding="{Binding Amount, StringFormat='{}{0:N2}'}" Width="120">
+                                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
+                                            <DataGridTextColumn Header="Academic Year" Binding="{Binding AcademicYear}" Width="150"/>
+                                            <DataGridTextColumn Header="Class" Binding="{Binding ClassName}" Width="200"/>
+                                            <DataGridTextColumn Header="Fee Type" Binding="{Binding FeeType}" Width="150"/>
+                                            <DataGridTextColumn Header="Amount (₹)" Binding="{Binding Amount, StringFormat='{}{0:N2}'}" Width="*">
                                                 <DataGridTextColumn.ElementStyle>
                                                     <Style TargetType="TextBlock">
                                                         <Setter Property="TextAlignment" Value="Right"/>
@@ -447,25 +454,6 @@
                                                     </Style>
                                                 </DataGridTextColumn.ElementStyle>
                                             </DataGridTextColumn>
-                                            <DataGridTemplateColumn Header="Actions" Width="150">
-                                                <DataGridTemplateColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                            <Button Content="✏️ Edit"
-                                                                    Tag="{Binding Id}"
-                                                                    Style="{StaticResource SecondaryButtonStyle}"
-                                                                    Height="25" Width="60" FontSize="10"
-                                                                    Margin="0,0,5,0"
-                                                                    Click="BtnEditStudentFeeStructure_Click"/>
-                                                            <Button Content="🗑️ Delete"
-                                                                    Tag="{Binding Id}"
-                                                                    Style="{StaticResource DangerButtonStyle}"
-                                                                    Height="25" Width="60" FontSize="10"
-                                                                    Click="BtnDeleteStudentFeeStructure_Click"/>
-                                                        </StackPanel>
-                                                    </DataTemplate>
-                                                </DataGridTemplateColumn.CellTemplate>
-                                            </DataGridTemplateColumn>
                                         </DataGrid.Columns>
                                     </DataGrid>
 

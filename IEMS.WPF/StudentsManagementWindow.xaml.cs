@@ -2019,16 +2019,16 @@ public partial class StudentsManagementWindow : Window
         {
             try
             {
-                if (sender is Button btn && btn.Tag is int feeStructureId)
+                if (dgStudentFeeStructures.SelectedItem is FeeStructureDto selectedFeeStructure)
                 {
                     var addEditWindow = App.ServiceProvider?.GetService(typeof(AddEditFeeStructureWindow)) as AddEditFeeStructureWindow;
                     if (addEditWindow != null)
                     {
                         addEditWindow.Owner = this;
-                        addEditWindow.SetFeeStructureId(feeStructureId);
+                        addEditWindow.SetFeeStructureId(selectedFeeStructure.Id);
                         if (addEditWindow.ShowDialog() == true)
                         {
-                            ApplyStudentFeeStructureFilters();
+                            await LoadFeeStructuresAsync();
                         }
                     }
                     else
@@ -2036,6 +2036,11 @@ public partial class StudentsManagementWindow : Window
                         MessageBox.Show("Unable to open fee structure window. Service not available.", "Error",
                             MessageBoxButton.OK, MessageBoxImage.Error);
                     }
+                }
+                else
+                {
+                    MessageBox.Show("Please select a fee structure to edit.", "No Selection",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
@@ -2052,27 +2057,28 @@ public partial class StudentsManagementWindow : Window
         {
             try
             {
-                if (sender is Button btn && btn.Tag is int feeStructureId)
+                if (dgStudentFeeStructures.SelectedItem is FeeStructureDto selectedFeeStructure)
                 {
-                    var feeStructure = _allFeeStructures.FirstOrDefault(fs => fs.Id == feeStructureId);
-                    if (feeStructure != null)
-                    {
-                        var result = MessageBox.Show(
-                            $"Are you sure you want to delete the fee structure for {feeStructure.ClassName} - {feeStructure.FeeType}?\n\n" +
-                            $"Amount: ₹{feeStructure.Amount:N2}\n" +
-                            $"Academic Year: {feeStructure.AcademicYear}",
-                            "Confirm Delete",
-                            MessageBoxButton.YesNo,
-                            MessageBoxImage.Warning);
+                    var result = MessageBox.Show(
+                        $"Are you sure you want to delete the fee structure for {selectedFeeStructure.ClassName} - {selectedFeeStructure.FeeType}?\n\n" +
+                        $"Amount: ₹{selectedFeeStructure.Amount:N2}\n" +
+                        $"Academic Year: {selectedFeeStructure.AcademicYear}",
+                        "Confirm Delete",
+                        MessageBoxButton.YesNo,
+                        MessageBoxImage.Warning);
 
-                        if (result == MessageBoxResult.Yes)
-                        {
-                            await _feeStructureService.DeleteFeeStructureAsync(feeStructureId);
-                            MessageBox.Show("Fee structure deleted successfully.", "Success",
-                                MessageBoxButton.OK, MessageBoxImage.Information);
-                            await LoadFeeStructuresAsync();
-                        }
+                    if (result == MessageBoxResult.Yes)
+                    {
+                        await _feeStructureService.DeleteFeeStructureAsync(selectedFeeStructure.Id);
+                        MessageBox.Show("Fee structure deleted successfully.", "Success",
+                            MessageBoxButton.OK, MessageBoxImage.Information);
+                        await LoadFeeStructuresAsync();
                     }
+                }
+                else
+                {
+                    MessageBox.Show("Please select a fee structure to delete.", "No Selection",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
@@ -2109,6 +2115,13 @@ public partial class StudentsManagementWindow : Window
                     MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }, "Fee Structure Double Click Error");
+    }
+
+    private void DgStudentFeeStructures_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        var hasSelection = dgStudentFeeStructures.SelectedItem != null;
+        btnEditStudentFeeStructure.IsEnabled = hasSelection;
+        btnDeleteStudentFeeStructure.IsEnabled = hasSelection;
     }
 
     private void BtnRefreshStudentFeeStructures_Click(object sender, RoutedEventArgs e)
