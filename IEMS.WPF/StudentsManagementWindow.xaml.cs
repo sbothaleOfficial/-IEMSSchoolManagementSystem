@@ -41,6 +41,7 @@ public partial class StudentsManagementWindow : Window
         AsyncHelper.SafeFireAndForget(LoadStudentsAsync);
         AsyncHelper.SafeFireAndForget(LoadClassesAsync);
         AsyncHelper.SafeFireAndForget(LoadFeePaymentsAsync);
+        AsyncHelper.SafeFireAndForget(LoadFeeStructuresAsync);
         AsyncHelper.SafeFireAndForget(LoadBonafideStudentsAsync);
         AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync);
         AsyncHelper.SafeFireAndForget(LoadPromotionDataAsync);
@@ -410,6 +411,27 @@ public partial class StudentsManagementWindow : Window
         {
             MessageBox.Show($"Error loading fee payments: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             lblStatus.Text = "Error loading fee payments";
+        }
+    }
+
+    private async Task LoadFeeStructuresAsync()
+    {
+        try
+        {
+            lblStatus.Text = "Loading fee structures...";
+            var feeStructures = await _feeStructureService.GetAllFeeStructuresAsync();
+            _allFeeStructures = feeStructures.ToList();
+            dgStudentFeeStructures.ItemsSource = _allFeeStructures;
+
+            // Initialize the filters after loading the data
+            await InitializeStudentFeeStructureFilters();
+
+            lblStatus.Text = $"Loaded {feeStructures.Count()} fee structures";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error loading fee structures: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error loading fee structures";
         }
     }
 
@@ -1983,7 +2005,7 @@ public partial class StudentsManagementWindow : Window
                     addEditWindow.Owner = this;
                     if (addEditWindow.ShowDialog() == true)
                     {
-                        ApplyStudentFeeStructureFilters();
+                        await LoadFeeStructuresAsync();
                     }
                 }
                 else
@@ -2057,7 +2079,7 @@ public partial class StudentsManagementWindow : Window
                             await _feeStructureService.DeleteFeeStructureAsync(feeStructureId);
                             MessageBox.Show("Fee structure deleted successfully.", "Success",
                                 MessageBoxButton.OK, MessageBoxImage.Information);
-                            ApplyStudentFeeStructureFilters();
+                            await LoadFeeStructuresAsync();
                         }
                     }
                 }
@@ -2100,12 +2122,7 @@ public partial class StudentsManagementWindow : Window
 
     private void BtnRefreshStudentFeeStructures_Click(object sender, RoutedEventArgs e)
     {
-        AsyncHelper.SafeFireAndForget(async () =>
-        {
-            if (lblStudentFeeStructureStatus != null)
-                lblStudentFeeStructureStatus.Text = "Refreshing...";
-            ApplyStudentFeeStructureFilters();
-        }, "Refresh Fee Structures Error");
+        AsyncHelper.SafeFireAndForget(LoadFeeStructuresAsync, "Refresh Fee Structures Error");
     }
 
     private void CmbStudentFeeAcademicYear_SelectionChanged(object sender, SelectionChangedEventArgs e)
