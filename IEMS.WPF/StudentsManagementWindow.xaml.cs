@@ -1927,15 +1927,6 @@ public partial class StudentsManagementWindow : Window
                 filtered = filtered.Where(fs => fs.FeeType == feeType);
             }
 
-            // Apply Status filter
-            if (cmbStudentFeeStatusFilter?.SelectedItem is ComboBoxItem selectedStatus)
-            {
-                var status = selectedStatus.Content.ToString();
-                if (status == "Active")
-                    filtered = filtered.Where(fs => fs.IsActive);
-                else if (status == "Inactive")
-                    filtered = filtered.Where(fs => !fs.IsActive);
-            }
 
             // Apply search filter
             if (!string.IsNullOrWhiteSpace(txtStudentFeeSearch?.Text))
@@ -2140,10 +2131,6 @@ public partial class StudentsManagementWindow : Window
         ApplyStudentFeeStructureFilters();
     }
 
-    private void CmbStudentFeeStatusFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        ApplyStudentFeeStructureFilters();
-    }
 
     private void TxtStudentFeeSearch_TextChanged(object sender, TextChangedEventArgs e)
     {
@@ -2157,7 +2144,6 @@ public partial class StudentsManagementWindow : Window
             if (cmbStudentFeeAcademicYear != null) cmbStudentFeeAcademicYear.SelectedIndex = 0;
             if (cmbStudentFeeClassFilter != null) cmbStudentFeeClassFilter.SelectedIndex = 0;
             if (cmbStudentFeeFeeTypeFilter != null) cmbStudentFeeFeeTypeFilter.SelectedIndex = 0;
-            if (cmbStudentFeeStatusFilter != null) cmbStudentFeeStatusFilter.SelectedIndex = 0;
             if (txtStudentFeeSearch != null) txtStudentFeeSearch.Text = "";
             ApplyStudentFeeStructureFilters();
         }

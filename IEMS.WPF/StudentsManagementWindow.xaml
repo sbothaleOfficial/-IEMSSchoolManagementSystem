@@ -376,7 +376,6 @@
                                         <ColumnDefinition Width="200"/>
                                         <ColumnDefinition Width="200"/>
                                         <ColumnDefinition Width="200"/>
-                                        <ColumnDefinition Width="200"/>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
@@ -402,27 +401,16 @@
                                                   SelectionChanged="CmbStudentFeeFeeTypeFilter_SelectionChanged"/>
                                     </StackPanel>
 
-                                    <!-- Status Filter -->
-                                    <StackPanel Grid.Column="3" Margin="0,0,10,0">
-                                        <TextBlock Text="Status" FontWeight="SemiBold" Margin="0,0,0,5" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}"/>
-                                        <ComboBox x:Name="cmbStudentFeeStatusFilter" Height="30"
-                                                  SelectionChanged="CmbStudentFeeStatusFilter_SelectionChanged">
-                                            <ComboBoxItem Content="All" IsSelected="True"/>
-                                            <ComboBoxItem Content="Active"/>
-                                            <ComboBoxItem Content="Inactive"/>
-                                        </ComboBox>
-                                    </StackPanel>
-
                                     <!-- Search Box -->
-                                    <StackPanel Grid.Column="4" Margin="0,0,10,0">
+                                    <StackPanel Grid.Column="3" Margin="0,0,10,0">
                                         <TextBlock Text="Search" FontWeight="SemiBold" Margin="0,0,0,5" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}"/>
                                         <TextBox x:Name="txtStudentFeeSearch" Height="30"
                                                  TextChanged="TxtStudentFeeSearch_TextChanged"
-                                                 Tag="Search by description..."/>
+                                                 Tag="Search..."/>
                                     </StackPanel>
 
                                     <!-- Clear Filters Button -->
-                                    <Button Grid.Column="5" x:Name="btnClearStudentFeeFilters"
+                                    <Button Grid.Column="4" x:Name="btnClearStudentFeeFilters"
                                             Content="Clear Filters"
                                             Style="{StaticResource SecondaryButtonStyle}"
                                             VerticalAlignment="Bottom" Height="30"
@@ -459,43 +447,6 @@
                                                     </Style>
                                                 </DataGridTextColumn.ElementStyle>
                                             </DataGridTextColumn>
-                                            <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
-                                            <DataGridTemplateColumn Header="Status" Width="80">
-                                                <DataGridTemplateColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <Border CornerRadius="10"
-                                                                Padding="8,4"
-                                                                HorizontalAlignment="Center">
-                                                            <Border.Style>
-                                                                <Style TargetType="Border">
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding IsActive}" Value="True">
-                                                                            <Setter Property="Background" Value="{StaticResource SuccessBrush}"/>
-                                                                        </DataTrigger>
-                                                                        <DataTrigger Binding="{Binding IsActive}" Value="False">
-                                                                            <Setter Property="Background" Value="{StaticResource DangerBrush}"/>
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </Border.Style>
-                                                            <TextBlock Foreground="White" FontSize="11" FontWeight="SemiBold">
-                                                                <TextBlock.Style>
-                                                                    <Style TargetType="TextBlock">
-                                                                        <Style.Triggers>
-                                                                            <DataTrigger Binding="{Binding IsActive}" Value="True">
-                                                                                <Setter Property="Text" Value="Active"/>
-                                                                            </DataTrigger>
-                                                                            <DataTrigger Binding="{Binding IsActive}" Value="False">
-                                                                                <Setter Property="Text" Value="Inactive"/>
-                                                                            </DataTrigger>
-                                                                        </Style.Triggers>
-                                                                    </Style>
-                                                                </TextBlock.Style>
-                                                            </TextBlock>
-                                                        </Border>
-                                                    </DataTemplate>
-                                                </DataGridTemplateColumn.CellTemplate>
-                                            </DataGridTemplateColumn>
                                             <DataGridTemplateColumn Header="Actions" Width="150">
                                                 <DataGridTemplateColumn.CellTemplate>
                                                     <DataTemplate>
