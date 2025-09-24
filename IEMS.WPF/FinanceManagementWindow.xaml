@@ -80,6 +80,237 @@
                 </Style>
             </TabControl.Resources>
 
+            <!-- Fee Structure Tab -->
+            <TabItem Header="⚙️ Fee Structure">
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Header Section -->
+                    <Border Grid.Row="0" Background="{StaticResource SurfaceBrush}" Padding="20" Margin="0,0,0,20" CornerRadius="8"
+                            BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Fee Structure Management" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBlock Text="Configure fee amounts for different classes and fee types" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,5,0,0"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button x:Name="btnAddFeeStructure" Content="➕ Add Fee Structure"
+                                        Style="{StaticResource PrimaryButtonStyle}"
+                                        Margin="0,0,10,0" Click="BtnAddFeeStructure_Click" Height="35" Padding="15,0"/>
+                                <Button x:Name="btnRefreshFeeStructures" Content="🔄 Refresh"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Click="BtnRefreshFeeStructures_Click" Height="35" Padding="10,0"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Filter Section -->
+                    <Border Grid.Row="1" Background="{StaticResource SurfaceBrush}" Margin="0,0,0,20" Padding="15" CornerRadius="5"
+                            BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Academic Year Filter -->
+                            <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                <TextBlock Text="Academic Year" FontWeight="SemiBold" Margin="0,0,0,5" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <ComboBox x:Name="cmbFeeAcademicYear" Height="30"
+                                          SelectionChanged="CmbFeeAcademicYear_SelectionChanged"/>
+                            </StackPanel>
+
+                            <!-- Class Filter -->
+                            <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                                <TextBlock Text="Class" FontWeight="SemiBold" Margin="0,0,0,5" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <ComboBox x:Name="cmbFeeClassFilter" Height="30"
+                                          SelectionChanged="CmbFeeClassFilter_SelectionChanged"/>
+                            </StackPanel>
+
+                            <!-- Fee Type Filter -->
+                            <StackPanel Grid.Column="2" Margin="0,0,10,0">
+                                <TextBlock Text="Fee Type" FontWeight="SemiBold" Margin="0,0,0,5" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <ComboBox x:Name="cmbFeeFeeTypeFilter" Height="30"
+                                          SelectionChanged="CmbFeeFeeTypeFilter_SelectionChanged"/>
+                            </StackPanel>
+
+                            <!-- Status Filter -->
+                            <StackPanel Grid.Column="3" Margin="0,0,10,0">
+                                <TextBlock Text="Status" FontWeight="SemiBold" Margin="0,0,0,5" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <ComboBox x:Name="cmbFeeStatusFilter" Height="30"
+                                          SelectionChanged="CmbFeeStatusFilter_SelectionChanged">
+                                    <ComboBoxItem Content="All" IsSelected="True"/>
+                                    <ComboBoxItem Content="Active"/>
+                                    <ComboBoxItem Content="Inactive"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <!-- Search Box -->
+                            <StackPanel Grid.Column="4" Margin="0,0,10,0">
+                                <TextBlock Text="Search" FontWeight="SemiBold" Margin="0,0,0,5" FontSize="12" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                <TextBox x:Name="txtFeeSearch" Height="30"
+                                         TextChanged="TxtFeeSearch_TextChanged"
+                                         Tag="Search by description..."/>
+                            </StackPanel>
+
+                            <!-- Clear Filters Button -->
+                            <Button Grid.Column="5" x:Name="btnClearFeeFilters"
+                                    Content="Clear Filters"
+                                    Style="{StaticResource SecondaryButtonStyle}"
+                                    VerticalAlignment="Bottom" Height="30"
+                                    Click="BtnClearFeeFilters_Click"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Data Grid -->
+                    <Border Grid.Row="2" Background="{StaticResource SurfaceBrush}" CornerRadius="8"
+                            BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" Margin="0,0,0,10">
+                        <Grid>
+                            <DataGrid x:Name="dgFeeStructures"
+                                      AutoGenerateColumns="False"
+                                      CanUserAddRows="False"
+                                      GridLinesVisibility="Horizontal"
+                                      HeadersVisibility="Column"
+                                      AlternatingRowBackground="#F8F9FA"
+                                      BorderThickness="0"
+                                      SelectionMode="Single"
+                                      MouseDoubleClick="DgFeeStructures_MouseDoubleClick">
+
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                                    <DataGridTextColumn Header="Academic Year" Binding="{Binding AcademicYear}" Width="120"/>
+                                    <DataGridTextColumn Header="Class" Binding="{Binding ClassName}" Width="150"/>
+                                    <DataGridTextColumn Header="Fee Type" Binding="{Binding FeeType}" Width="120"/>
+                                    <DataGridTextColumn Header="Amount (₹)" Binding="{Binding Amount, StringFormat='{}{0:N2}'}" Width="120">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="TextAlignment" Value="Right"/>
+                                                <Setter Property="Padding" Value="0,0,10,0"/>
+                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                                <Setter Property="Foreground" Value="{StaticResource SuccessBrush}"/>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="*"/>
+                                    <DataGridTemplateColumn Header="Status" Width="80">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Border CornerRadius="10"
+                                                        Padding="8,4"
+                                                        HorizontalAlignment="Center">
+                                                    <Border.Style>
+                                                        <Style TargetType="Border">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                                    <Setter Property="Background" Value="{StaticResource SuccessBrush}"/>
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                                    <Setter Property="Background" Value="{StaticResource DangerBrush}"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </Border.Style>
+                                                    <TextBlock Foreground="White" FontSize="11" FontWeight="SemiBold">
+                                                        <TextBlock.Style>
+                                                            <Style TargetType="TextBlock">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding IsActive}" Value="True">
+                                                                        <Setter Property="Text" Value="Active"/>
+                                                                    </DataTrigger>
+                                                                    <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                                        <Setter Property="Text" Value="Inactive"/>
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+                                                </Border>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                    <DataGridTemplateColumn Header="Actions" Width="150">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Button Content="✏️ Edit"
+                                                            Tag="{Binding Id}"
+                                                            Style="{StaticResource SecondaryButtonStyle}"
+                                                            Height="25" Width="60" FontSize="10"
+                                                            Margin="0,0,5,0"
+                                                            Click="BtnEditFeeStructure_Click"/>
+                                                    <Button Content="🗑️ Delete"
+                                                            Tag="{Binding Id}"
+                                                            Style="{StaticResource DangerButtonStyle}"
+                                                            Height="25" Width="60" FontSize="10"
+                                                            Click="BtnDeleteFeeStructure_Click"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <!-- Empty State -->
+                            <Border x:Name="feeStructureEmptyStatePanel"
+                                    Visibility="Collapsed"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center">
+                                <StackPanel>
+                                    <TextBlock Text="📊" FontSize="48" HorizontalAlignment="Center" Opacity="0.5"/>
+                                    <TextBlock Text="No Fee Structures Found"
+                                               FontSize="18"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               HorizontalAlignment="Center"
+                                               Margin="0,10,0,5"/>
+                                    <TextBlock Text="Add fee structures to configure fees for classes"
+                                               Foreground="{StaticResource TextSecondaryBrush}"
+                                               HorizontalAlignment="Center"/>
+                                    <Button Content="Add First Fee Structure"
+                                            Style="{StaticResource PrimaryButtonStyle}"
+                                            HorizontalAlignment="Center"
+                                            Margin="0,20,0,0"
+                                            Click="BtnAddFeeStructure_Click"/>
+                                </StackPanel>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <!-- Summary Bar -->
+                    <Border Grid.Row="3" Background="{StaticResource SecondaryDarkBrush}" CornerRadius="5" Padding="15,10">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <TextBlock x:Name="lblFeeStructureStatus" Foreground="{StaticResource TextOnPrimaryBrush}" Text="Ready"/>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                <TextBlock x:Name="lblTotalFeeRecords" Foreground="{StaticResource TextOnPrimaryBrush}" Text="Total Records: 0"/>
+                                <TextBlock Text=" | " Foreground="{StaticResource TextOnPrimaryBrush}" Margin="10,0"/>
+                                <TextBlock x:Name="lblTotalFeeAmount" Foreground="{StaticResource TextOnPrimaryBrush}" Text="Total Amount: ₹0.00"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </TabItem>
+
             <!-- Fee Analytics Tab (Read-only) -->
             <TabItem Header="📊 Fee Analytics">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -112,11 +343,13 @@
                                                TextWrapping="Wrap" Margin="0,5,0,0"/>
                                 </StackPanel>
 
-                                <Button Grid.Column="1" x:Name="btnGoToStudentManagement"
-                                        Content="Go to Student Management →"
-                                        Click="BtnGoToStudentManagement_Click"
-                                        Style="{StaticResource PrimaryButtonStyle}"
-                                        Height="40" Padding="20,0" VerticalAlignment="Center"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button x:Name="btnGoToStudentManagement"
+                                            Content="Go to Student Management →"
+                                            Click="BtnGoToStudentManagement_Click"
+                                            Style="{StaticResource PrimaryButtonStyle}"
+                                            Height="40" Padding="20,0"/>
+                                </StackPanel>
                             </Grid>
                         </Border>
 
