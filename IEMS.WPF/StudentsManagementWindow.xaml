@@ -231,6 +231,26 @@
                             <DataGridTextColumn Header="Semi-English" Binding="{Binding IsSemiEnglish}" Width="100"/>
                             <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="150"/>
                             <DataGridTextColumn Header="Mobile" Binding="{Binding ParentMobileNumber}" Width="100"/>
+                            <DataGridTextColumn Header="Outstanding Fees" Binding="{Binding FormattedOutstandingFees}" Width="120">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="TextAlignment" Value="Right"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Foreground" Value="#E74C3C"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTemplateColumn Header="Actions" Width="100">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="View Fees" Width="80" Height="25"
+                                              Click="BtnViewStudentFees_Click"
+                                              Tag="{Binding Id}"
+                                              Style="{StaticResource PrimaryButtonStyle}"
+                                              FontSize="10" Padding="5,2"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
@@ -265,6 +285,132 @@
                             <DataGridTextColumn Header="Students Enrolled" Binding="{Binding StudentCount}" Width="120"/>
                         </DataGrid.Columns>
                     </DataGrid>
+                </Grid>
+            </TabItem>
+
+            <TabItem Header="⚙️ Fee Structure" FontSize="14">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Fee Structure Header with Actions -->
+                    <Border Grid.Row="0" Background="White" Padding="15" Margin="0,0,0,1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Fee Structure Management" FontSize="18" FontWeight="Bold" Foreground="#2C3E50"/>
+                                <TextBlock Text="Configure fee amounts for different classes and fee types"
+                                         FontSize="12" Foreground="#7F8C8D" Margin="0,5,0,0"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                <Button Name="btnAddFeeStructure" Content="Add Fee Structure"
+                                      Width="140" Height="35" Margin="0,0,10,0"
+                                      Click="BtnAddFeeStructure_Click" Style="{StaticResource SuccessButtonStyle}"/>
+                                <Button Name="btnEditFeeStructure" Content="Edit Fee Structure"
+                                      Width="140" Height="35" Margin="0,0,10,0"
+                                      Click="BtnEditFeeStructure_Click" Style="{StaticResource PrimaryButtonStyle}"/>
+                                <Button Name="btnDeleteFeeStructure" Content="Delete Fee Structure"
+                                      Width="150" Height="35" Margin="0,0,10,0"
+                                      Click="BtnDeleteFeeStructure_Click" Style="{StaticResource DangerButtonStyle}"/>
+                                <Button Name="btnRefreshFeeStructures" Content="Refresh"
+                                      Width="100" Height="35"
+                                      Click="BtnRefreshFeeStructures_Click" Style="{StaticResource SecondaryButtonStyle}"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Fee Structure Content -->
+                    <Grid Grid.Row="1" Margin="10">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Filters -->
+                        <Border Grid.Row="0" Background="White" Margin="0,0,0,10" Padding="15"
+                              BorderBrush="#E0E6ED" BorderThickness="1" CornerRadius="5">
+                            <StackPanel Orientation="Horizontal">
+                                <!-- Academic Year Filter -->
+                                <StackPanel Margin="0,0,15,0">
+                                    <TextBlock Text="Academic Year" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                    <ComboBox Name="cmbFeeStructureAcademicYear" Width="120" Height="30"
+                                            SelectionChanged="CmbFeeStructureAcademicYear_SelectionChanged"/>
+                                </StackPanel>
+
+                                <!-- Class Filter -->
+                                <StackPanel Margin="0,0,15,0">
+                                    <TextBlock Text="Class" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                    <ComboBox Name="cmbFeeStructureClassFilter" Width="150" Height="30"
+                                            SelectionChanged="CmbFeeStructureClassFilter_SelectionChanged"/>
+                                </StackPanel>
+
+                                <!-- Fee Type Filter -->
+                                <StackPanel Margin="0,0,15,0">
+                                    <TextBlock Text="Fee Type" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                    <ComboBox Name="cmbFeeStructureFeeTypeFilter" Width="130" Height="30"
+                                            SelectionChanged="CmbFeeStructureFeeTypeFilter_SelectionChanged"/>
+                                </StackPanel>
+
+                                <!-- Clear Filters Button -->
+                                <Button Name="btnClearFeeStructureFilters" Content="Clear Filters" Width="120" Height="30"
+                                      VerticalAlignment="Bottom" Click="BtnClearFeeStructureFilters_Click"
+                                      Style="{StaticResource SecondaryButtonStyle}"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Fee Structures DataGrid -->
+                        <Border Grid.Row="1" Background="White" BorderBrush="#E0E6ED" BorderThickness="1" CornerRadius="5">
+                            <DataGrid Name="dgFeeStructures" AutoGenerateColumns="False"
+                                    CanUserAddRows="False" GridLinesVisibility="None"
+                                    HeadersVisibility="Column" AlternatingRowBackground="#F8F9FA"
+                                    BorderThickness="0" SelectionMode="Single"
+                                    MouseDoubleClick="DgFeeStructures_MouseDoubleClick">
+
+                                <DataGrid.Resources>
+                                    <Style TargetType="DataGridColumnHeader">
+                                        <Setter Property="Background" Value="#34495E"/>
+                                        <Setter Property="Foreground" Value="White"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Height" Value="40"/>
+                                        <Setter Property="Padding" Value="10,0"/>
+                                    </Style>
+                                    <Style TargetType="DataGridRow">
+                                        <Setter Property="Height" Value="45"/>
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="#E8F6FF"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.Resources>
+
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="60"/>
+                                    <DataGridTextColumn Header="Academic Year" Binding="{Binding AcademicYear}" Width="130"/>
+                                    <DataGridTextColumn Header="Class" Binding="{Binding ClassName}" Width="200"/>
+                                    <DataGridTextColumn Header="Fee Type" Binding="{Binding FeeType}" Width="150"/>
+                                    <DataGridTextColumn Header="Amount (₹)" Binding="{Binding Amount, StringFormat='{}{0:N2}'}" Width="*">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="TextAlignment" Value="Right"/>
+                                                <Setter Property="Padding" Value="0,0,15,0"/>
+                                                <Setter Property="FontWeight" Value="SemiBold"/>
+                                                <Setter Property="Foreground" Value="#27AE60"/>
+                                                <Setter Property="FontSize" Value="14"/>
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Border>
+                    </Grid>
                 </Grid>
             </TabItem>
 

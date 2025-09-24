@@ -41,11 +41,7 @@
 
                 <!-- Academic Year -->
                 <Label Content="Academic Year *" FontWeight="Bold" Margin="0,5"/>
-                <ComboBox x:Name="cmbAcademicYear" Height="30">
-                    <ComboBoxItem Content="2024-25" IsSelected="True"/>
-                    <ComboBoxItem Content="2025-26"/>
-                    <ComboBoxItem Content="2023-24"/>
-                </ComboBox>
+                <ComboBox x:Name="cmbAcademicYear" Height="30"/>
 
                 <!-- Fee Type -->
                 <Label Content="Fee Type *" FontWeight="Bold" Margin="0,5"/>
@@ -75,50 +71,12 @@
                 </StackPanel>
 
                 <!-- Amount Section -->
-                <Grid Margin="0,10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel Grid.Column="0" Margin="0,0,5,0">
-                        <Label Content="Amount to Pay *" FontWeight="Bold"/>
-                        <TextBox x:Name="txtAmount" Height="30" TextChanged="TxtAmount_TextChanged"/>
-                        <TextBlock x:Name="txtAmountInWords" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"
-                                   TextWrapping="Wrap" Margin="0,2"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                        <Label Content="Late Fee (if any)" FontWeight="Bold"/>
-                        <TextBox x:Name="txtLateFee" Height="30" Text="0" TextChanged="RecalculateTotals"/>
-                    </StackPanel>
-                </Grid>
-
-                <Grid Margin="0,5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-
-                    <StackPanel Grid.Column="0" Margin="0,0,5,0">
-                        <Label Content="Discount (if any)" FontWeight="Bold"/>
-                        <TextBox x:Name="txtDiscount" Height="30" Text="0" TextChanged="RecalculateTotals"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                        <Label Content="Installment No." FontWeight="Bold"/>
-                        <TextBox x:Name="txtInstallmentNumber" Height="30"/>
-                    </StackPanel>
-                </Grid>
-
-                <!-- Next Due Date -->
-                <Label Content="Next Due Date (if applicable)" FontWeight="Bold" Margin="0,5"/>
-                <DatePicker x:Name="dpNextDueDate" Height="30"/>
-
-                <!-- Payment Notes -->
-                <Label Content="Payment Notes" FontWeight="Bold" Margin="0,5"/>
-                <TextBox x:Name="txtPaymentNotes" Height="60" TextWrapping="Wrap"
-                         AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+                <StackPanel Margin="0,10">
+                    <Label Content="Amount to Pay *" FontWeight="Bold"/>
+                    <TextBox x:Name="txtAmount" Height="30" TextChanged="TxtAmount_TextChanged"/>
+                    <TextBlock x:Name="txtAmountInWords" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"
+                               TextWrapping="Wrap" Margin="0,2"/>
+                </StackPanel>
 
                 <!-- Summary Display -->
                 <Border BorderBrush="{StaticResource AccentBrush}" BorderThickness="2" CornerRadius="3"

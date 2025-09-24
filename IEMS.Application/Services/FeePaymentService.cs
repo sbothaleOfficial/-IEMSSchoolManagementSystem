@@ -55,6 +55,90 @@ public class FeePaymentService
         return feePayments.Select(MapToDto);
     }
 
+    public async Task<StudentFeeStatusDto> GetStudentFeeStatusAsync(int studentId, string academicYear)
+    {
+        var student = await _studentRepository.GetByIdAsync(studentId);
+        if (student == null) throw new ArgumentException("Student not found");
+
+        var studentClass = await _classRepository.GetByIdAsync(student.ClassId);
+        if (studentClass == null) throw new ArgumentException("Student class not found");
+
+        // Get all fee structures for this student's class and academic year
+        var feeStructures = await _feeStructureRepository.GetByClassIdAndAcademicYearAsync(student.ClassId, academicYear);
+
+        // Get all payments for this student and academic year
+        var allPayments = await _feePaymentRepository.GetByStudentIdAsync(studentId);
+        var paymentsThisYear = allPayments.Where(p => p.AcademicYear == academicYear).ToList();
+
+        var feeTypeStatuses = new List<StudentFeeTypeStatusDto>();
+        decimal totalOutstanding = 0;
+
+        // Process each fee type that has a structure
+        foreach (var feeStructure in feeStructures)
+        {
+            var feeTypePayments = paymentsThisYear.Where(p => p.FeeType == feeStructure.FeeType).ToList();
+            var totalPaid = feeTypePayments.Sum(p => p.AmountPaid);
+            var lastPayment = feeTypePayments.OrderByDescending(p => p.PaymentDate).FirstOrDefault();
+
+            // Calculate outstanding for this fee type
+            var outstandingForType = Math.Max(0, feeStructure.Amount - totalPaid);
+            totalOutstanding += outstandingForType;
+
+            feeTypeStatuses.Add(new StudentFeeTypeStatusDto
+            {
+                FeeType = feeStructure.FeeType,
+                FeeTypeName = GetFeeTypeDisplayName(feeStructure.FeeType),
+                FeeStructureAmount = feeStructure.Amount,
+                TotalPaid = totalPaid,
+                OutstandingAmount = outstandingForType,
+                LastPaidAmount = lastPayment?.AmountPaid ?? 0,
+                LastPaymentDate = lastPayment?.PaymentDate,
+                PaymentCount = feeTypePayments.Count
+            });
+        }
+
+        // Get recent payments (last 5)
+        var recentPayments = paymentsThisYear
+            .OrderByDescending(p => p.PaymentDate)
+            .Take(5)
+            .Select(MapToDto)
+            .ToList();
+
+        return new StudentFeeStatusDto
+        {
+            StudentId = studentId,
+            StudentName = $"{student.FirstName} {student.Surname}",
+            StudentNumber = student.StudentNumber ?? "",
+            ClassName = $"{studentClass.Name} - {studentClass.Section}",
+            AcademicYear = academicYear,
+            TotalOutstandingBalance = totalOutstanding,
+            FeeTypeStatuses = feeTypeStatuses,
+            RecentPayments = recentPayments
+        };
+    }
+
+    public async Task<decimal> GetStudentOutstandingBalanceAsync(int studentId, string academicYear)
+    {
+        var feeStatus = await GetStudentFeeStatusAsync(studentId, academicYear);
+        return feeStatus.TotalOutstandingBalance;
+    }
+
+    private string GetFeeTypeDisplayName(FeeType feeType)
+    {
+        return feeType switch
+        {
+            FeeType.TUITION => "Tuition Fee",
+            FeeType.ADMISSION => "Admission Fee",
+            FeeType.LIBRARY => "Library Fee",
+            FeeType.EXAM => "Examination Fee",
+            FeeType.SPORTS => "Sports Fee",
+            FeeType.TRANSPORT => "Transport Fee",
+            FeeType.UNIFORM => "Uniform Fee",
+            FeeType.MISCELLANEOUS => "Miscellaneous Fee",
+            _ => feeType.ToString()
+        };
+    }
+
     public async Task<IEnumerable<FeePaymentDto>> GetFeePaymentsByDateRangeAsync(DateTime fromDate, DateTime toDate)
     {
         var feePayments = await _feePaymentRepository.GetByDateRangeAsync(fromDate, toDate);
@@ -307,7 +391,7 @@ public class FeePaymentService
         return feeTypeData;
     }
 
-    public async Task<List<StudentFeeStatusDto>> GetStudentsWithPendingFeesAsync(string academicYear, int? classId = null)
+    public async Task<List<StudentFeeAnalyticsDto>> GetStudentsWithPendingFeesAsync(string academicYear, int? classId = null)
     {
         var allFeePayments = await _feePaymentRepository.GetAllAsync();
         var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYear == academicYear).ToList();
@@ -326,7 +410,7 @@ public class FeePaymentService
                 var daysSinceLastPayment = lastPayment != null ?
                     (DateTime.Now - lastPayment.PaymentDate).Days : 0;
 
-                return new StudentFeeStatusDto
+                return new StudentFeeAnalyticsDto
                 {
                     StudentId = student.Id,
                     StudentName = student.FullName,
@@ -350,7 +434,7 @@ public class FeePaymentService
             })
             .Where(s => s != null)
             .OrderByDescending(s => s!.TotalPendingAmount)
-            .Cast<StudentFeeStatusDto>()
+            .Cast<StudentFeeAnalyticsDto>()
             .ToList();
 
         return studentsWithPending;

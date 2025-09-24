@@ -23,6 +23,8 @@ public class StudentDto
     public string ParentMobileNumber { get; set; } = string.Empty;
     public int ClassId { get; set; }
     public string ClassName { get; set; } = string.Empty;
+    public decimal OutstandingFees { get; set; }
+    public bool HasOutstandingFees { get; set; }
 
     public string FullName => $"{FirstName} {Surname}".Trim();
     public string FullNameWithAdmissionNumber => $"{FullName} - {StudentNumber}";
@@ -31,4 +33,5 @@ public class StudentDto
         : Standard;
     public string FormattedDateOfBirth => DateOfBirth.ToString("dd/MM/yyyy");
     public string FormattedAdmissionDate => AdmissionDate.ToString("dd/MM/yyyy");
+    public string FormattedOutstandingFees => HasOutstandingFees ? $"₹{OutstandingFees:N2}" : "₹0.00";
 }

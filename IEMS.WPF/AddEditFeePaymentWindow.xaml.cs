@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
 using IEMS.Core.Enums;
+using IEMS.Core.Interfaces;
 using IEMS.WPF.Helpers;
 
 namespace IEMS.WPF;
@@ -12,13 +13,16 @@ public partial class AddEditFeePaymentWindow : Window
     private readonly FeePaymentService _feePaymentService;
     private readonly FeeStructureService _feeStructureService;
     private readonly StudentService _studentService;
+    private readonly IAcademicYearRepository _academicYearRepository;
     private List<StudentDto> _students = new List<StudentDto>();
     private List<FeeStructureDto> _feeStructures = new List<FeeStructureDto>();
+    private int? _preSelectedStudentId;
 
     public AddEditFeePaymentWindow(
         FeePaymentService feePaymentService,
         FeeStructureService feeStructureService,
-        StudentService studentService)
+        StudentService studentService,
+        IAcademicYearRepository academicYearRepository)
     {
         try
         {
@@ -28,6 +32,7 @@ public partial class AddEditFeePaymentWindow : Window
             _feePaymentService = feePaymentService ?? throw new ArgumentNullException(nameof(feePaymentService));
             _feeStructureService = feeStructureService ?? throw new ArgumentNullException(nameof(feeStructureService));
             _studentService = studentService ?? throw new ArgumentNullException(nameof(studentService));
+            _academicYearRepository = academicYearRepository ?? throw new ArgumentNullException(nameof(academicYearRepository));
 
             // Use Loaded event to ensure UI is fully initialized
             this.Loaded += AddEditFeePaymentWindow_Loaded;
@@ -44,6 +49,11 @@ public partial class AddEditFeePaymentWindow : Window
         AsyncHelper.SafeFireAndForget(async () => await LoadData(), "Fee Payment Window Loading Error");
     }
 
+    public void SetStudentId(int studentId)
+    {
+        _preSelectedStudentId = studentId;
+    }
+
     private async Task LoadData()
     {
         try
@@ -55,11 +65,12 @@ public partial class AddEditFeePaymentWindow : Window
             }
 
             await LoadStudents();
+            await LoadAcademicYears();
             LoadFeeTypes();
             LoadPaymentMethods();
 
-            // Initialize the payment summary instead of calling RecalculateTotals with null
-            txtPaymentSummary.Text = "Amount: ₹0.00\nLate Fee: ₹0.00\nDiscount: ₹0.00\n──────────────────\nTotal Amount: ₹0.00\nIn Words: Zero Rupees Only";
+            // Initialize the payment summary
+            txtPaymentSummary.Text = "Amount: ₹0.00\nIn Words: Zero Rupees Only";
         }
         catch (Exception ex)
         {
@@ -81,7 +92,15 @@ public partial class AddEditFeePaymentWindow : Window
         studentItems.Insert(0, new { Id = 0, DisplayName = "-- Select Student --" });
 
         cmbStudent.ItemsSource = studentItems;
-        cmbStudent.SelectedValue = 0;
+        // Pre-select student if specified
+        if (_preSelectedStudentId.HasValue && _preSelectedStudentId.Value > 0)
+        {
+            cmbStudent.SelectedValue = _preSelectedStudentId.Value;
+        }
+        else
+        {
+            cmbStudent.SelectedValue = 0;
+        }
     }
 
     private void LoadFeeTypes()
@@ -114,6 +133,56 @@ public partial class AddEditFeePaymentWindow : Window
         cmbPaymentMethod.DisplayMemberPath = "Display";
         cmbPaymentMethod.SelectedValuePath = "Value";
         cmbPaymentMethod.SelectedIndex = 0;
+    }
+
+    private async Task LoadAcademicYears()
+    {
+        try
+        {
+            var academicYears = await _academicYearRepository.GetRecentAcademicYearsAsync(10);
+            var yearItems = academicYears.Select(ay => new
+            {
+                Value = ay.Year,
+                Display = ay.Year,
+                IsCurrent = ay.IsCurrent
+            }).ToList();
+
+            yearItems.Insert(0, new { Value = "", Display = "-- Select Academic Year --", IsCurrent = false });
+
+            cmbAcademicYear.ItemsSource = yearItems;
+            cmbAcademicYear.DisplayMemberPath = "Display";
+            cmbAcademicYear.SelectedValuePath = "Value";
+
+            // Select current academic year if available
+            var currentYear = yearItems.FirstOrDefault(y => y.IsCurrent);
+            if (currentYear != null)
+            {
+                cmbAcademicYear.SelectedValue = currentYear.Value;
+            }
+            else
+            {
+                cmbAcademicYear.SelectedIndex = 0;
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error loading academic years: {ex.Message}", "Data Loading Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            // Fallback to default years if database loading fails
+            cmbAcademicYear.Items.Clear();
+            cmbAcademicYear.Items.Add("2024-25");
+            cmbAcademicYear.Items.Add("2025-26");
+            cmbAcademicYear.Items.Add("2023-24");
+            cmbAcademicYear.SelectedIndex = 0;
+        }
+    }
+
+    private string GetSelectedAcademicYear()
+    {
+        if (cmbAcademicYear?.SelectedValue != null && !string.IsNullOrEmpty(cmbAcademicYear.SelectedValue.ToString()))
+        {
+            return cmbAcademicYear.SelectedValue.ToString();
+        }
+        return "2024-25"; // Fallback to default year
     }
 
     private void CmbStudent_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -149,7 +218,7 @@ public partial class AddEditFeePaymentWindow : Window
         var selectedStudent = _students.FirstOrDefault(s => s.Id == (int)cmbStudent.SelectedValue);
         if (selectedStudent != null)
         {
-            var academicYear = "2024-25"; // Default academic year since ComboBox might not be initialized
+            var academicYear = GetSelectedAcademicYear();
             _feeStructures = (await _feeStructureService.GetFeeStructuresByClassIdAsync(selectedStudent.ClassId)).ToList();
         }
     }
@@ -171,7 +240,7 @@ public partial class AddEditFeePaymentWindow : Window
         {
             try
             {
-                var academicYear = "2024-25"; // Default academic year since ComboBox might not be initialized
+                var academicYear = GetSelectedAcademicYear();
                 var feeStructure = await _feeStructureService.GetFeeStructureByClassFeeTypeAndYearAsync(
                     selectedStudent.ClassId, selectedFeeType, academicYear);
 
@@ -241,46 +310,21 @@ public partial class AddEditFeePaymentWindow : Window
     private void TxtAmount_TextChanged(object sender, TextChangedEventArgs e)
     {
         // Skip if UI elements are not fully initialized
-        if (txtAmount == null || txtAmountInWords == null)
+        if (txtAmount == null || txtAmountInWords == null || txtPaymentSummary == null)
             return;
 
         if (decimal.TryParse(txtAmount.Text, out decimal amount))
         {
             txtAmountInWords.Text = ConvertAmountToWords(amount);
+            txtPaymentSummary.Text = $"Amount: ₹{amount:F2}\nIn Words: {ConvertAmountToWords(amount)}";
         }
         else
         {
             txtAmountInWords.Text = "";
+            txtPaymentSummary.Text = "Amount: ₹0.00\nIn Words: Zero Rupees Only";
         }
     }
 
-    private void RecalculateTotals(object sender, TextChangedEventArgs e)
-    {
-        // Skip if UI elements are not fully initialized
-        if (txtAmount == null || txtLateFee == null || txtDiscount == null || txtPaymentSummary == null)
-            return;
-
-        try
-        {
-            var amount = decimal.TryParse(txtAmount.Text, out decimal amt) ? amt : 0;
-            var lateFee = decimal.TryParse(txtLateFee.Text, out decimal late) ? late : 0;
-            var discount = decimal.TryParse(txtDiscount.Text, out decimal disc) ? disc : 0;
-
-            var totalAmount = amount + lateFee - discount;
-
-            txtPaymentSummary.Text = $"Amount: ₹{amount:F2}\n" +
-                                   $"Late Fee: ₹{lateFee:F2}\n" +
-                                   $"Discount: ₹{discount:F2}\n" +
-                                   $"──────────────────\n" +
-                                   $"Total Amount: ₹{totalAmount:F2}\n" +
-                                   $"In Words: {ConvertAmountToWords(totalAmount)}";
-        }
-        catch
-        {
-            if (txtPaymentSummary != null)
-                txtPaymentSummary.Text = "Invalid amounts entered";
-        }
-    }
 
     private void BtnSave_Click(object sender, RoutedEventArgs e)
     {
@@ -299,12 +343,12 @@ public partial class AddEditFeePaymentWindow : Window
                     TransactionId = txtTransactionId.Text.Trim(),
                     ChequeNumber = txtTransactionId.Text.Trim(), // Same field for cheque/DD
                     BankName = txtBankName.Text.Trim(),
-                    PaymentNotes = txtPaymentNotes.Text.Trim(),
-                    LateFee = decimal.TryParse(txtLateFee.Text, out decimal late) ? late : 0,
-                    Discount = decimal.TryParse(txtDiscount.Text, out decimal disc) ? disc : 0,
-                    InstallmentNumber = int.TryParse(txtInstallmentNumber.Text, out int inst) ? inst : null,
-                    NextDueDate = dpNextDueDate.SelectedDate,
-                    AcademicYear = "2024-25", // Default academic year
+                    PaymentNotes = "",
+                    LateFee = 0,
+                    Discount = 0,
+                    InstallmentNumber = null,
+                    NextDueDate = null,
+                    AcademicYear = GetSelectedAcademicYear(),
                     GeneratedBy = Environment.UserName
                 };
 
