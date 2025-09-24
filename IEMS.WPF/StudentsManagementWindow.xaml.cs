@@ -41,7 +41,6 @@ public partial class StudentsManagementWindow : Window
         AsyncHelper.SafeFireAndForget(LoadStudentsAsync);
         AsyncHelper.SafeFireAndForget(LoadClassesAsync);
         AsyncHelper.SafeFireAndForget(LoadFeePaymentsAsync);
-        AsyncHelper.SafeFireAndForget(LoadFeeStructuresAsync);
         AsyncHelper.SafeFireAndForget(LoadBonafideStudentsAsync);
         AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync);
         AsyncHelper.SafeFireAndForget(LoadPromotionDataAsync);
@@ -1777,185 +1776,7 @@ public partial class StudentsManagementWindow : Window
 
     #endregion
 
-    #region Fee Structure Management
 
-    private async Task LoadFeeStructuresAsync()
-    {
-        try
-        {
-            _allFeeStructures = (await _feeStructureService.GetAllFeeStructuresAsync()).ToList();
-            InitializeFeeStructureFilters();
-            ApplyFeeStructureFilters();
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error loading fee structures: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
-
-    private void InitializeFeeStructureFilters()
-    {
-        // Initialize Academic Year dropdown
-        var currentYear = DateTime.Now.Year;
-        var academicYears = new List<string> { "All" };
-        for (int i = -2; i <= 2; i++)
-        {
-            var year = currentYear + i;
-            academicYears.Add($"{year}-{(year + 1).ToString().Substring(2)}");
-        }
-        cmbFeeStructureAcademicYear.ItemsSource = academicYears;
-        cmbFeeStructureAcademicYear.SelectedIndex = 0;
-
-        // Initialize Class dropdown
-        var classItems = new List<dynamic> { new { Id = -1, Display = "All Classes" } };
-        classItems.AddRange(_allClasses.Select(c => new { Id = c.Id, Display = $"{c.Name} - {c.Section}" }));
-        cmbFeeStructureClassFilter.ItemsSource = classItems;
-        cmbFeeStructureClassFilter.DisplayMemberPath = "Display";
-        cmbFeeStructureClassFilter.SelectedValuePath = "Id";
-        cmbFeeStructureClassFilter.SelectedIndex = 0;
-
-        // Initialize Fee Type dropdown
-        var feeTypes = new List<dynamic> { new { Value = -1, Display = "All Types" } };
-        feeTypes.AddRange(Enum.GetValues<IEMS.Core.Enums.FeeType>()
-            .Select(ft => new { Value = (int)ft, Display = ft.ToString() }));
-        cmbFeeStructureFeeTypeFilter.ItemsSource = feeTypes;
-        cmbFeeStructureFeeTypeFilter.DisplayMemberPath = "Display";
-        cmbFeeStructureFeeTypeFilter.SelectedValuePath = "Value";
-        cmbFeeStructureFeeTypeFilter.SelectedIndex = 0;
-    }
-
-    private void ApplyFeeStructureFilters()
-    {
-        var filtered = _allFeeStructures.AsEnumerable();
-
-        // Apply Academic Year filter
-        if (cmbFeeStructureAcademicYear.SelectedItem != null && cmbFeeStructureAcademicYear.SelectedItem.ToString() != "All")
-        {
-            var selectedYear = cmbFeeStructureAcademicYear.SelectedItem.ToString();
-            filtered = filtered.Where(fs => fs.AcademicYear == selectedYear);
-        }
-
-        // Apply Class filter
-        if (cmbFeeStructureClassFilter.SelectedValue != null && (int)cmbFeeStructureClassFilter.SelectedValue != -1)
-        {
-            var classId = (int)cmbFeeStructureClassFilter.SelectedValue;
-            filtered = filtered.Where(fs => fs.ClassId == classId);
-        }
-
-        // Apply Fee Type filter
-        if (cmbFeeStructureFeeTypeFilter.SelectedValue != null && (int)cmbFeeStructureFeeTypeFilter.SelectedValue != -1)
-        {
-            var feeType = (IEMS.Core.Enums.FeeType)cmbFeeStructureFeeTypeFilter.SelectedValue;
-            filtered = filtered.Where(fs => fs.FeeType == feeType);
-        }
-
-        dgFeeStructures.ItemsSource = filtered.ToList();
-    }
-
-    private void BtnAddFeeStructure_Click(object sender, RoutedEventArgs e)
-    {
-        var addEditWindow = new AddEditFeeStructureWindow(_feeStructureService, _classService);
-        addEditWindow.Owner = this;
-        if (addEditWindow.ShowDialog() == true)
-        {
-            AsyncHelper.SafeFireAndForget(LoadFeeStructuresAsync);
-        }
-    }
-
-    private void BtnEditFeeStructure_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is int feeStructureId)
-        {
-            var addEditWindow = new AddEditFeeStructureWindow(_feeStructureService, _classService);
-            addEditWindow.Owner = this;
-            addEditWindow.SetFeeStructureId(feeStructureId);
-            if (addEditWindow.ShowDialog() == true)
-            {
-                AsyncHelper.SafeFireAndForget(LoadFeeStructuresAsync);
-            }
-        }
-    }
-
-    private void BtnDeleteFeeStructure_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is int feeStructureId)
-        {
-            var feeStructure = _allFeeStructures.FirstOrDefault(fs => fs.Id == feeStructureId);
-            if (feeStructure != null)
-            {
-                var result = MessageBox.Show(
-                    $"Are you sure you want to delete the fee structure for {feeStructure.ClassName} - {feeStructure.FeeType}?\n\n" +
-                    $"Amount: ₹{feeStructure.Amount:N2}\n" +
-                    $"Academic Year: {feeStructure.AcademicYear}",
-                    "Confirm Delete",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Warning);
-
-                if (result == MessageBoxResult.Yes)
-                {
-                    AsyncHelper.SafeFireAndForget(async () =>
-                    {
-                        try
-                        {
-                            await _feeStructureService.DeleteFeeStructureAsync(feeStructureId);
-                            MessageBox.Show("Fee structure deleted successfully.", "Success",
-                                MessageBoxButton.OK, MessageBoxImage.Information);
-                            await LoadFeeStructuresAsync();
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Error deleting fee structure: {ex.Message}", "Error",
-                                MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    });
-                }
-            }
-        }
-    }
-
-    private void BtnRefreshFeeStructures_Click(object sender, RoutedEventArgs e)
-    {
-        AsyncHelper.SafeFireAndForget(LoadFeeStructuresAsync);
-    }
-
-    private void CmbFeeStructureAcademicYear_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        ApplyFeeStructureFilters();
-    }
-
-    private void CmbFeeStructureClassFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        ApplyFeeStructureFilters();
-    }
-
-    private void CmbFeeStructureFeeTypeFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        ApplyFeeStructureFilters();
-    }
-
-    private void BtnClearFeeStructureFilters_Click(object sender, RoutedEventArgs e)
-    {
-        cmbFeeStructureAcademicYear.SelectedIndex = 0;
-        cmbFeeStructureClassFilter.SelectedIndex = 0;
-        cmbFeeStructureFeeTypeFilter.SelectedIndex = 0;
-        ApplyFeeStructureFilters();
-    }
-
-    private void DgFeeStructures_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-    {
-        if (dgFeeStructures.SelectedItem is FeeStructureDto selectedFeeStructure)
-        {
-            var addEditWindow = new AddEditFeeStructureWindow(_feeStructureService, _classService);
-            addEditWindow.Owner = this;
-            addEditWindow.SetFeeStructureId(selectedFeeStructure.Id);
-            if (addEditWindow.ShowDialog() == true)
-            {
-                AsyncHelper.SafeFireAndForget(LoadFeeStructuresAsync);
-            }
-        }
-    }
-
-    #endregion
 
     private async Task LoadOutstandingFeesAsync()
     {
@@ -2011,4 +1832,323 @@ public partial class StudentsManagementWindow : Window
             }
         }, "Student Fee Status Error");
     }
+
+    #region Fee Structure Management
+
+    private async Task InitializeStudentFeeStructureFilters()
+    {
+        try
+        {
+            // Initialize Academic Year dropdown
+            var currentYear = DateTime.Now.Year;
+            var academicYears = new List<string> { "All" };
+            for (int i = -2; i <= 2; i++)
+            {
+                var year = currentYear + i;
+                academicYears.Add($"{year}-{(year + 1).ToString().Substring(2)}");
+            }
+            cmbStudentFeeAcademicYear.ItemsSource = academicYears;
+            cmbStudentFeeAcademicYear.SelectedIndex = 0;
+
+            // Initialize Class dropdown
+            var classItems = new List<dynamic> { new { Id = -1, Display = "All Classes" } };
+            classItems.AddRange(_allClasses.Select(c => new { Id = c.Id, Display = $"{c.Name} - {c.Section}" }));
+            cmbStudentFeeClassFilter.ItemsSource = classItems;
+            cmbStudentFeeClassFilter.DisplayMemberPath = "Display";
+            cmbStudentFeeClassFilter.SelectedValuePath = "Id";
+            cmbStudentFeeClassFilter.SelectedIndex = 0;
+
+            // Initialize Fee Type dropdown
+            var feeTypes = new List<dynamic> { new { Value = -1, Display = "All Types" } };
+            feeTypes.AddRange(Enum.GetValues<IEMS.Core.Enums.FeeType>()
+                .Select(ft => new { Value = (int)ft, Display = ft.ToString() }));
+            cmbStudentFeeFeeTypeFilter.ItemsSource = feeTypes;
+            cmbStudentFeeFeeTypeFilter.DisplayMemberPath = "Display";
+            cmbStudentFeeFeeTypeFilter.SelectedValuePath = "Value";
+            cmbStudentFeeFeeTypeFilter.SelectedIndex = 0;
+
+            // Apply initial filters
+            ApplyStudentFeeStructureFilters();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error initializing fee structure filters: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void ApplyStudentFeeStructureFilters()
+    {
+        try
+        {
+            if (_allFeeStructures == null || !_allFeeStructures.Any()) return;
+
+            var filtered = _allFeeStructures.AsEnumerable();
+
+            // Apply Academic Year filter
+            if (cmbStudentFeeAcademicYear?.SelectedItem != null && cmbStudentFeeAcademicYear.SelectedItem.ToString() != "All")
+            {
+                var selectedYear = cmbStudentFeeAcademicYear.SelectedItem.ToString();
+                filtered = filtered.Where(fs => fs.AcademicYear == selectedYear);
+            }
+
+            // Apply Class filter
+            if (cmbStudentFeeClassFilter?.SelectedValue != null && (int)cmbStudentFeeClassFilter.SelectedValue != -1)
+            {
+                var classId = (int)cmbStudentFeeClassFilter.SelectedValue;
+                filtered = filtered.Where(fs => fs.ClassId == classId);
+            }
+
+            // Apply Fee Type filter
+            if (cmbStudentFeeFeeTypeFilter?.SelectedValue != null && (int)cmbStudentFeeFeeTypeFilter.SelectedValue != -1)
+            {
+                var feeType = (IEMS.Core.Enums.FeeType)cmbStudentFeeFeeTypeFilter.SelectedValue;
+                filtered = filtered.Where(fs => fs.FeeType == feeType);
+            }
+
+            // Apply Status filter
+            if (cmbStudentFeeStatusFilter?.SelectedItem is ComboBoxItem selectedStatus)
+            {
+                var status = selectedStatus.Content.ToString();
+                if (status == "Active")
+                    filtered = filtered.Where(fs => fs.IsActive);
+                else if (status == "Inactive")
+                    filtered = filtered.Where(fs => !fs.IsActive);
+            }
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(txtStudentFeeSearch?.Text))
+            {
+                var searchTerm = txtStudentFeeSearch.Text.ToLower();
+                filtered = filtered.Where(fs => fs.Description.ToLower().Contains(searchTerm));
+            }
+
+            var filteredList = filtered.ToList();
+            dgStudentFeeStructures.ItemsSource = filteredList;
+
+            // Show/hide empty state
+            if (studentFeeStructureEmptyStatePanel != null)
+            {
+                if (filteredList.Count == 0)
+                {
+                    dgStudentFeeStructures.Visibility = Visibility.Collapsed;
+                    studentFeeStructureEmptyStatePanel.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    dgStudentFeeStructures.Visibility = Visibility.Visible;
+                    studentFeeStructureEmptyStatePanel.Visibility = Visibility.Collapsed;
+                }
+            }
+
+            UpdateStudentFeeStructureStatusBar();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error applying fee structure filters: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void UpdateStudentFeeStructureStatusBar()
+    {
+        try
+        {
+            var items = dgStudentFeeStructures?.ItemsSource as List<FeeStructureDto>;
+            if (items != null && lblStudentTotalFeeRecords != null && lblStudentTotalFeeAmount != null)
+            {
+                lblStudentTotalFeeRecords.Text = $"Total Records: {items.Count}";
+                var totalAmount = items.Sum(fs => fs.Amount);
+                lblStudentTotalFeeAmount.Text = $"Total Amount: ₹{totalAmount:N2}";
+            }
+            else if (lblStudentTotalFeeRecords != null && lblStudentTotalFeeAmount != null)
+            {
+                lblStudentTotalFeeRecords.Text = "Total Records: 0";
+                lblStudentTotalFeeAmount.Text = "Total Amount: ₹0.00";
+            }
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error updating fee structure status: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void BtnAddStudentFeeStructure_Click(object sender, RoutedEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(async () =>
+        {
+            try
+            {
+                var addEditWindow = App.ServiceProvider?.GetService(typeof(AddEditFeeStructureWindow)) as AddEditFeeStructureWindow;
+                if (addEditWindow != null)
+                {
+                    addEditWindow.Owner = this;
+                    if (addEditWindow.ShowDialog() == true)
+                    {
+                        ApplyStudentFeeStructureFilters();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Unable to open fee structure window. Service not available.", "Error",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening add fee structure window: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }, "Add Fee Structure Error");
+    }
+
+    private void BtnEditStudentFeeStructure_Click(object sender, RoutedEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(async () =>
+        {
+            try
+            {
+                if (sender is Button btn && btn.Tag is int feeStructureId)
+                {
+                    var addEditWindow = App.ServiceProvider?.GetService(typeof(AddEditFeeStructureWindow)) as AddEditFeeStructureWindow;
+                    if (addEditWindow != null)
+                    {
+                        addEditWindow.Owner = this;
+                        addEditWindow.SetFeeStructureId(feeStructureId);
+                        if (addEditWindow.ShowDialog() == true)
+                        {
+                            ApplyStudentFeeStructureFilters();
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Unable to open fee structure window. Service not available.", "Error",
+                            MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening edit fee structure window: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }, "Edit Fee Structure Error");
+    }
+
+    private void BtnDeleteStudentFeeStructure_Click(object sender, RoutedEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(async () =>
+        {
+            try
+            {
+                if (sender is Button btn && btn.Tag is int feeStructureId)
+                {
+                    var feeStructure = _allFeeStructures.FirstOrDefault(fs => fs.Id == feeStructureId);
+                    if (feeStructure != null)
+                    {
+                        var result = MessageBox.Show(
+                            $"Are you sure you want to delete the fee structure for {feeStructure.ClassName} - {feeStructure.FeeType}?\n\n" +
+                            $"Amount: ₹{feeStructure.Amount:N2}\n" +
+                            $"Academic Year: {feeStructure.AcademicYear}",
+                            "Confirm Delete",
+                            MessageBoxButton.YesNo,
+                            MessageBoxImage.Warning);
+
+                        if (result == MessageBoxResult.Yes)
+                        {
+                            await _feeStructureService.DeleteFeeStructureAsync(feeStructureId);
+                            MessageBox.Show("Fee structure deleted successfully.", "Success",
+                                MessageBoxButton.OK, MessageBoxImage.Information);
+                            ApplyStudentFeeStructureFilters();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error deleting fee structure: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }, "Delete Fee Structure Error");
+    }
+
+    private void DgStudentFeeStructures_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(async () =>
+        {
+            try
+            {
+                if (dgStudentFeeStructures.SelectedItem is FeeStructureDto selectedFeeStructure)
+                {
+                    var addEditWindow = App.ServiceProvider?.GetService(typeof(AddEditFeeStructureWindow)) as AddEditFeeStructureWindow;
+                    if (addEditWindow != null)
+                    {
+                        addEditWindow.Owner = this;
+                        addEditWindow.SetFeeStructureId(selectedFeeStructure.Id);
+                        if (addEditWindow.ShowDialog() == true)
+                        {
+                            ApplyStudentFeeStructureFilters();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error opening fee structure for editing: {ex.Message}", "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }, "Fee Structure Double Click Error");
+    }
+
+    private void BtnRefreshStudentFeeStructures_Click(object sender, RoutedEventArgs e)
+    {
+        AsyncHelper.SafeFireAndForget(async () =>
+        {
+            if (lblStudentFeeStructureStatus != null)
+                lblStudentFeeStructureStatus.Text = "Refreshing...";
+            ApplyStudentFeeStructureFilters();
+        }, "Refresh Fee Structures Error");
+    }
+
+    private void CmbStudentFeeAcademicYear_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        ApplyStudentFeeStructureFilters();
+    }
+
+    private void CmbStudentFeeClassFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        ApplyStudentFeeStructureFilters();
+    }
+
+    private void CmbStudentFeeFeeTypeFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        ApplyStudentFeeStructureFilters();
+    }
+
+    private void CmbStudentFeeStatusFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        ApplyStudentFeeStructureFilters();
+    }
+
+    private void TxtStudentFeeSearch_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        ApplyStudentFeeStructureFilters();
+    }
+
+    private void BtnClearStudentFeeFilters_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            if (cmbStudentFeeAcademicYear != null) cmbStudentFeeAcademicYear.SelectedIndex = 0;
+            if (cmbStudentFeeClassFilter != null) cmbStudentFeeClassFilter.SelectedIndex = 0;
+            if (cmbStudentFeeFeeTypeFilter != null) cmbStudentFeeFeeTypeFilter.SelectedIndex = 0;
+            if (cmbStudentFeeStatusFilter != null) cmbStudentFeeStatusFilter.SelectedIndex = 0;
+            if (txtStudentFeeSearch != null) txtStudentFeeSearch.Text = "";
+            ApplyStudentFeeStructureFilters();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error clearing filters: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    #endregion
 }
