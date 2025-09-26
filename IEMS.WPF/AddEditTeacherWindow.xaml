@@ -89,7 +89,7 @@
 
                 <!-- Action Buttons -->
                 <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-                    <Button x:Name="btnSave" Content="Save" Width="100" Height="35" Margin="0,0,15,0"
+                    <Button x:Name="btnSave" Content="💾 Save" Width="100" Height="35" Margin="0,0,10,0"
                             Click="BtnSave_Click" Style="{StaticResource SuccessButtonStyle}"/>
                     <Button x:Name="btnCancel" Content="Cancel" Width="100" Height="35" IsCancel="True"
                             Click="BtnCancel_Click" Style="{StaticResource SecondaryButtonStyle}"/>

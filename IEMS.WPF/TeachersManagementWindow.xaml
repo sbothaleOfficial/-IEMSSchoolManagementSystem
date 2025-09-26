@@ -26,13 +26,13 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,20">
-                <Button x:Name="btnAddTeacher" Content="Add Teacher" Width="120" Height="35" Margin="0,0,10,0"
+                <Button x:Name="btnAddTeacher" Content="➕ Add Teacher" Width="130" Height="35" Margin="0,0,10,0"
                         Click="BtnAddTeacher_Click" Style="{StaticResource SuccessButtonStyle}"/>
-                <Button x:Name="btnEditTeacher" Content="Edit Teacher" Width="120" Height="35" Margin="0,0,10,0"
+                <Button x:Name="btnEditTeacher" Content="✏️ Edit Teacher" Width="130" Height="35" Margin="0,0,10,0"
                         Click="BtnEditTeacher_Click" Style="{StaticResource PrimaryButtonStyle}"/>
-                <Button x:Name="btnDeleteTeacher" Content="Delete Teacher" Width="130" Height="35" Margin="0,0,10,0"
+                <Button x:Name="btnDeleteTeacher" Content="🗑️ Delete Teacher" Width="140" Height="35" Margin="0,0,10,0"
                         Click="BtnDeleteTeacher_Click" Style="{StaticResource DangerButtonStyle}"/>
-                <Button x:Name="btnRefreshTeachers" Content="Refresh" Width="100" Height="35" Margin="0,0,10,0"
+                <Button x:Name="btnRefreshTeachers" Content="🔄 Refresh" Width="110" Height="35" Margin="0,0,10,0"
                         Click="BtnRefreshTeachers_Click" Style="{StaticResource SecondaryButtonStyle}"/>
             </StackPanel>
 
