@@ -205,7 +205,7 @@
                             </StackPanel>
 
                             <Button Grid.Column="2" x:Name="btnRefreshDashboard" Content="🔄 Refresh"
-                                    Height="30" Click="BtnRefreshDashboard_Click" Style="{StaticResource SecondaryButtonStyle}"/>
+                                    Width="110" Height="35" Click="BtnRefreshDashboard_Click" Style="{StaticResource SecondaryButtonStyle}"/>
                         </Grid>
 
                         <!-- Summary Cards -->

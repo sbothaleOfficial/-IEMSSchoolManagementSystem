@@ -19,24 +19,20 @@
             </Grid.ColumnDefinitions>
 
             <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
-                <Border Background="{StaticResource PrimaryDarkBrush}" Width="50" Height="50" CornerRadius="25" Margin="0,0,15,0">
-                    <TextBlock Text="🚌" FontSize="24" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White"/>
-                </Border>
-                <StackPanel VerticalAlignment="Center">
-                    <TextBlock Text="Transport Management"
-                               FontSize="22" FontWeight="Bold" Foreground="{StaticResource TextOnPrimaryBrush}"/>
-                    <TextBlock Text="Manage Vehicles and Expenses"
-                               FontSize="14" Foreground="{StaticResource TextOnPrimaryBrush}" Margin="0,2,0,0" Opacity="0.8"/>
-                </StackPanel>
+                <Button x:Name="btnBack" Content="← Back"
+                        Click="BtnBack_Click"
+                        Background="White" Foreground="Black" BorderBrush="#CCCCCC" BorderThickness="1"
+                        Width="80" Height="32" Margin="0,0,20,0" FontWeight="SemiBold"/>
+                <TextBlock Text="🚌" FontSize="30" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                <TextBlock Text="Transport Management"
+                           FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextOnPrimaryBrush}"
+                           VerticalAlignment="Center"/>
             </StackPanel>
 
             <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
                 <Button x:Name="btnRefresh" Content="🔄 Refresh"
-                        Height="35" Width="100" Margin="5" Click="BtnRefresh_Click"
+                        Height="35" Width="110" Margin="5" Click="BtnRefresh_Click"
                         Style="{StaticResource SecondaryButtonStyle}"/>
-                <Button x:Name="btnClose" Content="✖ Close"
-                        Height="35" Width="90" Margin="5" Click="BtnClose_Click"
-                        Style="{StaticResource DangerButtonStyle}"/>
             </StackPanel>
         </Grid>
 

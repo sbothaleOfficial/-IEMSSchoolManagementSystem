@@ -38,9 +38,8 @@
                     <ComboBox x:Name="cmbAcademicYear" Width="120" Height="30"
                               SelectionChanged="CmbAcademicYear_SelectionChanged"/>
                     <Button x:Name="btnRefreshAnalytics" Content="🔄 Refresh"
-                            Click="BtnRefreshAnalytics_Click"
-                            Background="White" Foreground="Black" BorderBrush="#CCCCCC" BorderThickness="1"
-                            Width="80" Height="30" Margin="10,0,0,0" FontWeight="SemiBold"/>
+                            Click="BtnRefreshAnalytics_Click" Style="{StaticResource SecondaryButtonStyle}"
+                            Width="110" Height="35" Margin="10,0,0,0"/>
                 </StackPanel>
             </Grid>
         </Border>

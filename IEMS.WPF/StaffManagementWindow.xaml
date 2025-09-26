@@ -11,12 +11,23 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <StackPanel Grid.Row="0" Background="{StaticResource PrimaryBrush}" Orientation="Horizontal" Height="80">
-            <TextBlock Text="👥" FontSize="26" Margin="20,0" VerticalAlignment="Center"/>
-            <TextBlock Text="Staff Management System"
-                       FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextOnPrimaryBrush}"
-                       VerticalAlignment="Center" Margin="10,0,0,0"/>
-        </StackPanel>
+        <Grid Grid.Row="0" Background="{StaticResource PrimaryBrush}" Height="80">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="20,0">
+                <Button x:Name="btnBack" Content="← Back"
+                        Click="BtnBack_Click"
+                        Background="White" Foreground="Black" BorderBrush="#CCCCCC" BorderThickness="1"
+                        Width="80" Height="32" Margin="0,0,20,0" FontWeight="SemiBold"/>
+                <TextBlock Text="👥" FontSize="26" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                <TextBlock Text="Staff Management System"
+                           FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextOnPrimaryBrush}"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
 
         <!-- Main Content with Tabs -->
         <TabControl Grid.Row="1" Margin="20" FontSize="14">
@@ -42,7 +53,7 @@
                                     Click="BtnEditTeacher_Click" Style="{StaticResource PrimaryButtonStyle}"/>
                             <Button x:Name="btnDeleteTeacher" Content="Delete Teacher" Width="130" Height="35" Margin="0,0,10,0"
                                     Click="BtnDeleteTeacher_Click" Style="{StaticResource DangerButtonStyle}"/>
-                            <Button x:Name="btnRefreshTeachers" Content="Refresh" Width="100" Height="35" Margin="0,0,10,0"
+                            <Button x:Name="btnRefreshTeachers" Content="🔄 Refresh" Width="110" Height="35" Margin="0,0,10,0"
                                     Click="BtnRefreshTeachers_Click" Style="{StaticResource SecondaryButtonStyle}"/>
                         </StackPanel>
 
@@ -105,7 +116,7 @@
                                     Click="BtnEditStaff_Click" Style="{StaticResource PrimaryButtonStyle}"/>
                             <Button x:Name="btnDeleteStaff" Content="Delete Staff" Width="130" Height="35" Margin="0,0,10,0"
                                     Click="BtnDeleteStaff_Click" Style="{StaticResource DangerButtonStyle}"/>
-                            <Button x:Name="btnRefreshStaff" Content="Refresh" Width="100" Height="35" Margin="0,0,10,0"
+                            <Button x:Name="btnRefreshStaff" Content="🔄 Refresh" Width="110" Height="35" Margin="0,0,10,0"
                                     Click="BtnRefreshStaff_Click" Style="{StaticResource SecondaryButtonStyle}"/>
                         </StackPanel>
 

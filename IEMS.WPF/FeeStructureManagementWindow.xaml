@@ -101,6 +101,7 @@
                           Margin="0,0,10,0" Click="BtnAddFeeStructure_Click"/>
                     <Button Name="btnRefresh" Content="🔄 Refresh"
                           Style="{StaticResource SecondaryButtonStyle}"
+                          Width="110" Height="35"
                           Click="BtnRefresh_Click"/>
                 </StackPanel>
             </Grid>
