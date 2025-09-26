@@ -1,0 +1,193 @@
+<Window x:Class="IEMS.WPF.AddEditFeeStructureWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Add Fee Structure" Height="550" Width="500"
+        WindowStartupLocation="CenterOwner"
+        Background="#F5F7FA"
+        ResizeMode="NoResize">
+
+    <Window.Resources>
+        <Style x:Key="LabelStyle" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#2C3E50"/>
+            <Setter Property="Margin" Value="0,0,0,5"/>
+        </Style>
+
+        <Style x:Key="InputStyle" TargetType="Control">
+            <Setter Property="Height" Value="35"/>
+            <Setter Property="Padding" Value="8,5"/>
+            <Setter Property="BorderBrush" Value="#BDC3C7"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+
+        <Style x:Key="ComboBoxStyle" TargetType="ComboBox" BasedOn="{StaticResource InputStyle}">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="TextBoxStyle" TargetType="TextBox" BasedOn="{StaticResource InputStyle}">
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="ActionButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#3498DB"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="5"
+                                Padding="15,10">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#2980B9"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="CancelButtonStyle" BasedOn="{StaticResource ActionButtonStyle}" TargetType="Button">
+            <Setter Property="Background" Value="#95A5A6"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#7F8C8D"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="White" Padding="20">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="5" Direction="270" ShadowDepth="1" Opacity="0.1"/>
+            </Border.Effect>
+            <StackPanel>
+                <TextBlock Name="lblTitle" Text="Add Fee Structure"
+                         FontSize="24" FontWeight="Bold" Foreground="#2C3E50"/>
+                <TextBlock Text="Configure fee amounts for a class and fee type"
+                         FontSize="14" Foreground="#7F8C8D" Margin="0,5,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Form Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="20">
+            <StackPanel>
+                <!-- Academic Year -->
+                <StackPanel Margin="0,0,0,15">
+                    <TextBlock Text="Academic Year *" Style="{StaticResource LabelStyle}"/>
+                    <ComboBox Name="cmbAcademicYear" Style="{StaticResource ComboBoxStyle}"/>
+                </StackPanel>
+
+                <!-- Class Selection -->
+                <StackPanel Margin="0,0,0,15">
+                    <TextBlock Text="Class *" Style="{StaticResource LabelStyle}"/>
+                    <ComboBox Name="cmbClass" Style="{StaticResource ComboBoxStyle}"
+                            SelectionChanged="CmbClass_SelectionChanged"/>
+                </StackPanel>
+
+                <!-- Fee Type -->
+                <StackPanel Margin="0,0,0,15">
+                    <TextBlock Text="Fee Type *" Style="{StaticResource LabelStyle}"/>
+                    <ComboBox Name="cmbFeeType" Style="{StaticResource ComboBoxStyle}"
+                            SelectionChanged="CmbFeeType_SelectionChanged"/>
+                </StackPanel>
+
+                <!-- Amount -->
+                <StackPanel Margin="0,0,0,15">
+                    <TextBlock Text="Amount (₹) *" Style="{StaticResource LabelStyle}"/>
+                    <TextBox Name="txtAmount" Style="{StaticResource TextBoxStyle}"
+                           PreviewTextInput="TxtAmount_PreviewTextInput"
+                           TextChanged="TxtAmount_TextChanged"/>
+                    <TextBlock Name="lblAmountInWords" Foreground="#7F8C8D"
+                             FontStyle="Italic" Margin="0,5,0,0"/>
+                </StackPanel>
+
+
+                <!-- Current Fee Info (shown in edit mode) -->
+                <Border Name="pnlCurrentInfo" Background="#E8F6FF"
+                      CornerRadius="5" Padding="15" Margin="0,10,0,0"
+                      Visibility="Collapsed">
+                    <StackPanel>
+                        <TextBlock Text="Current Fee Information"
+                                 FontWeight="Bold" Foreground="#2980B9"
+                                 Margin="0,0,0,10"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Created:"
+                                     FontWeight="SemiBold" Margin="0,0,0,5"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Name="lblCreatedAt"
+                                     Margin="0,0,0,5"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Last Updated:"
+                                     FontWeight="SemiBold" Margin="0,0,0,5"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Name="lblUpdatedAt"
+                                     Margin="0,0,0,5"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="ID:"
+                                     FontWeight="SemiBold"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Name="lblFeeStructureId"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Validation Message -->
+                <TextBlock Name="lblValidation"
+                         Foreground="#E74C3C"
+                         FontWeight="SemiBold"
+                         TextWrapping="Wrap"
+                         Margin="0,10,0,0"
+                         Visibility="Collapsed"/>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Action Buttons -->
+        <Border Grid.Row="2" Background="White" Padding="20">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="5" Direction="90" ShadowDepth="1" Opacity="0.1"/>
+            </Border.Effect>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Button Grid.Column="1" Name="btnSave" Content="💾 Save"
+                      Style="{StaticResource ActionButtonStyle}"
+                      Width="120" Margin="0,0,10,0"
+                      Click="BtnSave_Click"/>
+                <Button Grid.Column="2" Name="btnCancel" Content="Cancel"
+                      Style="{StaticResource CancelButtonStyle}"
+                      Width="120"
+                      Click="BtnCancel_Click"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

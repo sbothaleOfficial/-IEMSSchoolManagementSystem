@@ -1,8 +1,8 @@
 <Window x:Class="IEMS.WPF.AddEditFeePaymentWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Record Fee Payment" Height="650" Width="500"
-        WindowStartupLocation="CenterScreen" ResizeMode="NoResize">
+        Title="Record Fee Payment" Height="700" Width="600"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Background="{StaticResource BackgroundBrush}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

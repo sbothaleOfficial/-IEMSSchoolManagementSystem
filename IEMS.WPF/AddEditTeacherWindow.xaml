@@ -1,7 +1,7 @@
 <Window x:Class="IEMS.WPF.AddEditTeacherWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Add/Edit Teacher" Height="520" Width="600"
+        Title="Add/Edit Teacher" Height="600" Width="700"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Background="{StaticResource BackgroundBrush}">
     <Border Style="{StaticResource CardStyle}">
         <ScrollViewer VerticalScrollBarVisibility="Auto">
