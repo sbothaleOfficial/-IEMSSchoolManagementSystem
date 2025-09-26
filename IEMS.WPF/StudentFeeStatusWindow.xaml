@@ -6,7 +6,7 @@
         mc:Ignorable="d"
         Title="Student Fee Status" Height="700" Width="1000"
         WindowStartupLocation="CenterOwner"
-        Background="#F5F7FA">
+        Background="{StaticResource BackgroundBrush}">
 
     <Window.Resources>
         <Style x:Key="HeaderTextStyle" TargetType="TextBlock">
@@ -130,7 +130,7 @@
 
                         <DataGrid Name="dgFeeTypes" AutoGenerateColumns="False"
                                 CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                                GridLinesVisibility="None" HeadersVisibility="Column"
+                                GridLinesVisibility="Horizontal" HeadersVisibility="Column"
                                 AlternatingRowBackground="#F8F9FA" BorderThickness="0">
 
                             <DataGrid.Resources>
@@ -209,7 +209,7 @@
 
                         <DataGrid Name="dgRecentPayments" AutoGenerateColumns="False"
                                 CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                                GridLinesVisibility="None" HeadersVisibility="Column"
+                                GridLinesVisibility="Horizontal" HeadersVisibility="Column"
                                 AlternatingRowBackground="#F8F9FA" BorderThickness="0">
 
                             <DataGrid.Resources>

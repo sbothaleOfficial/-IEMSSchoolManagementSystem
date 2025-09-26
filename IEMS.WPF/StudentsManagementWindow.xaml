@@ -221,7 +221,7 @@
 
                     <DataGrid x:Name="dgStudents" Grid.Row="1" AutoGenerateColumns="False"
                               CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                              GridLinesVisibility="All" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}">
+                              GridLinesVisibility="Horizontal" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Serial No" Binding="{Binding SerialNo}" Width="70"/>
                             <DataGridTextColumn Header="Standard" Binding="{Binding Standard}" Width="70"/>
@@ -287,7 +287,7 @@
 
                     <DataGrid x:Name="dgClasses" Grid.Row="1" AutoGenerateColumns="False"
                               CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                              GridLinesVisibility="All" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}">
+                              GridLinesVisibility="Horizontal" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Class" Binding="{Binding DisplayName}" Width="150"/>
                             <DataGridTextColumn Header="Class Teacher" Binding="{Binding TeacherName}" Width="200"/>
@@ -326,7 +326,7 @@
 
                             <DataGrid x:Name="dgFeePayments" Grid.Row="1" AutoGenerateColumns="False"
                                       CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                                      GridLinesVisibility="All" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}">
+                                      GridLinesVisibility="Horizontal" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Receipt No" Binding="{Binding ReceiptNumber}" Width="100"/>
                                     <DataGridTextColumn Header="Student Name" Binding="{Binding StudentName}" Width="150"/>
@@ -535,7 +535,7 @@
 
                     <DataGrid x:Name="dgBonafideStudents" Grid.Row="1" AutoGenerateColumns="False"
                               CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                              GridLinesVisibility="All" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}">
+                              GridLinesVisibility="Horizontal" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Student No" Binding="{Binding StudentNumber}" Width="100"/>
                             <DataGridTextColumn Header="Full Name" Binding="{Binding FullName}" Width="200"/>

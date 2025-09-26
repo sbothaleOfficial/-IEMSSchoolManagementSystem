@@ -181,7 +181,7 @@
                 <DataGrid Name="dgFeeStructures"
                         AutoGenerateColumns="False"
                         CanUserAddRows="False"
-                        GridLinesVisibility="None"
+                        GridLinesVisibility="Horizontal"
                         HeadersVisibility="Column"
                         AlternatingRowBackground="{StaticResource SurfaceBrush}"
                         BorderThickness="0"

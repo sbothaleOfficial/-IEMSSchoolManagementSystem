@@ -65,7 +65,7 @@
 
                     <DataGrid x:Name="dgTeachers" Grid.Row="1" AutoGenerateColumns="False"
                               CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                              GridLinesVisibility="All" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}"
+                              GridLinesVisibility="Horizontal" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}"
                               ScrollViewer.HorizontalScrollBarVisibility="Auto">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Employee ID" Binding="{Binding EmployeeId}" Width="100"/>
@@ -141,7 +141,7 @@
 
                     <DataGrid x:Name="dgStaff" Grid.Row="1" AutoGenerateColumns="False"
                               CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                              GridLinesVisibility="All" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}"
+                              GridLinesVisibility="Horizontal" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}"
                               ScrollViewer.HorizontalScrollBarVisibility="Auto">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Employee ID" Binding="{Binding EmployeeId}" Width="100"/>
