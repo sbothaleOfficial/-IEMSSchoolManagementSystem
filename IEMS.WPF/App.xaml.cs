@@ -6,6 +6,7 @@ using IEMS.Infrastructure.Data;
 using IEMS.Core.Interfaces;
 using IEMS.Infrastructure.Repositories;
 using IEMS.Application.Services;
+using IEMS.Application.Interfaces;
 using IEMS.Core.Services;
 using IEMS.Core.Configuration;
 
@@ -14,6 +15,7 @@ namespace IEMS.WPF;
 public partial class App : System.Windows.Application
 {
     private IHost? _host;
+    public static IServiceProvider ServiceProvider { get; private set; } = null!;
 
     protected override async void OnStartup(StartupEventArgs e)
     {
@@ -74,13 +76,21 @@ public partial class App : System.Windows.Application
                     services.AddScoped<TransportExpenseService>();
                     services.AddScoped<ElectricityBillService>();
                     services.AddScoped<OtherExpenseService>();
+                    services.AddScoped<AcademicYearService>();
                     services.AddScoped<BulkPromotionService>();
+                    services.AddScoped<IBackupService, BackupService>();
+                    services.AddScoped<ISystemSettingsService, SystemSettingsService>();
+                    services.AddHostedService<AutomaticBackupService>();
 
                     services.AddSingleton<MainWindow>();
+                    services.AddTransient<FeeStructureManagementWindow>();
+                    services.AddTransient<AddEditFeeStructureWindow>();
                 })
                 .Build();
 
             await _host.StartAsync();
+
+            ServiceProvider = _host.Services;
 
             using (var scope = _host.Services.CreateScope())
             {

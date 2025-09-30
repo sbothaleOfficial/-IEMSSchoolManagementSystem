@@ -19,9 +19,9 @@ public partial class MainWindow : Window
     private readonly ElectricityBillService _electricityBillService;
     private readonly OtherExpenseService _otherExpenseService;
     private readonly BulkPromotionService _bulkPromotionService;
-    private readonly IAcademicYearRepository _academicYearRepository;
+    private readonly AcademicYearService _academicYearService;
 
-    public MainWindow(StudentService studentService, TeacherService teacherService, ClassService classService, StaffService staffService, FeePaymentService feePaymentService, FeeStructureService feeStructureService, VehicleService vehicleService, TransportExpenseService transportExpenseService, ElectricityBillService electricityBillService, OtherExpenseService otherExpenseService, BulkPromotionService bulkPromotionService, IAcademicYearRepository academicYearRepository)
+    public MainWindow(StudentService studentService, TeacherService teacherService, ClassService classService, StaffService staffService, FeePaymentService feePaymentService, FeeStructureService feeStructureService, VehicleService vehicleService, TransportExpenseService transportExpenseService, ElectricityBillService electricityBillService, OtherExpenseService otherExpenseService, BulkPromotionService bulkPromotionService, AcademicYearService academicYearService)
     {
         InitializeComponent();
         _studentService = studentService;
@@ -35,7 +35,7 @@ public partial class MainWindow : Window
         _electricityBillService = electricityBillService;
         _otherExpenseService = otherExpenseService;
         _bulkPromotionService = bulkPromotionService;
-        _academicYearRepository = academicYearRepository;
+        _academicYearService = academicYearService;
 
         lblStatus.Text = "Dashboard loaded successfully";
     }
@@ -48,7 +48,7 @@ public partial class MainWindow : Window
         try
         {
             // Direct access to general student management - no confusing popup
-            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService, _feePaymentService, _feeStructureService, _bulkPromotionService, _academicYearRepository);
+            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService, _feePaymentService, _feeStructureService, _bulkPromotionService, _academicYearService);
             studentsWindow.ShowDialog();
             lblStatus.Text = "Student Management module accessed";
         }
@@ -104,12 +104,42 @@ public partial class MainWindow : Window
         }
     }
 
+    private void BtnBackupRestore_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var backupWindow = new BackupRestoreWindow();
+            backupWindow.ShowDialog();
+            lblStatus.Text = "Backup & Restore module accessed";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening Backup & Restore: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening Backup & Restore";
+        }
+    }
+
+    private void BtnSystemSettings_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var systemSettingsWindow = new SystemSettingsWindow();
+            systemSettingsWindow.ShowDialog();
+            lblStatus.Text = "System Settings module accessed";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening System Settings: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening System Settings";
+        }
+    }
+
     // Legacy Click Handlers (kept for backward compatibility if needed)
     private void BtnStudentsModule_Click(object sender, RoutedEventArgs e)
     {
         try
         {
-            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService, _feePaymentService, _feeStructureService, _bulkPromotionService, _academicYearRepository);
+            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService, _feePaymentService, _feeStructureService, _bulkPromotionService, _academicYearService);
             studentsWindow.ShowDialog();
             lblStatus.Text = "Students Management module accessed";
         }
@@ -199,7 +229,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService, _feePaymentService, _feeStructureService, _bulkPromotionService, _academicYearRepository);
+            var studentsWindow = new StudentsManagementWindow(_studentService, _classService, _teacherService, _feePaymentService, _feeStructureService, _bulkPromotionService, _academicYearService);
             studentsWindow.ShowDialog();
             lblStatus.Text = "Student Fees Management module accessed";
         }

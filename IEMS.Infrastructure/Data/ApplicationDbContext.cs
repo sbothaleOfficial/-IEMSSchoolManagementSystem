@@ -20,6 +20,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<ElectricityBill> ElectricityBills { get; set; }
     public DbSet<OtherExpense> OtherExpenses { get; set; }
     public DbSet<AcademicYear> AcademicYears { get; set; }
+    public DbSet<SystemSetting> SystemSettings { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -191,6 +192,20 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.IsCurrent).IsRequired();
             entity.HasIndex(e => e.Year).IsUnique();
             entity.HasIndex(e => e.IsCurrent);
+        });
+
+        modelBuilder.Entity<SystemSetting>(entity =>
+        {
+            entity.HasKey(e => e.Key);
+            entity.Property(e => e.Key).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Value).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Description).IsRequired().HasMaxLength(200);
+            entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.DataType).IsRequired().HasMaxLength(20);
+            entity.Property(e => e.DefaultValue).HasMaxLength(500);
+            entity.Property(e => e.IsReadOnly).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.ModifiedAt);
         });
 
         SeedData(modelBuilder);
@@ -391,6 +406,45 @@ public class ApplicationDbContext : DbContext
             new AcademicYear { Id = 2, Year = "2023-24", StartDate = new DateTime(2023, 6, 1), EndDate = new DateTime(2024, 5, 31), IsCurrent = false, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             new AcademicYear { Id = 3, Year = "2024-25", StartDate = new DateTime(2024, 6, 1), EndDate = new DateTime(2025, 5, 31), IsCurrent = true, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             new AcademicYear { Id = 4, Year = "2025-26", StartDate = new DateTime(2025, 6, 1), EndDate = new DateTime(2026, 5, 31), IsCurrent = false, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+        );
+
+        // SystemSettings seed data
+        modelBuilder.Entity<SystemSetting>().HasData(
+            // School Information
+            new SystemSetting { Key = "School.Name", Value = "IEMS School", Description = "Official name of the school", Category = "School", DataType = "String", DefaultValue = "IEMS School", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "School.Address", Value = "123 Education Street, City, State - 123456", Description = "Complete address of the school", Category = "School", DataType = "String", DefaultValue = "", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "School.Phone", Value = "+91-1234567890", Description = "Primary contact number", Category = "School", DataType = "String", DefaultValue = "", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "School.Email", Value = "info@iemsschool.edu.in", Description = "Official email address", Category = "School", DataType = "String", DefaultValue = "", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "School.Website", Value = "www.iemsschool.edu.in", Description = "School website URL", Category = "School", DataType = "String", DefaultValue = "", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "School.Logo", Value = "", Description = "Path to school logo image", Category = "School", DataType = "FilePath", DefaultValue = "", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+
+            // Academic Settings
+            new SystemSetting { Key = "Academic.CurrentYear", Value = "2024-25", Description = "Current academic year", Category = "Academic", DataType = "String", DefaultValue = "2024-25", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "Academic.SessionStartMonth", Value = "6", Description = "Academic session start month (1-12)", Category = "Academic", DataType = "Integer", DefaultValue = "6", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "Academic.GradingSystem", Value = "Percentage", Description = "Grading system used (Percentage/CGPA/Grades)", Category = "Academic", DataType = "String", DefaultValue = "Percentage", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+
+            // Finance Settings
+            new SystemSetting { Key = "Finance.Currency", Value = "INR", Description = "Currency symbol", Category = "Finance", DataType = "String", DefaultValue = "INR", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "Finance.LateFeePercentage", Value = "5", Description = "Late fee percentage on overdue payments", Category = "Finance", DataType = "Decimal", DefaultValue = "5", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "Finance.GracePeriodDays", Value = "15", Description = "Grace period in days before late fee applies", Category = "Finance", DataType = "Integer", DefaultValue = "15", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+
+            // Backup Settings
+            new SystemSetting { Key = "Backup.AutoBackupEnabled", Value = "true", Description = "Enable automatic backup", Category = "Backup", DataType = "Boolean", DefaultValue = "true", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "Backup.RetentionDays", Value = "30", Description = "Days to retain backup files", Category = "Backup", DataType = "Integer", DefaultValue = "30", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "Backup.BackupPath", Value = "C:\\Users\\SP\\Documents\\IEMS_Backups", Description = "Default backup directory path", Category = "Backup", DataType = "DirectoryPath", DefaultValue = "", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+
+            // System Settings
+            new SystemSetting { Key = "System.DateFormat", Value = "dd/MM/yyyy", Description = "Default date display format", Category = "System", DataType = "String", DefaultValue = "dd/MM/yyyy", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "System.TimeFormat", Value = "HH:mm", Description = "Default time display format", Category = "System", DataType = "String", DefaultValue = "HH:mm", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "System.Language", Value = "English", Description = "System display language", Category = "System", DataType = "String", DefaultValue = "English", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+
+            // UI Settings
+            new SystemSetting { Key = "UI.Theme", Value = "Light", Description = "Application theme (Light/Dark)", Category = "UI", DataType = "String", DefaultValue = "Light", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "UI.DefaultPageSize", Value = "50", Description = "Default number of records per page", Category = "UI", DataType = "Integer", DefaultValue = "50", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+
+            // Security Settings
+            new SystemSetting { Key = "Security.SessionTimeoutMinutes", Value = "30", Description = "User session timeout in minutes", Category = "Security", DataType = "Integer", DefaultValue = "30", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "Security.RequirePasswordChange", Value = "false", Description = "Require users to change password on first login", Category = "Security", DataType = "Boolean", DefaultValue = "false", IsReadOnly = false, CreatedAt = DateTime.UtcNow }
         );
     }
 }
