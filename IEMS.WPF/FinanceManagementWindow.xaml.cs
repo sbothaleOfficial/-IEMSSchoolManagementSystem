@@ -29,8 +29,6 @@ namespace IEMS.WPF
         private List<ClassDto> _allClasses = new();
         private string _currentAcademicYear = DateTime.Now.Year.ToString() + "-" + (DateTime.Now.Year + 1).ToString().Substring(2);
 
-        // Fee Structure management
-        private List<FeeStructureDto> _allFeeStructures = new();
 
         // Expense management collections
         private ObservableCollection<ElectricityBillDto> _electricityBills = new();
@@ -68,18 +66,15 @@ namespace IEMS.WPF
                     // Initialize academic year dropdown
                     InitializeAcademicYears();
 
-                    // Initialize date filters
-                    dpFeeFromDate.SelectedDate = DateTime.Today.AddDays(-30);
-                    dpFeeToDate.SelectedDate = DateTime.Today;
+                    // Fee Analytics tab has been removed - data loading commented out
+                    // dpFeeFromDate.SelectedDate = DateTime.Today.AddDays(-30);
+                    // dpFeeToDate.SelectedDate = DateTime.Today;
 
                     // Load initial data
-                    await LoadClasses();
-                    await LoadFeePayments();
-                    await LoadAnalytics();
+                    // await LoadClasses();
+                    // await LoadFeePayments();
+                    // await LoadAnalytics();
 
-                    // Initialize fee structure tab
-                    InitializeFeeStructureFilters();
-                    await LoadFeeStructures();
 
                     // Load expense dashboard
                     await RefreshExpenseDashboard();
@@ -117,8 +112,8 @@ namespace IEMS.WPF
                 // Add "All Classes" option for filter
                 var filterClasses = new List<ClassDto> { new ClassDto { Id = 0, Name = "All Classes" } };
                 filterClasses.AddRange(_allClasses);
-                cmbClassFilter.ItemsSource = filterClasses;
-                cmbClassFilter.SelectedIndex = 0;
+                // cmbClassFilter.ItemsSource = filterClasses;
+                // cmbClassFilter.SelectedIndex = 0;
             }
             catch (Exception ex)
             {
@@ -145,7 +140,7 @@ namespace IEMS.WPF
             {
                 var analytics = await _feePaymentService.GetFeeAnalyticsAsync(_currentAcademicYear);
 
-                dgClassWiseAnalysis.ItemsSource = analytics.ClassWisePendingFees;
+                // dgClassWiseAnalysis.ItemsSource = analytics.ClassWisePendingFees;
 
                 // Load pending fees
                 await LoadPendingFees();
@@ -163,7 +158,7 @@ namespace IEMS.WPF
             try
             {
                 var pendingFees = await _feePaymentService.GetStudentsWithPendingFeesAsync(_currentAcademicYear, classId);
-                dgPendingFees.ItemsSource = pendingFees;
+                // dgPendingFees.ItemsSource = pendingFees;
 
                 lblStatus.Text = $"Found {pendingFees.Count} students with pending fees";
             }
@@ -179,17 +174,18 @@ namespace IEMS.WPF
 
             var filtered = _allFeePayments.AsEnumerable();
 
-            if (dpFeeFromDate.SelectedDate.HasValue)
-            {
-                filtered = filtered.Where(f => f.PaymentDate >= dpFeeFromDate.SelectedDate.Value);
-            }
+            // Fee Analytics tab removed - date filters commented out
+            // if (dpFeeFromDate.SelectedDate.HasValue)
+            // {
+            //     filtered = filtered.Where(f => f.PaymentDate >= dpFeeFromDate.SelectedDate.Value);
+            // }
 
-            if (dpFeeToDate.SelectedDate.HasValue)
-            {
-                filtered = filtered.Where(f => f.PaymentDate <= dpFeeToDate.SelectedDate.Value.AddDays(1));
-            }
+            // if (dpFeeToDate.SelectedDate.HasValue)
+            // {
+            //     filtered = filtered.Where(f => f.PaymentDate <= dpFeeToDate.SelectedDate.Value.AddDays(1));
+            // }
 
-            dgFeePayments.ItemsSource = filtered.OrderByDescending(f => f.PaymentDate).ToList();
+            // dgFeePayments.ItemsSource = filtered.OrderByDescending(f => f.PaymentDate).ToList();
         }
 
         #region Event Handlers
@@ -217,14 +213,15 @@ namespace IEMS.WPF
 
         private void CmbClassFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            AsyncHelper.SafeFireAndForget(async () =>
-            {
-                if (cmbClassFilter.SelectedItem is ClassDto selectedClass)
-                {
-                    var classId = selectedClass.Id == 0 ? (int?)null : selectedClass.Id;
-                    await LoadPendingFees(classId);
-                }
-            }, "Class Filter Selection Error");
+            // Fee Analytics tab removed - entire method commented out
+            // AsyncHelper.SafeFireAndForget(async () =>
+            // {
+            //     if (cmbClassFilter.SelectedItem is ClassDto selectedClass)
+            //     {
+            //         var classId = selectedClass.Id == 0 ? (int?)null : selectedClass.Id;
+            //         await LoadPendingFees(classId);
+            //     }
+            // }, "Class Filter Selection Error");
         }
 
         private void BtnGoToStudentManagement_Click(object sender, RoutedEventArgs e)
@@ -264,7 +261,9 @@ namespace IEMS.WPF
         {
             try
             {
-                var pendingFees = dgPendingFees.ItemsSource as List<StudentFeeAnalyticsDto>;
+                // Fee Analytics tab removed - pending fees export commented out
+                // var pendingFees = dgPendingFees.ItemsSource as List<StudentFeeAnalyticsDto>;
+                var pendingFees = null as List<StudentFeeAnalyticsDto>;
                 if (pendingFees?.Count > 0)
                 {
                     ExportToExcel(pendingFees);
@@ -444,6 +443,23 @@ namespace IEMS.WPF
             }, "Electricity Bill Double Click Error");
         }
 
+        private void BtnRefreshElectricityBills_Click(object sender, RoutedEventArgs e)
+        {
+            AsyncHelper.SafeFireAndForget(async () =>
+            {
+                try
+                {
+                    await LoadElectricityBills();
+                    lblStatus.Text = "Electricity bills refreshed successfully";
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error refreshing electricity bills: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    lblStatus.Text = "Error refreshing electricity bills";
+                }
+            });
+        }
+
         #endregion
 
         #region Other Expenses Tab
@@ -538,15 +554,19 @@ namespace IEMS.WPF
             {
                 try
                 {
-                    if (sender is Button button && button.Tag is int expenseId)
+                    if (dgOtherExpenses.SelectedItem is OtherExpenseDto selectedExpense)
                     {
-                        var editWindow = new AddEditOtherExpenseWindow(_otherExpenseService, expenseId);
+                        var editWindow = new AddEditOtherExpenseWindow(_otherExpenseService, selectedExpense.Id);
                         if (editWindow.ShowDialog() == true)
                         {
                             await LoadOtherExpenses();
                             await RefreshExpenseDashboard();
                             lblStatus.Text = "Other expense updated successfully";
                         }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Please select an expense to edit.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
                 catch (Exception ex)
@@ -562,18 +582,22 @@ namespace IEMS.WPF
             {
                 try
                 {
-                    if (sender is Button button && button.Tag is int expenseId)
+                    if (dgOtherExpenses.SelectedItem is OtherExpenseDto selectedExpense)
                     {
-                        var result = MessageBox.Show("Are you sure you want to delete this expense?",
+                        var result = MessageBox.Show($"Are you sure you want to delete the expense '{selectedExpense.Description}'?",
                             "Confirm Delete", MessageBoxButton.YesNo, MessageBoxImage.Warning);
 
                         if (result == MessageBoxResult.Yes)
                         {
-                            await _otherExpenseService.DeleteAsync(expenseId);
+                            await _otherExpenseService.DeleteAsync(selectedExpense.Id);
                             await LoadOtherExpenses();
                             await RefreshExpenseDashboard();
                             lblStatus.Text = "Other expense deleted successfully";
                         }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Please select an expense to delete.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
                     }
                 }
                 catch (Exception ex)
@@ -597,6 +621,23 @@ namespace IEMS.WPF
                     }
                 }
             }, "Other Expense Double Click Error");
+        }
+
+        private void BtnRefreshOtherExpenses_Click(object sender, RoutedEventArgs e)
+        {
+            AsyncHelper.SafeFireAndForget(async () =>
+            {
+                try
+                {
+                    await LoadOtherExpenses();
+                    lblStatus.Text = "Other expenses refreshed successfully";
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error refreshing other expenses: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    lblStatus.Text = "Error refreshing other expenses";
+                }
+            });
         }
 
         #endregion
@@ -628,7 +669,9 @@ namespace IEMS.WPF
                     txtElectricityTotal == null || txtOtherExpensesTotal == null ||
                     txtTransportTotal == null || txtSalariesTotal == null ||
                     txtTotalIncome == null || txtTotalExpenses == null ||
-                    txtNetBalance == null || dgCategoryBreakdown == null)
+                    txtNetBalance == null || dgCategoryBreakdown == null ||
+                    txtFeesCollected == null || txtPendingFees == null ||
+                    txtAllExpensesTotal == null || dgFeeBreakdown == null)
                 {
                     return; // UI not ready yet
                 }
@@ -638,38 +681,134 @@ namespace IEMS.WPF
 
                 // Get expense data by filtering existing collections
                 var electricityBills = await _electricityBillService.GetAllAsync();
+
+                // Debug: Log total bills and date range
+                System.Diagnostics.Debug.WriteLine($"=== ELECTRICITY BILLS DEBUG ===");
+                System.Diagnostics.Debug.WriteLine($"Total electricity bills in DB: {electricityBills.Count()}");
+                System.Diagnostics.Debug.WriteLine($"Date range: {fromDate:yyyy-MM-dd} to {toDate:yyyy-MM-dd}");
+
+                foreach (var bill in electricityBills.Take(5)) // Show first 5 bills for debugging
+                {
+                    var effectiveDate = bill.PaidDate ?? bill.DueDate;
+                    System.Diagnostics.Debug.WriteLine($"Bill: Amount={bill.Amount:C}, DueDate={bill.DueDate:yyyy-MM-dd}, PaidDate={bill.PaidDate?.ToString("yyyy-MM-dd") ?? "null"}, EffectiveDate={effectiveDate:yyyy-MM-dd}");
+                }
+
                 var electricityTotal = electricityBills
-                    .Where(b => (b.PaidDate ?? b.DueDate) >= fromDate && (b.PaidDate ?? b.DueDate) <= toDate)
+                    .Where(b => {
+                        var effectiveDate = b.PaidDate ?? b.DueDate;
+                        return effectiveDate >= fromDate && effectiveDate <= toDate;
+                    })
                     .Sum(b => b.Amount);
+
+                // If no bills in date range and we're not in "Overall" mode, try showing all bills
+                if (electricityTotal == 0 && rbOverall?.IsChecked != true)
+                {
+                    System.Diagnostics.Debug.WriteLine($"No electricity bills found in date range, showing total of all bills...");
+                    var totalAllBills = electricityBills.Sum(b => b.Amount);
+                    System.Diagnostics.Debug.WriteLine($"Total of all electricity bills: {totalAllBills:C}");
+                }
+
+                System.Diagnostics.Debug.WriteLine($"Filtered electricity total: {electricityTotal:C}");
 
                 var otherExpenses = await _otherExpenseService.GetAllAsync();
                 var otherExpensesTotal = otherExpenses
                     .Where(e => e.ExpenseDate >= fromDate && e.ExpenseDate <= toDate)
                     .Sum(e => e.Amount);
 
-                // For transport expenses - use a simple calculation
-                var transportTotal = 0m; // Placeholder - would need to implement based on TransportExpenseService
+                // For transport expenses - get actual data from transport service
+                var transportExpenses = await _transportExpenseService.GetAllExpensesAsync();
+                var transportTotal = transportExpenses
+                    .Where(t => t.ExpenseDate >= fromDate && t.ExpenseDate <= toDate)
+                    .Sum(t => t.Amount);
 
-                // For salaries - use a simple calculation
-                var salariesTotal = 0m; // Placeholder - would need to implement based on StaffService
+                // For staff salaries - calculate based on teachers and staff
+                var allTeachers = await _teacherService.GetAllTeachersAsync();
+                var allStaff = await _staffService.GetAllStaffAsync();
+                var salariesTotal = (allTeachers.Sum(t => t.MonthlySalary) + allStaff.Sum(s => s.MonthlySalary));
+
+                // For monthly/yearly view, calculate pro-rated salaries
+                if (rbMonthly?.IsChecked == true)
+                {
+                    salariesTotal = salariesTotal; // Monthly salary total
+                }
+                else if (rbYearly?.IsChecked == true)
+                {
+                    salariesTotal = salariesTotal * 12; // Annual salary total
+                }
+                // For overall, we need to calculate based on employment duration, but for simplicity, use yearly
 
                 // Get income data from fee payments
                 var feePayments = await _feePaymentService.GetAllFeePaymentsAsync();
-                var totalIncome = feePayments
+                var feesCollected = feePayments
                     .Where(f => f.PaymentDate >= fromDate && f.PaymentDate <= toDate)
                     .Sum(f => f.AmountPaid);
 
-                // Update UI
+                // Calculate pending fees more efficiently
+                var allStudents = await _studentService.GetAllStudentsAsync();
+                var allFeeStructures = await _feeStructureService.GetAllFeeStructuresAsync();
+
+                decimal totalPendingFees = 0;
+                decimal totalExpectedFees = 0;
+
+                // Group fee structures by class for efficiency
+                var feeStructuresByClass = allFeeStructures.GroupBy(fs => fs.ClassId).ToDictionary(g => g.Key, g => g.ToList());
+
+                foreach (var student in allStudents)
+                {
+                    if (feeStructuresByClass.TryGetValue(student.ClassId, out var classFeeStructures))
+                    {
+                        foreach (var feeStructure in classFeeStructures)
+                        {
+                            // Expected amount for this student and fee type
+                            var expectedAmount = feeStructure.Amount;
+                            totalExpectedFees += expectedAmount;
+
+                            // Amount actually paid by this student for this fee type in the selected period
+                            var paidAmount = feePayments
+                                .Where(fp => fp.StudentId == student.Id && fp.FeeType == feeStructure.FeeType)
+                                .Sum(fp => fp.AmountPaid);
+
+                            // For time-based views, we need to be more careful about pending calculation
+                            decimal pendingForPeriod = 0;
+                            if (rbOverall?.IsChecked == true)
+                            {
+                                // For overall view, total pending = expected - total paid
+                                pendingForPeriod = Math.Max(0, expectedAmount - paidAmount);
+                            }
+                            else
+                            {
+                                // For monthly/yearly, only count as pending if payment was due in this period
+                                // This is a simplified approach - in reality you'd need due dates per fee type
+                                var paidInPeriod = feePayments
+                                    .Where(fp => fp.StudentId == student.Id &&
+                                               fp.FeeType == feeStructure.FeeType &&
+                                               fp.PaymentDate >= fromDate && fp.PaymentDate <= toDate)
+                                    .Sum(fp => fp.AmountPaid);
+                                pendingForPeriod = Math.Max(0, expectedAmount - paidInPeriod);
+                            }
+
+                            totalPendingFees += pendingForPeriod;
+                        }
+                    }
+                }
+
+                // Update UI - New summary cards
+                txtFeesCollected.Text = $"₹{feesCollected:N2}";
+                txtPendingFees.Text = $"₹{totalPendingFees:N2}";
+
+                // Update detailed expense cards
                 txtElectricityTotal.Text = $"₹{electricityTotal:N2}";
                 txtOtherExpensesTotal.Text = $"₹{otherExpensesTotal:N2}";
                 txtTransportTotal.Text = $"₹{transportTotal:N2}";
                 txtSalariesTotal.Text = $"₹{salariesTotal:N2}";
-                txtTotalIncome.Text = $"₹{totalIncome:N2}";
+
+                txtTotalIncome.Text = $"₹{feesCollected:N2}";
 
                 var totalExpenses = electricityTotal + otherExpensesTotal + transportTotal + salariesTotal;
                 txtTotalExpenses.Text = $"₹{totalExpenses:N2}";
+                txtAllExpensesTotal.Text = $"₹{totalExpenses:N2}";
 
-                var netBalance = totalIncome - totalExpenses;
+                var netBalance = feesCollected - totalExpenses;
                 txtNetBalance.Text = $"₹{netBalance:N2}";
                 txtNetBalance.Foreground = netBalance >= 0
                     ? new SolidColorBrush(Color.FromRgb(76, 175, 80)) // Green
@@ -685,6 +824,54 @@ namespace IEMS.WPF
                 };
 
                 dgCategoryBreakdown.ItemsSource = categoryData.Where(c => c.Amount > 0);
+
+                // Update fee breakdown data
+                var feeBreakdownData = new List<dynamic>();
+                var feeTypes = Enum.GetValues<FeeType>();
+
+                foreach (var feeType in feeTypes)
+                {
+                    // Amount collected for this fee type in the selected period
+                    var collectedInPeriod = feePayments
+                        .Where(f => f.FeeType == feeType && f.PaymentDate >= fromDate && f.PaymentDate <= toDate)
+                        .Sum(f => f.AmountPaid);
+
+                    // Calculate expected amount more accurately
+                    var expectedForFeeType = 0m;
+                    var pendingForFeeType = 0m;
+
+                    foreach (var feeStructure in allFeeStructures.Where(fs => fs.FeeType == feeType))
+                    {
+                        var studentsInClass = allStudents.Count(s => s.ClassId == feeStructure.ClassId);
+                        expectedForFeeType += feeStructure.Amount * studentsInClass;
+                    }
+
+                    if (rbOverall?.IsChecked == true)
+                    {
+                        // For overall, pending = expected - total ever collected
+                        var totalEverCollected = feePayments
+                            .Where(f => f.FeeType == feeType)
+                            .Sum(f => f.AmountPaid);
+                        pendingForFeeType = Math.Max(0, expectedForFeeType - totalEverCollected);
+                    }
+                    else
+                    {
+                        // For monthly/yearly, pending = expected - collected in period
+                        pendingForFeeType = Math.Max(0, expectedForFeeType - collectedInPeriod);
+                    }
+
+                    if (collectedInPeriod > 0 || pendingForFeeType > 0 || expectedForFeeType > 0)
+                    {
+                        feeBreakdownData.Add(new {
+                            FeeType = feeType.ToString().Replace("_", " "),
+                            CollectedAmount = collectedInPeriod,
+                            PendingAmount = pendingForFeeType,
+                            ExpectedAmount = expectedForFeeType
+                        });
+                    }
+                }
+
+                dgFeeBreakdown.ItemsSource = feeBreakdownData;
             }
             catch (Exception ex)
             {
@@ -715,309 +902,6 @@ namespace IEMS.WPF
 
         #endregion
 
-        #region Fee Structure Management Tab
-
-        private async Task LoadFeeStructures()
-        {
-            try
-            {
-                _allFeeStructures = (await _feeStructureService.GetAllFeeStructuresAsync()).ToList();
-                ApplyFeeStructureFilters();
-                UpdateFeeStructureStatusBar();
-                lblFeeStructureStatus.Text = "Fee structures loaded successfully";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading fee structures: {ex.Message}", "Error",
-                    MessageBoxButton.OK, MessageBoxImage.Error);
-                lblFeeStructureStatus.Text = "Error loading fee structures";
-            }
-        }
-
-        private void InitializeFeeStructureFilters()
-        {
-            // Initialize Academic Year dropdown
-            var currentYear = DateTime.Now.Year;
-            var academicYears = new List<string> { "All" };
-            for (int i = -2; i <= 2; i++)
-            {
-                var year = currentYear + i;
-                academicYears.Add($"{year}-{(year + 1).ToString().Substring(2)}");
-            }
-            cmbFeeAcademicYear.ItemsSource = academicYears;
-            cmbFeeAcademicYear.SelectedIndex = 0;
-
-            // Initialize Class dropdown
-            var classItems = new List<dynamic> { new { Id = -1, Display = "All Classes" } };
-            classItems.AddRange(_allClasses.Select(c => new { Id = c.Id, Display = $"{c.Name} - {c.Section}" }));
-            cmbFeeClassFilter.ItemsSource = classItems;
-            cmbFeeClassFilter.DisplayMemberPath = "Display";
-            cmbFeeClassFilter.SelectedValuePath = "Id";
-            cmbFeeClassFilter.SelectedIndex = 0;
-
-            // Initialize Fee Type dropdown
-            var feeTypes = new List<dynamic> { new { Value = -1, Display = "All Types" } };
-            feeTypes.AddRange(Enum.GetValues<FeeType>()
-                .Select(ft => new { Value = (int)ft, Display = ft.ToString() }));
-            cmbFeeFeeTypeFilter.ItemsSource = feeTypes;
-            cmbFeeFeeTypeFilter.DisplayMemberPath = "Display";
-            cmbFeeFeeTypeFilter.SelectedValuePath = "Value";
-            cmbFeeFeeTypeFilter.SelectedIndex = 0;
-        }
-
-        private void ApplyFeeStructureFilters()
-        {
-            if (_allFeeStructures == null) return;
-
-            var filtered = _allFeeStructures.AsEnumerable();
-
-            // Apply Academic Year filter
-            if (cmbFeeAcademicYear?.SelectedItem != null && cmbFeeAcademicYear.SelectedItem.ToString() != "All")
-            {
-                var selectedYear = cmbFeeAcademicYear.SelectedItem.ToString();
-                filtered = filtered.Where(fs => fs.AcademicYear == selectedYear);
-            }
-
-            // Apply Class filter
-            if (cmbFeeClassFilter?.SelectedValue != null && (int)cmbFeeClassFilter.SelectedValue != -1)
-            {
-                var classId = (int)cmbFeeClassFilter.SelectedValue;
-                filtered = filtered.Where(fs => fs.ClassId == classId);
-            }
-
-            // Apply Fee Type filter
-            if (cmbFeeFeeTypeFilter?.SelectedValue != null && (int)cmbFeeFeeTypeFilter.SelectedValue != -1)
-            {
-                var feeType = (FeeType)cmbFeeFeeTypeFilter.SelectedValue;
-                filtered = filtered.Where(fs => fs.FeeType == feeType);
-            }
-
-            // Apply Status filter
-            if (cmbFeeStatusFilter?.SelectedItem is ComboBoxItem selectedStatus)
-            {
-                var status = selectedStatus.Content.ToString();
-                if (status == "Active")
-                    filtered = filtered.Where(fs => fs.IsActive);
-                else if (status == "Inactive")
-                    filtered = filtered.Where(fs => !fs.IsActive);
-            }
-
-            // Apply search filter
-            if (!string.IsNullOrWhiteSpace(txtFeeSearch?.Text))
-            {
-                var searchTerm = txtFeeSearch.Text.ToLower();
-                filtered = filtered.Where(fs => fs.Description.ToLower().Contains(searchTerm));
-            }
-
-            var filteredList = filtered.ToList();
-            dgFeeStructures.ItemsSource = filteredList;
-
-            // Show/hide empty state
-            if (feeStructureEmptyStatePanel != null)
-            {
-                if (filteredList.Count == 0)
-                {
-                    dgFeeStructures.Visibility = Visibility.Collapsed;
-                    feeStructureEmptyStatePanel.Visibility = Visibility.Visible;
-                }
-                else
-                {
-                    dgFeeStructures.Visibility = Visibility.Visible;
-                    feeStructureEmptyStatePanel.Visibility = Visibility.Collapsed;
-                }
-            }
-
-            UpdateFeeStructureStatusBar();
-        }
-
-        private void UpdateFeeStructureStatusBar()
-        {
-            var items = dgFeeStructures?.ItemsSource as List<FeeStructureDto>;
-            if (items != null && lblTotalFeeRecords != null && lblTotalFeeAmount != null)
-            {
-                lblTotalFeeRecords.Text = $"Total Records: {items.Count}";
-                var totalAmount = items.Sum(fs => fs.Amount);
-                lblTotalFeeAmount.Text = $"Total Amount: ₹{totalAmount:N2}";
-            }
-            else if (lblTotalFeeRecords != null && lblTotalFeeAmount != null)
-            {
-                lblTotalFeeRecords.Text = "Total Records: 0";
-                lblTotalFeeAmount.Text = "Total Amount: ₹0.00";
-            }
-        }
-
-        private void BtnAddFeeStructure_Click(object sender, RoutedEventArgs e)
-        {
-            AsyncHelper.SafeFireAndForget(async () =>
-            {
-                try
-                {
-                    var addEditWindow = App.ServiceProvider?.GetService(typeof(AddEditFeeStructureWindow)) as AddEditFeeStructureWindow;
-                    if (addEditWindow != null)
-                    {
-                        addEditWindow.Owner = this;
-                        if (addEditWindow.ShowDialog() == true)
-                        {
-                            await LoadFeeStructures();
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("Unable to open fee structure window. Service not available.", "Error",
-                            MessageBoxButton.OK, MessageBoxImage.Error);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error opening add fee structure window: {ex.Message}", "Error",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }, "Add Fee Structure Error");
-        }
-
-        private void BtnEditFeeStructure_Click(object sender, RoutedEventArgs e)
-        {
-            AsyncHelper.SafeFireAndForget(async () =>
-            {
-                try
-                {
-                    if (sender is Button btn && btn.Tag is int feeStructureId)
-                    {
-                        var addEditWindow = App.ServiceProvider?.GetService(typeof(AddEditFeeStructureWindow)) as AddEditFeeStructureWindow;
-                        if (addEditWindow != null)
-                        {
-                            addEditWindow.Owner = this;
-                            addEditWindow.SetFeeStructureId(feeStructureId);
-                            if (addEditWindow.ShowDialog() == true)
-                            {
-                                await LoadFeeStructures();
-                            }
-                        }
-                        else
-                        {
-                            MessageBox.Show("Unable to open fee structure window. Service not available.", "Error",
-                                MessageBoxButton.OK, MessageBoxImage.Error);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error opening edit fee structure window: {ex.Message}", "Error",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }, "Edit Fee Structure Error");
-        }
-
-        private void BtnDeleteFeeStructure_Click(object sender, RoutedEventArgs e)
-        {
-            AsyncHelper.SafeFireAndForget(async () =>
-            {
-                try
-                {
-                    if (sender is Button btn && btn.Tag is int feeStructureId)
-                    {
-                        var feeStructure = _allFeeStructures.FirstOrDefault(fs => fs.Id == feeStructureId);
-                        if (feeStructure != null)
-                        {
-                            var result = MessageBox.Show(
-                                $"Are you sure you want to delete the fee structure for {feeStructure.ClassName} - {feeStructure.FeeType}?\n\n" +
-                                $"Amount: ₹{feeStructure.Amount:N2}\n" +
-                                $"Academic Year: {feeStructure.AcademicYear}",
-                                "Confirm Delete",
-                                MessageBoxButton.YesNo,
-                                MessageBoxImage.Warning);
-
-                            if (result == MessageBoxResult.Yes)
-                            {
-                                await _feeStructureService.DeleteFeeStructureAsync(feeStructureId);
-                                MessageBox.Show("Fee structure deleted successfully.", "Success",
-                                    MessageBoxButton.OK, MessageBoxImage.Information);
-                                await LoadFeeStructures();
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error deleting fee structure: {ex.Message}", "Error",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }, "Delete Fee Structure Error");
-        }
-
-        private void DgFeeStructures_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
-        {
-            AsyncHelper.SafeFireAndForget(async () =>
-            {
-                try
-                {
-                    if (dgFeeStructures.SelectedItem is FeeStructureDto selectedFeeStructure)
-                    {
-                        var addEditWindow = App.ServiceProvider?.GetService(typeof(AddEditFeeStructureWindow)) as AddEditFeeStructureWindow;
-                        if (addEditWindow != null)
-                        {
-                            addEditWindow.Owner = this;
-                            addEditWindow.SetFeeStructureId(selectedFeeStructure.Id);
-                            if (addEditWindow.ShowDialog() == true)
-                            {
-                                await LoadFeeStructures();
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Error opening fee structure for editing: {ex.Message}", "Error",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
-                }
-            }, "Fee Structure Double Click Error");
-        }
-
-        private void BtnRefreshFeeStructures_Click(object sender, RoutedEventArgs e)
-        {
-            AsyncHelper.SafeFireAndForget(async () =>
-            {
-                lblFeeStructureStatus.Text = "Refreshing...";
-                await LoadFeeStructures();
-            }, "Refresh Fee Structures Error");
-        }
-
-        private void CmbFeeAcademicYear_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ApplyFeeStructureFilters();
-        }
-
-        private void CmbFeeClassFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ApplyFeeStructureFilters();
-        }
-
-        private void CmbFeeFeeTypeFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ApplyFeeStructureFilters();
-        }
-
-        private void CmbFeeStatusFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ApplyFeeStructureFilters();
-        }
-
-        private void TxtFeeSearch_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            ApplyFeeStructureFilters();
-        }
-
-        private void BtnClearFeeFilters_Click(object sender, RoutedEventArgs e)
-        {
-            if (cmbFeeAcademicYear != null) cmbFeeAcademicYear.SelectedIndex = 0;
-            if (cmbFeeClassFilter != null) cmbFeeClassFilter.SelectedIndex = 0;
-            if (cmbFeeFeeTypeFilter != null) cmbFeeFeeTypeFilter.SelectedIndex = 0;
-            if (cmbFeeStatusFilter != null) cmbFeeStatusFilter.SelectedIndex = 0;
-            if (txtFeeSearch != null) txtFeeSearch.Text = "";
-            ApplyFeeStructureFilters();
-        }
-
-        #endregion
 
         #endregion
     }

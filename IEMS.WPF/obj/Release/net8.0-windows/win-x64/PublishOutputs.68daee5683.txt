@@ -5,6 +5,8 @@ C:\Users\SP\Development\IEMSSchoolManagementSystem\publish\IEMS.WPF.runtimeconfi
 C:\Users\SP\Development\IEMSSchoolManagementSystem\publish\IEMS.WPF.pdb
 C:\Users\SP\Development\IEMSSchoolManagementSystem\publish\BCrypt.Net-Next.dll
 C:\Users\SP\Development\IEMSSchoolManagementSystem\publish\Humanizer.dll
+C:\Users\SP\Development\IEMSSchoolManagementSystem\publish\Microsoft.AspNetCore.Cryptography.Internal.dll
+C:\Users\SP\Development\IEMSSchoolManagementSystem\publish\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
 C:\Users\SP\Development\IEMSSchoolManagementSystem\publish\Microsoft.Bcl.AsyncInterfaces.dll
 C:\Users\SP\Development\IEMSSchoolManagementSystem\publish\Microsoft.CodeAnalysis.dll
 C:\Users\SP\Development\IEMSSchoolManagementSystem\publish\Microsoft.CodeAnalysis.CSharp.dll

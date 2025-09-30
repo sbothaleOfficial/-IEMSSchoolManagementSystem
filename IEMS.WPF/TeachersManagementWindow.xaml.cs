@@ -27,6 +27,11 @@ public partial class TeachersManagementWindow : Window
         lblStatus.Text = $"Loaded {teachers.Count()} teachers";
     }
 
+    private void BtnBack_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
     private void BtnAddTeacher_Click(object sender, RoutedEventArgs e)
     {
         var addWindow = new AddEditTeacherWindow(_teacherService);

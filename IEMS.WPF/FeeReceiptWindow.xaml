@@ -12,10 +12,10 @@
 
         <!-- Action Buttons -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
-            <Button x:Name="btnPrint" Content="🖨️ Print" Width="100" Height="35"
+            <Button x:Name="btnPrint" Content="Print" Width="100" Height="35"
                     Margin="5" Click="BtnPrint_Click"
                     Style="{StaticResource SuccessButtonStyle}"/>
-            <Button x:Name="btnClose" Content="Close" Width="80" Height="35"
+            <Button x:Name="btnClose" Content="Close" Width="100" Height="35"
                     Margin="5" Click="BtnClose_Click"
                     Style="{StaticResource SecondaryButtonStyle}"/>
         </StackPanel>

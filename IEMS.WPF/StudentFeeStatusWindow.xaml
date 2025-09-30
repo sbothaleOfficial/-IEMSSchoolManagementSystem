@@ -289,12 +289,12 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="1" Name="btnRecordPayment" Content="💰 Record Payment"
+                <Button Grid.Column="1" Name="btnRecordPayment" Content="Record Payment"
                       Style="{StaticResource ActionButtonStyle}"
                       Width="150" Margin="0,0,10,0"
                       Click="BtnRecordPayment_Click"/>
 
-                <Button Grid.Column="2" Name="btnRefresh" Content="🔄 Refresh"
+                <Button Grid.Column="2" Name="btnRefresh" Content="Refresh"
                       Style="{StaticResource SecondaryButtonStyle}"
                       Width="110" Height="35" Margin="0,0,10,0"
                       Click="BtnRefresh_Click"/>

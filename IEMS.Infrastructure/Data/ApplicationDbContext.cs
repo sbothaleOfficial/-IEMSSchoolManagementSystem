@@ -21,6 +21,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<OtherExpense> OtherExpenses { get; set; }
     public DbSet<AcademicYear> AcademicYears { get; set; }
     public DbSet<SystemSetting> SystemSettings { get; set; }
+    public DbSet<User> Users { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -206,6 +207,21 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.IsReadOnly).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
             entity.Property(e => e.ModifiedAt);
+        });
+
+        modelBuilder.Entity<User>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Username).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.PasswordHash).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.FullName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.Role).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Email).HasMaxLength(100);
+            entity.Property(e => e.IsActive).IsRequired();
+            entity.Property(e => e.CreatedDate).IsRequired();
+            entity.Property(e => e.CreatedBy).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.ModifiedBy).HasMaxLength(50);
+            entity.HasIndex(e => e.Username).IsUnique();
         });
 
         SeedData(modelBuilder);

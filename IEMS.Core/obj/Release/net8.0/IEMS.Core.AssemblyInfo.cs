@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("IEMS.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e0cc4dc6de4dd486f493fa208896efb6069346a3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d22b988c6c0a14220b555acdc665323d8ad629bc")]
 [assembly: System.Reflection.AssemblyProductAttribute("IEMS.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("IEMS.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -31,7 +31,7 @@
                 </StackPanel>
             </StackPanel>
 
-            <Button Grid.Column="2" x:Name="btnClose" Content="✕" Width="40" Height="40"
+            <Button Grid.Column="2" x:Name="btnClose" Content="×" Width="40" Height="40"
                     Margin="0,0,20,0" Click="BtnClose_Click"
                     Style="{StaticResource CloseButtonStyle}"/>
         </Grid>
@@ -41,7 +41,7 @@
                     Style="{StaticResource ModernTabControlStyle}" Margin="0">
 
             <!-- Electricity Bills Tab -->
-            <TabItem Header="🔌 Electricity Bills" Style="{StaticResource ModernTabItemStyle}">
+            <TabItem Header="Electricity Bills" Style="{StaticResource ModernTabItemStyle}">
                 <Grid Margin="20">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -97,7 +97,7 @@
             </TabItem>
 
             <!-- Other Expenses Tab -->
-            <TabItem Header="📝 Other Expenses" Style="{StaticResource ModernTabItemStyle}">
+            <TabItem Header="Other Expenses" Style="{StaticResource ModernTabItemStyle}">
                 <Grid Margin="20">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -135,7 +135,7 @@
                         <ComboBox Grid.Column="1" x:Name="cmbCategoryFilter" SelectionChanged="CmbCategoryFilter_SelectionChanged"
                                   Style="{StaticResource ModernComboBoxStyle}"/>
                         <Button Grid.Column="2" x:Name="btnClearFilter" Content="Clear Filter" Margin="10,0,0,0"
-                                Height="30" Click="BtnClearFilter_Click" Style="{StaticResource SecondaryButtonStyle}"/>
+                                Height="35" Click="BtnClearFilter_Click" Style="{StaticResource SecondaryButtonStyle}"/>
                     </Grid>
 
                     <!-- Other Expenses DataGrid -->
@@ -169,7 +169,7 @@
             </TabItem>
 
             <!-- Dashboard Tab -->
-            <TabItem Header="📊 Dashboard" Style="{StaticResource ModernTabItemStyle}">
+            <TabItem Header="Dashboard" Style="{StaticResource ModernTabItemStyle}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <Grid Margin="20">
                         <Grid.RowDefinitions>
@@ -204,8 +204,8 @@
                                              Checked="ViewRadioButton_Checked" Style="{StaticResource ModernRadioButtonStyle}"/>
                             </StackPanel>
 
-                            <Button Grid.Column="2" x:Name="btnRefreshDashboard" Content="🔄 Refresh"
-                                    Width="110" Height="35" Click="BtnRefreshDashboard_Click" Style="{StaticResource SecondaryButtonStyle}"/>
+                            <Button Grid.Column="2" x:Name="btnRefreshDashboard" Content="Refresh"
+                                    Width="130" Height="35" Click="BtnRefreshDashboard_Click" Style="{StaticResource SecondaryButtonStyle}"/>
                         </Grid>
 
                         <!-- Summary Cards -->

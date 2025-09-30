@@ -42,9 +42,44 @@
                 </StackPanel>
             </StackPanel>
 
-            <TextBlock Grid.Column="2" Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='dddd, MMMM dd, yyyy'}"
-                       xmlns:sys="clr-namespace:System;assembly=mscorlib"
-                       FontSize="12" Foreground="{StaticResource TextOnPrimaryBrush}" Opacity="0.9" VerticalAlignment="Center" Margin="0,0,20,0"/>
+            <StackPanel Grid.Column="2" Orientation="Vertical" VerticalAlignment="Center" Margin="0,0,20,0">
+                <TextBlock Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='dddd, MMMM dd, yyyy'}"
+                           xmlns:sys="clr-namespace:System;assembly=mscorlib"
+                           FontSize="12" Foreground="{StaticResource TextOnPrimaryBrush}" Opacity="0.9" HorizontalAlignment="Right"/>
+                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                    <TextBlock x:Name="txtWelcomeUser" Text="Welcome, Admin" FontSize="11"
+                               Foreground="{StaticResource PrimaryLightBrush}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <Button x:Name="btnLogout" Content="🚪 Logout" Click="BtnLogout_Click"
+                            Background="Transparent" BorderBrush="{StaticResource TextOnPrimaryBrush}"
+                            Foreground="{StaticResource TextOnPrimaryBrush}"
+                            BorderThickness="1" Padding="10,5" FontSize="11" Cursor="Hand"
+                            Height="28" Width="80">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                    CornerRadius="4" Padding="{TemplateBinding Padding}">
+                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="{StaticResource TextOnPrimaryBrush}"/>
+                                        <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
         </Grid>
 
         <!-- Dashboard Content -->
@@ -63,6 +98,7 @@
                 <!-- Dashboard Cards -->
                 <Grid Grid.Row="1">
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
@@ -244,6 +280,36 @@
                                     Style="{StaticResource PrimaryButtonStyle}"
                                     FontSize="14" FontWeight="SemiBold" IsEnabled="True"
                                     Click="BtnSystemSettings_Click"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- User Management Card (Admin Only) -->
+                    <Border x:Name="cardUserManagement" Grid.Row="3" Grid.Column="0" Style="{StaticResource CardStyle}">
+                        <Border.Effect>
+                            <DropShadowEffect Color="#000000" ShadowDepth="2" BlurRadius="6" Opacity="0.1"/>
+                        </Border.Effect>
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Border Grid.Column="0" Background="{StaticResource PrimaryBrush}" Width="60" Height="60" CornerRadius="30" Margin="0,0,15,0">
+                                    <TextBlock Text="👥" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="User Management" FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextPrimaryBrush}"/>
+                                    <TextBlock Text="Manage system users, roles and permissions" FontSize="12" Foreground="{StaticResource TextSecondaryBrush}" Margin="0,5,0,0"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <Button x:Name="btnUserManagement" Content="Manage Users"
+                                    Height="40" Margin="0,20,0,0"
+                                    Style="{StaticResource PrimaryButtonStyle}"
+                                    FontSize="14" FontWeight="SemiBold"
+                                    Click="BtnUserManagement_Click"/>
                         </StackPanel>
                     </Border>
                 </Grid>

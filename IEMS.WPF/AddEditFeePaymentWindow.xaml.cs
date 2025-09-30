@@ -13,7 +13,7 @@ public partial class AddEditFeePaymentWindow : Window
     private readonly FeePaymentService _feePaymentService;
     private readonly FeeStructureService _feeStructureService;
     private readonly StudentService _studentService;
-    private readonly IAcademicYearRepository _academicYearRepository;
+    private readonly AcademicYearService _academicYearService;
     private List<StudentDto> _students = new List<StudentDto>();
     private List<FeeStructureDto> _feeStructures = new List<FeeStructureDto>();
     private int? _preSelectedStudentId;
@@ -22,7 +22,7 @@ public partial class AddEditFeePaymentWindow : Window
         FeePaymentService feePaymentService,
         FeeStructureService feeStructureService,
         StudentService studentService,
-        IAcademicYearRepository academicYearRepository)
+        AcademicYearService academicYearService)
     {
         try
         {
@@ -32,7 +32,7 @@ public partial class AddEditFeePaymentWindow : Window
             _feePaymentService = feePaymentService ?? throw new ArgumentNullException(nameof(feePaymentService));
             _feeStructureService = feeStructureService ?? throw new ArgumentNullException(nameof(feeStructureService));
             _studentService = studentService ?? throw new ArgumentNullException(nameof(studentService));
-            _academicYearRepository = academicYearRepository ?? throw new ArgumentNullException(nameof(academicYearRepository));
+            _academicYearService = academicYearService ?? throw new ArgumentNullException(nameof(academicYearService));
 
             // Use Loaded event to ensure UI is fully initialized
             this.Loaded += AddEditFeePaymentWindow_Loaded;
@@ -139,7 +139,7 @@ public partial class AddEditFeePaymentWindow : Window
     {
         try
         {
-            var academicYears = await _academicYearRepository.GetRecentAcademicYearsAsync(10);
+            var academicYears = await _academicYearService.GetRecentAcademicYearsAsync(10);
             var yearItems = academicYears.Select(ay => new
             {
                 Value = ay.Year,

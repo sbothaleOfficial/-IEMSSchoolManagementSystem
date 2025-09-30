@@ -22,13 +22,13 @@ public partial class StudentsManagementWindow : Window
     private readonly FeePaymentService _feePaymentService;
     private readonly FeeStructureService _feeStructureService;
     private readonly BulkPromotionService? _bulkPromotionService;
-    private readonly IAcademicYearRepository? _academicYearRepository;
+    private readonly AcademicYearService? _academicYearService;
     private List<StudentDto> _allStudents = new List<StudentDto>();
     private List<FeePaymentDto> _allFeePayments = new List<FeePaymentDto>();
     private List<ClassDto> _allClasses = new List<ClassDto>();
     private List<FeeStructureDto> _allFeeStructures = new List<FeeStructureDto>();
 
-    public StudentsManagementWindow(StudentService studentService, ClassService classService, TeacherService teacherService, FeePaymentService feePaymentService, FeeStructureService feeStructureService, BulkPromotionService? bulkPromotionService = null, IAcademicYearRepository? academicYearRepository = null)
+    public StudentsManagementWindow(StudentService studentService, ClassService classService, TeacherService teacherService, FeePaymentService feePaymentService, FeeStructureService feeStructureService, BulkPromotionService? bulkPromotionService = null, AcademicYearService? academicYearService = null)
     {
         InitializeComponent();
         _studentService = studentService;
@@ -37,7 +37,7 @@ public partial class StudentsManagementWindow : Window
         _feePaymentService = feePaymentService;
         _feeStructureService = feeStructureService;
         _bulkPromotionService = bulkPromotionService;
-        _academicYearRepository = academicYearRepository;
+        _academicYearService = academicYearService;
         AsyncHelper.SafeFireAndForget(LoadStudentsAsync);
         AsyncHelper.SafeFireAndForget(LoadClassesAsync);
         AsyncHelper.SafeFireAndForget(LoadFeePaymentsAsync);
@@ -112,6 +112,11 @@ public partial class StudentsManagementWindow : Window
             MessageBox.Show($"Error loading classes: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             lblStatus.Text = "Error loading classes";
         }
+    }
+
+    private void BtnBack_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
     }
 
     // Student Management Events
@@ -457,7 +462,7 @@ public partial class StudentsManagementWindow : Window
                 return;
             }
 
-            var addFeePaymentWindow = new AddEditFeePaymentWindow(_feePaymentService, _feeStructureService, _studentService, _academicYearRepository);
+            var addFeePaymentWindow = new AddEditFeePaymentWindow(_feePaymentService, _feeStructureService, _studentService, _academicYearService);
             if (addFeePaymentWindow.ShowDialog() == true)
             {
                 AsyncHelper.SafeFireAndForget(LoadFeePaymentsAsync); // Refresh fee payments list
@@ -1579,7 +1584,7 @@ public partial class StudentsManagementWindow : Window
     {
         try
         {
-            if (_bulkPromotionService == null || _academicYearRepository == null)
+            if (_bulkPromotionService == null || _academicYearService == null)
                 return;
 
             // Always load classes fresh from database for promotion dropdowns
@@ -1593,7 +1598,7 @@ public partial class StudentsManagementWindow : Window
             cmbPromotionToClass.ItemsSource = classesForPromotion;
 
             // Load academic years
-            var academicYears = await _academicYearRepository.GetRecentAcademicYearsAsync();
+            var academicYears = await _academicYearService.GetRecentAcademicYearsAsync();
             cmbPromotionAcademicYear.ItemsSource = academicYears;
             cmbPromotionAcademicYear.SelectedItem = academicYears.FirstOrDefault(ay => ay.IsCurrent);
         }

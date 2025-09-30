@@ -161,6 +161,9 @@
             <Setter Property="BorderThickness" Value="0"/>
         </Style>
 
+        <!-- Card Shadow Effect -->
+        <DropShadowEffect x:Key="CardShadow" Color="#000000" ShadowDepth="2" BlurRadius="6" Opacity="0.1"/>
+
         <!-- Card Style -->
         <Style x:Key="CardStyle" TargetType="Border">
             <Setter Property="Background" Value="{StaticResource CardBrush}"/>
@@ -169,11 +172,7 @@
             <Setter Property="CornerRadius" Value="8"/>
             <Setter Property="Padding" Value="20"/>
             <Setter Property="Margin" Value="10"/>
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect Color="#000000" ShadowDepth="2" BlurRadius="6" Opacity="0.1"/>
-                </Setter.Value>
-            </Setter>
+            <Setter Property="Effect" Value="{StaticResource CardShadow}"/>
         </Style>
 
         <!-- Loading Spinner Style -->

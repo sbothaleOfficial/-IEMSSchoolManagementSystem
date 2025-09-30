@@ -26,7 +26,7 @@
 
                 <!-- Student Selection -->
                 <Label Content="Select Student *" FontWeight="Bold" Margin="0,5"/>
-                <ComboBox x:Name="cmbStudent" Height="30"
+                <ComboBox x:Name="cmbStudent" Height="35"
                           DisplayMemberPath="DisplayName"
                           SelectedValuePath="Id"
                           SelectionChanged="CmbStudent_SelectionChanged"/>
@@ -41,11 +41,11 @@
 
                 <!-- Academic Year -->
                 <Label Content="Academic Year *" FontWeight="Bold" Margin="0,5"/>
-                <ComboBox x:Name="cmbAcademicYear" Height="30"/>
+                <ComboBox x:Name="cmbAcademicYear" Height="35"/>
 
                 <!-- Fee Type -->
                 <Label Content="Fee Type *" FontWeight="Bold" Margin="0,5"/>
-                <ComboBox x:Name="cmbFeeType" Height="30" SelectionChanged="CmbFeeType_SelectionChanged"/>
+                <ComboBox x:Name="cmbFeeType" Height="35" SelectionChanged="CmbFeeType_SelectionChanged"/>
 
                 <!-- Fee Structure Display -->
                 <Border x:Name="borderFeeInfo" BorderBrush="{StaticResource WarningBrush}" BorderThickness="1"
@@ -57,23 +57,23 @@
 
                 <!-- Payment Method -->
                 <Label Content="Payment Method *" FontWeight="Bold" Margin="0,5"/>
-                <ComboBox x:Name="cmbPaymentMethod" Height="30" SelectionChanged="CmbPaymentMethod_SelectionChanged"/>
+                <ComboBox x:Name="cmbPaymentMethod" Height="35" SelectionChanged="CmbPaymentMethod_SelectionChanged"/>
 
                 <!-- Transaction Details (Dynamic based on payment method) -->
                 <StackPanel x:Name="pnlTransactionDetails" Visibility="Collapsed">
                     <Label x:Name="lblTransactionField" Content="Transaction ID" FontWeight="Bold" Margin="0,5"/>
-                    <TextBox x:Name="txtTransactionId" Height="30"/>
+                    <TextBox x:Name="txtTransactionId" Height="35"/>
 
                     <StackPanel x:Name="pnlBankDetails" Visibility="Collapsed">
                         <Label Content="Bank Name" FontWeight="Bold" Margin="0,5"/>
-                        <TextBox x:Name="txtBankName" Height="30"/>
+                        <TextBox x:Name="txtBankName" Height="35"/>
                     </StackPanel>
                 </StackPanel>
 
                 <!-- Amount Section -->
                 <StackPanel Margin="0,10">
                     <Label Content="Amount to Pay *" FontWeight="Bold"/>
-                    <TextBox x:Name="txtAmount" Height="30" TextChanged="TxtAmount_TextChanged"/>
+                    <TextBox x:Name="txtAmount" Height="35" TextChanged="TxtAmount_TextChanged"/>
                     <TextBlock x:Name="txtAmountInWords" FontSize="10" Foreground="{StaticResource TextSecondaryBrush}"
                                TextWrapping="Wrap" Margin="0,2"/>
                 </StackPanel>

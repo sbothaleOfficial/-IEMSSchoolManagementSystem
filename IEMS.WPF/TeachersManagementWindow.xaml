@@ -21,9 +21,9 @@
                 <Button x:Name="btnBack" Content="← Back"
                         Click="BtnBack_Click"
                         Background="White" Foreground="Black" BorderBrush="#CCCCCC" BorderThickness="1"
-                        Width="80" Height="32" Margin="0,0,20,0" FontWeight="SemiBold"/>
-                <TextBlock Text="👨‍🏫" FontSize="26" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                <TextBlock Text="Class Teachers Management System"
+                        Width="100" Height="35" Margin="0,0,20,0" FontWeight="SemiBold"/>
+                <TextBlock Text="Teachers" FontSize="20" FontWeight="Bold" Margin="0,0,10,0" VerticalAlignment="Center" Foreground="{StaticResource TextOnPrimaryBrush}"/>
+                <TextBlock Text="Management System"
                            FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextOnPrimaryBrush}"
                            VerticalAlignment="Center"/>
             </StackPanel>
@@ -37,14 +37,27 @@
             </Grid.RowDefinitions>
 
             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,20">
-                <Button x:Name="btnAddTeacher" Content="➕ Add Teacher" Width="130" Height="35" Margin="0,0,10,0"
+                <Button x:Name="btnAddTeacher" Content="+ Add Teacher" Width="130" Height="35" Margin="0,0,10,0"
                         Click="BtnAddTeacher_Click" Style="{StaticResource SuccessButtonStyle}"/>
-                <Button x:Name="btnEditTeacher" Content="✏️ Edit Teacher" Width="130" Height="35" Margin="0,0,10,0"
+                <Button x:Name="btnEditTeacher" Content="Edit Teacher" Width="130" Height="35" Margin="0,0,10,0"
                         Click="BtnEditTeacher_Click" Style="{StaticResource PrimaryButtonStyle}"/>
-                <Button x:Name="btnDeleteTeacher" Content="🗑️ Delete Teacher" Width="140" Height="35" Margin="0,0,10,0"
+                <Button x:Name="btnDeleteTeacher" Content="Delete Teacher" Width="130" Height="35" Margin="0,0,10,0"
                         Click="BtnDeleteTeacher_Click" Style="{StaticResource DangerButtonStyle}"/>
-                <Button x:Name="btnRefreshTeachers" Content="🔄 Refresh" Width="110" Height="35" Margin="0,0,10,0"
+                <Button x:Name="btnRefreshTeachers" Content="Refresh" Width="130" Height="35" Margin="0,0,10,0"
                         Click="BtnRefreshTeachers_Click" Style="{StaticResource SecondaryButtonStyle}"/>
+                <Separator Width="20"/>
+                <TextBlock Text="Search:" VerticalAlignment="Center" Margin="10,0,10,0" FontSize="14"/>
+                <TextBox x:Name="txtSearchTeachers" Width="250" Height="35" VerticalAlignment="Center"
+                         VerticalContentAlignment="Center"
+                         ToolTip="Search by name, employee ID, or phone number">
+                    <TextBox.Resources>
+                        <Style TargetType="Border">
+                            <Setter Property="CornerRadius" Value="4"/>
+                        </Style>
+                    </TextBox.Resources>
+                </TextBox>
+                <Button x:Name="btnClearTeacherSearch" Content="Clear" Width="100" Height="35" Margin="10,0,0,0"
+ Style="{StaticResource SecondaryButtonStyle}"/>
             </StackPanel>
 
             <DataGrid x:Name="dgTeachers" Grid.Row="1" AutoGenerateColumns="False"
@@ -67,7 +80,7 @@
         </Grid>
 
         <!-- Status Bar -->
-        <StatusBar Grid.Row="2" Height="25" Background="{StaticResource SecondaryDarkBrush}">
+        <StatusBar Grid.Row="2" Height="30" Background="{StaticResource SecondaryDarkBrush}">
             <StatusBarItem>
                 <TextBlock x:Name="lblStatus" Text="Ready" Foreground="{StaticResource TextOnPrimaryBrush}"/>
             </StatusBarItem>

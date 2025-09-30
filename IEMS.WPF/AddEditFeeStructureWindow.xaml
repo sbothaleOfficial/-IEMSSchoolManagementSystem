@@ -179,13 +179,13 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <Button Grid.Column="1" Name="btnSave" Content="💾 Save"
+                <Button Grid.Column="1" Name="btnSave" Content="Save"
                       Style="{StaticResource ActionButtonStyle}"
-                      Width="120" Margin="0,0,10,0"
+                      Width="100" Margin="0,0,10,0"
                       Click="BtnSave_Click"/>
                 <Button Grid.Column="2" Name="btnCancel" Content="Cancel"
                       Style="{StaticResource CancelButtonStyle}"
-                      Width="120"
+                      Width="100"
                       Click="BtnCancel_Click"/>
             </Grid>
         </Border>

@@ -91,6 +91,11 @@ public partial class SupportStaffManagementWindow : Window
         ApplyFilters();
     }
 
+    private void BtnBack_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
     private void BtnAddStaff_Click(object sender, RoutedEventArgs e)
     {
         AsyncHelper.SafeFireAndForget(async () => await AddStaffAsync(), "Add Staff Error");

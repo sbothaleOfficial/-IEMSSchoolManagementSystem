@@ -132,6 +132,11 @@ public partial class TransportManagementWindow : Window
         }
     }
 
+    private void BtnBack_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
     // Vehicle Management Event Handlers
     private void BtnAddVehicle_Click(object sender, RoutedEventArgs e)
     {

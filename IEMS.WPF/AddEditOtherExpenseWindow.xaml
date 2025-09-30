@@ -91,15 +91,15 @@
 
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="Transaction ID:" VerticalAlignment="Center" Margin="0,0,10,10" FontSize="12"/>
                         <TextBox Grid.Row="0" Grid.Column="1" x:Name="txtTransactionId" Margin="0,0,0,10"
-                                 Style="{StaticResource ModernTextBoxStyle}" Height="30"/>
+                                 Style="{StaticResource ModernTextBoxStyle}" Height="35"/>
 
                         <TextBlock Grid.Row="1" Grid.Column="0" Text="Bank Name:" VerticalAlignment="Center" Margin="0,0,10,10" FontSize="12"/>
                         <TextBox Grid.Row="1" Grid.Column="1" x:Name="txtBankName" Margin="0,0,0,10"
-                                 Style="{StaticResource ModernTextBoxStyle}" Height="30"/>
+                                 Style="{StaticResource ModernTextBoxStyle}" Height="35"/>
 
                         <TextBlock Grid.Row="2" Grid.Column="0" Text="Cheque Number:" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="12"/>
                         <TextBox Grid.Row="2" Grid.Column="1" x:Name="txtChequeNumber" Margin="0,0,0,0"
-                                 Style="{StaticResource ModernTextBoxStyle}" Height="30"/>
+                                 Style="{StaticResource ModernTextBoxStyle}" Height="35"/>
                     </Grid>
                 </Border>
             </Grid>
@@ -114,9 +114,9 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Button Grid.Column="1" x:Name="btnSave" Content="💾 Save" Width="100" Height="40" Margin="0,0,10,0"
+            <Button Grid.Column="1" x:Name="btnSave" Content="Save" Width="100" Height="35" Margin="0,0,10,0"
                     Click="BtnSave_Click" Style="{StaticResource PrimaryButtonStyle}" FontWeight="SemiBold"/>
-            <Button Grid.Column="2" x:Name="btnCancel" Content="✖ Cancel" Width="100" Height="40"
+            <Button Grid.Column="2" x:Name="btnCancel" Content="Cancel" Width="100" Height="35"
                     Click="BtnCancel_Click" Style="{StaticResource SecondaryButtonStyle}"/>
         </Grid>
     </Grid>

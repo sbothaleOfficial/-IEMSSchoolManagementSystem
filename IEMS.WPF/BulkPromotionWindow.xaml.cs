@@ -7,7 +7,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
-using IEMS.Core.Interfaces;
 using IEMS.WPF.Helpers;
 
 namespace IEMS.WPF
@@ -16,16 +15,14 @@ namespace IEMS.WPF
     {
         private readonly BulkPromotionService _bulkPromotionService;
         private readonly ClassService _classService;
-        private readonly IAcademicYearRepository _academicYearRepository;
         private List<StudentPromotionViewModel> _currentPreview = new();
         private List<ClassDto> _allClasses = new();
 
-        public BulkPromotionWindow(BulkPromotionService bulkPromotionService, ClassService classService, IAcademicYearRepository academicYearRepository)
+        public BulkPromotionWindow(BulkPromotionService bulkPromotionService, ClassService classService)
         {
             InitializeComponent();
             _bulkPromotionService = bulkPromotionService;
             _classService = classService;
-            _academicYearRepository = academicYearRepository;
             Loaded += Window_Loaded;
         }
 

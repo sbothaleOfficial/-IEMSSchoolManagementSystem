@@ -29,6 +29,11 @@ public partial class ClassesManagementWindow : Window
         lblStatus.Text = $"Loaded {classes.Count()} classes";
     }
 
+    private void BtnBack_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
     private void BtnAddClass_Click(object sender, RoutedEventArgs e)
     {
         var addWindow = new AddEditClassWindow(_classService, _teacherService);

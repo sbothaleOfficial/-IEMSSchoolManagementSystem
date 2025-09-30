@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using IEMS.Application.Services;
 using IEMS.Application.DTOs;
 using IEMS.Core.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace IEMS.WPF;
 
@@ -20,8 +21,9 @@ public partial class MainWindow : Window
     private readonly OtherExpenseService _otherExpenseService;
     private readonly BulkPromotionService _bulkPromotionService;
     private readonly AcademicYearService _academicYearService;
+    private readonly UserService _userService;
 
-    public MainWindow(StudentService studentService, TeacherService teacherService, ClassService classService, StaffService staffService, FeePaymentService feePaymentService, FeeStructureService feeStructureService, VehicleService vehicleService, TransportExpenseService transportExpenseService, ElectricityBillService electricityBillService, OtherExpenseService otherExpenseService, BulkPromotionService bulkPromotionService, AcademicYearService academicYearService)
+    public MainWindow(StudentService studentService, TeacherService teacherService, ClassService classService, StaffService staffService, FeePaymentService feePaymentService, FeeStructureService feeStructureService, VehicleService vehicleService, TransportExpenseService transportExpenseService, ElectricityBillService electricityBillService, OtherExpenseService otherExpenseService, BulkPromotionService bulkPromotionService, AcademicYearService academicYearService, UserService userService)
     {
         InitializeComponent();
         _studentService = studentService;
@@ -36,8 +38,48 @@ public partial class MainWindow : Window
         _otherExpenseService = otherExpenseService;
         _bulkPromotionService = bulkPromotionService;
         _academicYearService = academicYearService;
+        _userService = userService;
+
+        // Update welcome message with current user
+        if (LoginWindow.CurrentUser != null)
+        {
+            txtWelcomeUser.Text = $"Welcome, {LoginWindow.CurrentUser.FullName}";
+
+            // Show User Management only for Admin role
+            if (LoginWindow.CurrentUser.Role != "Admin")
+            {
+                cardUserManagement.Visibility = System.Windows.Visibility.Collapsed;
+            }
+        }
 
         lblStatus.Text = "Dashboard loaded successfully";
+    }
+
+    private void BtnLogout_Click(object sender, RoutedEventArgs e)
+    {
+        var result = MessageBox.Show("Are you sure you want to logout?", "Confirm Logout", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+        if (result == MessageBoxResult.Yes)
+        {
+            // Clear current user
+            LoginWindow.CurrentUser = null;
+
+            // Create and show login window
+            var loginWindow = new LoginWindow();
+            loginWindow.Show();
+
+            // Set login window as main window before closing this one
+            System.Windows.Application.Current.MainWindow = loginWindow;
+
+            // Dispose the service scope if it exists
+            if (this.Tag is IServiceScope scope)
+            {
+                scope.Dispose();
+            }
+
+            // Close main window (won't shut down app since MainWindow is now loginWindow)
+            this.Close();
+        }
     }
 
     // Dashboard Navigation Event Handlers
@@ -131,6 +173,21 @@ public partial class MainWindow : Window
         {
             MessageBox.Show($"Error opening System Settings: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             lblStatus.Text = "Error opening System Settings";
+        }
+    }
+
+    private void BtnUserManagement_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var userManagementWindow = new UserManagementWindow(_userService);
+            userManagementWindow.ShowDialog();
+            lblStatus.Text = "User Management module accessed";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening User Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening User Management";
         }
     }
 

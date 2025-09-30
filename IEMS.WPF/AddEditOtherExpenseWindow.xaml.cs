@@ -72,17 +72,13 @@ public partial class AddEditOtherExpenseWindow : Window
     private void PopulateForm(OtherExpenseDto expense)
     {
         cmbCategory.SelectedValue = expense.Category;
-        txtExpenseType.Text = expense.ExpenseType;
         txtDescription.Text = expense.Description;
         txtAmount.Text = expense.Amount.ToString();
         dpExpenseDate.SelectedDate = expense.ExpenseDate;
-        txtVendorName.Text = expense.VendorName;
-        txtInvoiceNumber.Text = expense.InvoiceNumber;
         cmbPaymentMethod.SelectedValue = expense.PaymentMethod;
         txtTransactionId.Text = expense.TransactionId;
         txtBankName.Text = expense.BankName;
         txtChequeNumber.Text = expense.ChequeNumber;
-        txtNotes.Text = expense.Notes;
     }
 
     private void CmbPaymentMethod_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -117,17 +113,17 @@ public partial class AddEditOtherExpenseWindow : Window
             {
                 Id = _currentExpense?.Id ?? 0,
                 Category = (OtherExpenseCategory)cmbCategory.SelectedValue,
-                ExpenseType = txtExpenseType.Text.Trim(),
-                Description = txtDescription.Text.Trim(),
+                ExpenseType = cmbCategory.Text?.Replace("_", " ") ?? "Other",
+                Description = string.IsNullOrWhiteSpace(txtDescription.Text) ? $"{cmbCategory.Text?.Replace("_", " ")} expense" : txtDescription.Text.Trim(),
                 Amount = decimal.Parse(txtAmount.Text),
                 ExpenseDate = dpExpenseDate.SelectedDate!.Value,
-                VendorName = txtVendorName.Text.Trim(),
-                InvoiceNumber = txtInvoiceNumber.Text.Trim(),
+                VendorName = string.Empty,
+                InvoiceNumber = string.Empty,
                 PaymentMethod = (PaymentMethod)cmbPaymentMethod.SelectedValue,
                 TransactionId = txtTransactionId.Text.Trim(),
                 BankName = txtBankName.Text.Trim(),
                 ChequeNumber = txtChequeNumber.Text.Trim(),
-                Notes = txtNotes.Text.Trim()
+                Notes = string.Empty
             };
 
             if (_expenseId.HasValue)
@@ -157,19 +153,7 @@ public partial class AddEditOtherExpenseWindow : Window
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(txtExpenseType.Text))
-        {
-            MessageBox.Show("Please enter an expense type.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            txtExpenseType.Focus();
-            return false;
-        }
-
-        if (string.IsNullOrWhiteSpace(txtDescription.Text))
-        {
-            MessageBox.Show("Please enter a description.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            txtDescription.Focus();
-            return false;
-        }
+        // Description is optional, no validation needed
 
         if (!decimal.TryParse(txtAmount.Text, out decimal amount) || amount <= 0)
         {

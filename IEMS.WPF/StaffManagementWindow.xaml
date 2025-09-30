@@ -21,9 +21,9 @@
                 <Button x:Name="btnBack" Content="← Back"
                         Click="BtnBack_Click"
                         Background="White" Foreground="Black" BorderBrush="#CCCCCC" BorderThickness="1"
-                        Width="80" Height="32" Margin="0,0,20,0" FontWeight="SemiBold"/>
-                <TextBlock Text="👥" FontSize="26" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                <TextBlock Text="Staff Management System"
+                        Width="100" Height="35" Margin="0,0,20,0" FontWeight="SemiBold"/>
+                <TextBlock Text="Staff" FontSize="20" FontWeight="Bold" Margin="0,0,10,0" VerticalAlignment="Center" Foreground="{StaticResource TextOnPrimaryBrush}"/>
+                <TextBlock Text="Management System"
                            FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextOnPrimaryBrush}"
                            VerticalAlignment="Center"/>
             </StackPanel>
@@ -32,7 +32,7 @@
         <!-- Main Content with Tabs -->
         <TabControl Grid.Row="1" Margin="20" FontSize="14">
             <!-- Teachers Tab -->
-            <TabItem Header="👨‍🏫 Teachers" FontSize="16" Padding="15,10">
+            <TabItem Header="Teachers" FontSize="14" Padding="15,10">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -47,19 +47,19 @@
 
                         <!-- Action Buttons -->
                         <StackPanel Grid.Column="0" Orientation="Horizontal">
-                            <Button x:Name="btnAddTeacher" Content="Add Teacher" Width="120" Height="35" Margin="0,0,10,0"
+                            <Button x:Name="btnAddTeacher" Content="Add Teacher" Width="130" Height="35" Margin="0,0,10,0"
                                     Click="BtnAddTeacher_Click" Style="{StaticResource SuccessButtonStyle}"/>
-                            <Button x:Name="btnEditTeacher" Content="Edit Teacher" Width="120" Height="35" Margin="0,0,10,0"
+                            <Button x:Name="btnEditTeacher" Content="Edit Teacher" Width="130" Height="35" Margin="0,0,10,0"
                                     Click="BtnEditTeacher_Click" Style="{StaticResource PrimaryButtonStyle}"/>
                             <Button x:Name="btnDeleteTeacher" Content="Delete Teacher" Width="130" Height="35" Margin="0,0,10,0"
                                     Click="BtnDeleteTeacher_Click" Style="{StaticResource DangerButtonStyle}"/>
-                            <Button x:Name="btnRefreshTeachers" Content="🔄 Refresh" Width="110" Height="35" Margin="0,0,10,0"
+                            <Button x:Name="btnRefreshTeachers" Content="Refresh" Width="130" Height="35" Margin="0,0,10,0"
                                     Click="BtnRefreshTeachers_Click" Style="{StaticResource SecondaryButtonStyle}"/>
                         </StackPanel>
 
                         <!-- Search Section -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                            <TextBlock Text="🔍 Search:" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="14"/>
+                            <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="14"/>
                             <TextBox x:Name="txtSearchTeacher" Width="250" Height="35"
                                      VerticalContentAlignment="Center"
                                      TextChanged="TxtSearchTeacher_TextChanged">
@@ -69,7 +69,7 @@
                                     </Style>
                                 </TextBox.Resources>
                             </TextBox>
-                            <Button x:Name="btnClearTeacherSearch" Content="Clear" Width="60" Height="35" Margin="10,0,0,0"
+                            <Button x:Name="btnClearTeacherSearch" Content="Clear" Width="100" Height="35" Margin="10,0,0,0"
                                     Click="BtnClearTeacherSearch_Click" Style="{StaticResource SecondaryButtonStyle}"/>
                         </StackPanel>
                     </Grid>
@@ -95,7 +95,7 @@
             </TabItem>
 
             <!-- Other Staff Tab -->
-            <TabItem Header="👨‍💼 Other Staff" FontSize="16" Padding="15,10">
+            <TabItem Header="Other Staff" FontSize="14" Padding="15,10">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -110,19 +110,19 @@
 
                         <!-- Action Buttons -->
                         <StackPanel Grid.Column="0" Orientation="Horizontal">
-                            <Button x:Name="btnAddStaff" Content="Add Staff" Width="120" Height="35" Margin="0,0,10,0"
+                            <Button x:Name="btnAddStaff" Content="Add Staff" Width="130" Height="35" Margin="0,0,10,0"
                                     Click="BtnAddStaff_Click" Style="{StaticResource SuccessButtonStyle}"/>
-                            <Button x:Name="btnEditStaff" Content="Edit Staff" Width="120" Height="35" Margin="0,0,10,0"
+                            <Button x:Name="btnEditStaff" Content="Edit Staff" Width="130" Height="35" Margin="0,0,10,0"
                                     Click="BtnEditStaff_Click" Style="{StaticResource PrimaryButtonStyle}"/>
                             <Button x:Name="btnDeleteStaff" Content="Delete Staff" Width="130" Height="35" Margin="0,0,10,0"
                                     Click="BtnDeleteStaff_Click" Style="{StaticResource DangerButtonStyle}"/>
-                            <Button x:Name="btnRefreshStaff" Content="🔄 Refresh" Width="110" Height="35" Margin="0,0,10,0"
+                            <Button x:Name="btnRefreshStaff" Content="Refresh" Width="130" Height="35" Margin="0,0,10,0"
                                     Click="BtnRefreshStaff_Click" Style="{StaticResource SecondaryButtonStyle}"/>
                         </StackPanel>
 
                         <!-- Search Section -->
                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                            <TextBlock Text="🔍 Search:" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="14"/>
+                            <TextBlock Text="Search:" VerticalAlignment="Center" Margin="0,0,10,0" FontSize="14"/>
                             <ComboBox x:Name="cmbStaffPosition" Width="150" Height="35" Margin="0,0,10,0"
                                       VerticalContentAlignment="Center"
                                       SelectionChanged="CmbStaffPosition_SelectionChanged">
@@ -145,7 +145,7 @@
                                     </Style>
                                 </TextBox.Resources>
                             </TextBox>
-                            <Button x:Name="btnClearStaffSearch" Content="Clear" Width="60" Height="35" Margin="10,0,0,0"
+                            <Button x:Name="btnClearStaffSearch" Content="Clear" Width="100" Height="35" Margin="10,0,0,0"
                                     Click="BtnClearStaffSearch_Click" Style="{StaticResource SecondaryButtonStyle}"/>
                         </StackPanel>
                     </Grid>
@@ -172,7 +172,7 @@
             </TabItem>
 
             <!-- Payslip Generation Tab -->
-            <TabItem Header="📄 Payslip Generation" FontSize="16" Padding="15,10">
+            <TabItem Header="Payslip Generation" FontSize="14" Padding="15,10">
                 <Grid Margin="20">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -255,7 +255,7 @@
                                 </Border>
 
                                 <!-- Generate Button -->
-                                <Button x:Name="btnGeneratePayslip" Content="Generate Payslip" Height="40"
+                                <Button x:Name="btnGeneratePayslip" Content="Generate Payslip" Height="35"
                                         Background="#3498DB" Foreground="White" FontWeight="Bold"
                                         Click="BtnGeneratePayslip_Click"/>
                             </StackPanel>
@@ -429,7 +429,7 @@
                     <!-- Action Buttons -->
                     <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center"
                                 Margin="0,20,0,0">
-                        <Button x:Name="btnPrintPayslip" Content="Print Payslip" Width="120" Height="35"
+                        <Button x:Name="btnPrintPayslip" Content="Print Payslip" Width="130" Height="35"
                                 Margin="0,0,10,0" Background="#27AE60" Foreground="White"
                                 FontWeight="Bold" Click="BtnPrintPayslip_Click"/>
                         <Button x:Name="btnClearPayslip" Content="Clear" Width="100" Height="35"
@@ -440,7 +440,7 @@
             </TabItem>
 
             <!-- Dashboard Tab -->
-            <TabItem Header="📊 Dashboard" FontSize="16" Padding="15,10">
+            <TabItem Header="Dashboard" FontSize="14" Padding="15,10">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <Grid Margin="20">
                         <Grid.RowDefinitions>
@@ -579,7 +579,7 @@
         </TabControl>
 
         <!-- Status Bar -->
-        <StatusBar Grid.Row="2" Height="25" Background="{StaticResource SecondaryDarkBrush}">
+        <StatusBar Grid.Row="2" Height="30" Background="{StaticResource SecondaryDarkBrush}">
             <StatusBarItem>
                 <TextBlock x:Name="lblStatus" Text="Ready" Foreground="{StaticResource TextOnPrimaryBrush}"/>
             </StatusBarItem>

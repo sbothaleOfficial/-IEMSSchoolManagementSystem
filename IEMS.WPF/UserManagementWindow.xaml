@@ -1,0 +1,138 @@
+<Window x:Class="IEMS.WPF.UserManagementWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="User Management" Height="600" Width="1000"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource SurfaceBrush}">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" Padding="20">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <TextBlock Text="👥" FontSize="32" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="User Management" FontSize="24" FontWeight="Bold"
+                                   Foreground="{StaticResource TextOnPrimaryBrush}"/>
+                        <TextBlock Text="Manage system users and permissions" FontSize="12"
+                                   Foreground="{StaticResource PrimaryLightBrush}" Margin="0,2,0,0"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Button Grid.Column="2" Content="✕ Close" Click="BtnClose_Click"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        Width="100" Height="35"/>
+            </Grid>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="1" Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Action Buttons -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
+                <Button x:Name="btnAddUser" Content="+ Add User" Click="BtnAddUser_Click"
+                        Style="{StaticResource SuccessButtonStyle}"
+                        Width="130" Height="35" Margin="0,0,10,0"/>
+                <Button x:Name="btnEditUser" Content="Edit User" Click="BtnEditUser_Click"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Width="130" Height="35" Margin="0,0,10,0"/>
+                <Button x:Name="btnResetPassword" Content="Reset Password" Click="BtnResetPassword_Click"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Width="130" Height="35" Margin="0,0,10,0"/>
+                <Button x:Name="btnToggleStatus" Content="Toggle Status" Click="BtnToggleStatus_Click"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        Width="130" Height="35" Margin="0,0,10,0"/>
+                <Button x:Name="btnRefresh" Content="Refresh" Click="BtnRefresh_Click"
+                        Style="{StaticResource SecondaryButtonStyle}"
+                        Width="130" Height="35" Margin="0,0,10,0"/>
+            </StackPanel>
+
+            <!-- Filter Section -->
+            <Border Grid.Row="1" Background="White" Padding="15" CornerRadius="8" Margin="0,0,0,15"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="150"/>
+                        <ColumnDefinition Width="20"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="120"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0" Text="Search:" VerticalAlignment="Center"
+                               FontWeight="SemiBold" Margin="0,0,10,0"/>
+                    <TextBox x:Name="txtSearch" Grid.Column="1" Height="30"
+                             VerticalContentAlignment="Center"
+                             TextChanged="TxtSearch_TextChanged"/>
+
+                    <TextBlock Grid.Column="3" Text="Role:" VerticalAlignment="Center"
+                               FontWeight="SemiBold" Margin="0,0,10,0"/>
+                    <ComboBox x:Name="cmbRoleFilter" Grid.Column="4" Height="30"
+                              SelectionChanged="CmbRoleFilter_SelectionChanged">
+                        <ComboBoxItem Content="All Roles" IsSelected="True"/>
+                        <ComboBoxItem Content="Admin"/>
+                        <ComboBoxItem Content="Principal"/>
+                        <ComboBoxItem Content="Teacher"/>
+                        <ComboBoxItem Content="Clerk"/>
+                        <ComboBoxItem Content="Accountant"/>
+                    </ComboBox>
+
+                    <TextBlock Grid.Column="6" Text="Status:" VerticalAlignment="Center"
+                               FontWeight="SemiBold" Margin="0,0,10,0"/>
+                    <ComboBox x:Name="cmbStatusFilter" Grid.Column="7" Height="30"
+                              SelectionChanged="CmbStatusFilter_SelectionChanged">
+                        <ComboBoxItem Content="All" IsSelected="True"/>
+                        <ComboBoxItem Content="Active"/>
+                        <ComboBoxItem Content="Disabled"/>
+                    </ComboBox>
+                </Grid>
+            </Border>
+
+            <!-- Users DataGrid -->
+            <Border Grid.Row="2" Background="White" CornerRadius="8"
+                    BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+                <DataGrid x:Name="dgUsers" AutoGenerateColumns="False"
+                          IsReadOnly="True" SelectionMode="Single"
+                          CanUserAddRows="False" CanUserDeleteRows="False"
+                          GridLinesVisibility="Horizontal"
+                          HeadersVisibility="Column"
+                          AlternatingRowBackground="#F9F9F9"
+                          RowHeight="45">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Username" Binding="{Binding Username}" Width="150"/>
+                        <DataGridTextColumn Header="Full Name" Binding="{Binding FullName}" Width="200"/>
+                        <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="120"/>
+                        <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="250"/>
+                        <DataGridTextColumn Header="Status" Binding="{Binding StatusDisplay}" Width="100"/>
+                        <DataGridTextColumn Header="Last Login" Binding="{Binding LastLoginDisplay}" Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+        </Grid>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="2" Background="{StaticResource PrimaryBrush}" Padding="10">
+            <TextBlock x:Name="lblStatus" Text="Ready"
+                       Foreground="{StaticResource TextOnPrimaryBrush}" FontSize="12"/>
+        </Border>
+    </Grid>
+</Window>

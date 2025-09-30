@@ -982,4 +982,9 @@ public partial class StaffManagementWindow : Window
             // Safely ignore calculation errors during initialization
         }
     }
+
+    private void BtnBack_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
 }

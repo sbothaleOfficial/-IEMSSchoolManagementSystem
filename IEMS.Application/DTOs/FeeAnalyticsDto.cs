@@ -54,7 +54,7 @@ public class FeeTypeAnalyticsDto
     public decimal CollectionRate { get; set; }
 }
 
-public class StudentFeeStatusDto
+public class StudentFeeAnalyticsDto
 {
     public int StudentId { get; set; }
     public string StudentName { get; set; } = string.Empty;

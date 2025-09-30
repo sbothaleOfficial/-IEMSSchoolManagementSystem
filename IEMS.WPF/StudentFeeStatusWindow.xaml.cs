@@ -105,12 +105,12 @@ namespace IEMS.WPF
                 var studentService = serviceProvider?.GetService(typeof(StudentService)) as StudentService;
                 var classService = serviceProvider?.GetService(typeof(ClassService)) as ClassService;
                 var feeStructureService = serviceProvider?.GetService(typeof(FeeStructureService)) as FeeStructureService;
-                var academicYearRepository = serviceProvider?.GetService(typeof(IEMS.Core.Interfaces.IAcademicYearRepository)) as IEMS.Core.Interfaces.IAcademicYearRepository;
+                var academicYearService = serviceProvider?.GetService(typeof(AcademicYearService)) as AcademicYearService;
 
-                if (studentService != null && feeStructureService != null && academicYearRepository != null)
+                if (studentService != null && feeStructureService != null && academicYearService != null)
                 {
                     var addFeePaymentWindow = new AddEditFeePaymentWindow(
-                        _feePaymentService, feeStructureService, studentService, academicYearRepository);
+                        _feePaymentService, feeStructureService, studentService, academicYearService);
 
                     // Pre-select the current student if possible
                     addFeePaymentWindow.SetStudentId(_studentId);

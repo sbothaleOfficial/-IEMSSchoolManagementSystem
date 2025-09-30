@@ -10,11 +10,11 @@ none
 false
 TRACE;RELEASE;NET;NET8_0;NETCOREAPP
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\App.xaml
-16345548802
+321145240911
 
-18-710390592
-255-1545501049
-AddEditClassWindow.xaml;AddEditFeePaymentWindow.xaml;AddEditStaffWindow.xaml;AddEditStudentWindow.xaml;AddEditTeacherWindow.xaml;AddEditTransportExpenseWindow.xaml;AddEditVehicleWindow.xaml;ClassesManagementWindow.xaml;Controls\LoadingOverlay.xaml;Controls\ToastNotification.xaml;FeeReceiptWindow.xaml;MainWindow.xaml;StudentsManagementWindow.xaml;SupportStaffManagementWindow.xaml;TeachersManagementWindow.xaml;TransportManagementWindow.xaml;
+35661542869
+257-1374095640
+AddEditClassWindow.xaml;AddEditElectricityBillWindow.xaml;AddEditFeePaymentWindow.xaml;AddEditFeeStructureWindow.xaml;AddEditOtherExpenseWindow.xaml;AddEditStaffWindow.xaml;AddEditStudentWindow.xaml;AddEditTeacherWindow.xaml;AddEditTransportExpenseWindow.xaml;AddEditUserWindow.xaml;AddEditVehicleWindow.xaml;BackupRestoreWindow.xaml;BonafideCertificateWindow.xaml;BulkPromotionWindow.xaml;ClassesManagementWindow.xaml;Controls\LoadingOverlay.xaml;Controls\ToastNotification.xaml;ExpenseManagementWindow.xaml;FeeReceiptWindow.xaml;FeeStructureManagementWindow.xaml;FinanceManagementWindow.xaml;LoginWindow.xaml;MainWindow.xaml;ResetPasswordWindow.xaml;StaffManagementWindow.xaml;StudentFeeStatusWindow.xaml;StudentsManagementWindow.xaml;SupportStaffManagementWindow.xaml;SystemSettingsWindow.xaml;TeachersManagementWindow.xaml;TransportManagementWindow.xaml;UserManagementWindow.xaml;
 
 False
 

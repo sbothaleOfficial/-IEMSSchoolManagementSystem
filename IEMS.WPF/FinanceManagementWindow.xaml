@@ -26,7 +26,7 @@
                     <Button x:Name="btnBack" Content="← Back"
                             Click="BtnBack_Click"
                             Background="White" Foreground="Black" BorderBrush="#CCCCCC" BorderThickness="1"
-                            Width="80" Height="32" Margin="0,0,20,0" FontWeight="SemiBold"/>
+                            Width="100" Height="35" Margin="0,0,20,0" FontWeight="SemiBold"/>
                     <TextBlock Text="Finance Management &amp; Analytics"
                                FontSize="24" FontWeight="Bold"
                                Foreground="{StaticResource TextOnPrimaryBrush}"
@@ -37,7 +37,7 @@
                     <TextBlock Text="Academic Year:" Foreground="{StaticResource TextOnPrimaryBrush}" Margin="0,0,10,0"/>
                     <ComboBox x:Name="cmbAcademicYear" Width="120" Height="30"
                               SelectionChanged="CmbAcademicYear_SelectionChanged"/>
-                    <Button x:Name="btnRefreshAnalytics" Content="🔄 Refresh"
+                    <Button x:Name="btnRefreshAnalytics" Content="Refresh"
                             Click="BtnRefreshAnalytics_Click" Style="{StaticResource SecondaryButtonStyle}"
                             Width="110" Height="35" Margin="10,0,0,0"/>
                 </StackPanel>
@@ -82,7 +82,7 @@
 
             <!-- Expense Management Tab -->
             <!-- Electricity Bills Tab -->
-            <TabItem Header="🔌 Electricity Bills">
+            <TabItem Header="Electricity Bills" FontSize="14">
                 <Grid Margin="20">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -92,9 +92,9 @@
 
                     <!-- Action Buttons Row -->
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
-                        <Button x:Name="btnAddElectricityBill" Content="Add Bill" Width="120" Height="35" Margin="0,0,10,0"
+                        <Button x:Name="btnAddElectricityBill" Content="Add Bill" Width="130" Height="35" Margin="0,0,10,0"
                                 Click="BtnAddElectricityBill_Click" Style="{StaticResource SuccessButtonStyle}"/>
-                        <Button x:Name="btnEditElectricityBill" Content="Edit Bill" Width="120" Height="35" Margin="0,0,10,0"
+                        <Button x:Name="btnEditElectricityBill" Content="Edit Bill" Width="130" Height="35" Margin="0,0,10,0"
                                 Click="BtnEditElectricityBill_Click" Style="{StaticResource PrimaryButtonStyle}"/>
                         <Button x:Name="btnDeleteElectricityBill" Content="Delete Bill" Width="130" Height="35" Margin="0,0,10,0"
                                 Click="BtnDeleteElectricityBill_Click" Style="{StaticResource DangerButtonStyle}"/>
@@ -127,7 +127,7 @@
             </TabItem>
 
             <!-- Other Expenses Tab -->
-            <TabItem Header="📝 Other Expenses">
+            <TabItem Header="Other Expenses" FontSize="14">
                 <Grid Margin="20">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -138,11 +138,11 @@
 
                     <!-- Action Buttons Row -->
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,15">
-                        <Button x:Name="btnAddOtherExpense" Content="Add Expense" Width="120" Height="35" Margin="0,0,10,0"
+                        <Button x:Name="btnAddOtherExpense" Content="Add Expense" Width="130" Height="35" Margin="0,0,10,0"
                                 Click="BtnAddOtherExpense_Click" Style="{StaticResource SuccessButtonStyle}"/>
                         <Button x:Name="btnEditOtherExpense" Content="Edit Expense" Width="130" Height="35" Margin="0,0,10,0"
                                 Click="BtnEditOtherExpense_Click" Style="{StaticResource PrimaryButtonStyle}"/>
-                        <Button x:Name="btnDeleteOtherExpense" Content="Delete Expense" Width="140" Height="35" Margin="0,0,10,0"
+                        <Button x:Name="btnDeleteOtherExpense" Content="Delete Expense" Width="130" Height="35" Margin="0,0,10,0"
                                 Click="BtnDeleteOtherExpense_Click" Style="{StaticResource DangerButtonStyle}"/>
                         <Button x:Name="btnClearFilter" Content="Clear Filter" Width="100" Height="35" Margin="10,0,0,0"
                                 Click="BtnClearFilter_Click" Style="{StaticResource SecondaryButtonStyle}"/>
@@ -187,7 +187,7 @@
             </TabItem>
 
             <!-- Expense Analytics Tab -->
-            <TabItem Header="📊 Expense Analytics">
+            <TabItem Header="Expense Analytics" FontSize="14">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <Grid Margin="20">
                         <Grid.RowDefinitions>
@@ -459,7 +459,7 @@
         </TabControl>
 
         <!-- Status Bar -->
-        <StatusBar Grid.Row="2" Height="25" Background="{StaticResource SecondaryDarkBrush}">
+        <StatusBar Grid.Row="2" Height="30" Background="{StaticResource SecondaryDarkBrush}">
             <StatusBarItem>
                 <TextBlock x:Name="lblStatus" Text="Ready" Foreground="{StaticResource TextOnPrimaryBrush}"/>
             </StatusBarItem>

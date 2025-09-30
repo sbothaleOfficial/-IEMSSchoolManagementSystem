@@ -22,15 +22,15 @@
                 <Button x:Name="btnBack" Content="← Back"
                         Click="BtnBack_Click"
                         Background="White" Foreground="Black" BorderBrush="#CCCCCC" BorderThickness="1"
-                        Width="80" Height="32" Margin="0,0,20,0" FontWeight="SemiBold"/>
-                <TextBlock Text="🚌" FontSize="30" Margin="0,0,10,0" VerticalAlignment="Center"/>
-                <TextBlock Text="Transport Management"
+                        Width="100" Height="35" Margin="0,0,20,0" FontWeight="SemiBold"/>
+                <TextBlock Text="Transport" FontSize="20" FontWeight="Bold" Margin="0,0,10,0" VerticalAlignment="Center" Foreground="{StaticResource TextOnPrimaryBrush}"/>
+                <TextBlock Text="Management System"
                            FontSize="20" FontWeight="Bold" Foreground="{StaticResource TextOnPrimaryBrush}"
                            VerticalAlignment="Center"/>
             </StackPanel>
 
             <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,20,0">
-                <Button x:Name="btnRefresh" Content="🔄 Refresh"
+                <Button x:Name="btnRefresh" Content="Refresh"
                         Height="35" Width="110" Margin="5" Click="BtnRefresh_Click"
                         Style="{StaticResource SecondaryButtonStyle}"/>
             </StackPanel>
@@ -39,7 +39,7 @@
         <!-- Main Content -->
         <TabControl Grid.Row="1" Margin="10">
             <!-- Vehicles Tab -->
-            <TabItem Header="🚗 Vehicles">
+            <TabItem Header="Vehicles" FontSize="14">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -48,16 +48,16 @@
 
                     <!-- Vehicle Controls -->
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-                        <Button x:Name="btnAddVehicle" Content="➕ Add Vehicle"
+                        <Button x:Name="btnAddVehicle" Content="Add Vehicle"
                                 Height="35" Width="130" Margin="0,0,10,0" Click="BtnAddVehicle_Click"
                                 Style="{StaticResource SuccessButtonStyle}"/>
-                        <Button x:Name="btnEditVehicle" Content="✏️ Edit Vehicle"
+                        <Button x:Name="btnEditVehicle" Content="Edit Vehicle"
                                 Height="35" Width="130" Margin="0,0,10,0" Click="BtnEditVehicle_Click"
                                 Style="{StaticResource PrimaryButtonStyle}"/>
-                        <Button x:Name="btnDeleteVehicle" Content="🗑️ Delete Vehicle"
+                        <Button x:Name="btnDeleteVehicle" Content="Delete Vehicle"
                                 Height="35" Width="140" Margin="0,0,10,0" Click="BtnDeleteVehicle_Click"
                                 Style="{StaticResource DangerButtonStyle}"/>
-                        <Button x:Name="btnViewExpenses" Content="📊 View Expenses"
+                        <Button x:Name="btnViewExpenses" Content="View Expenses"
                                 Height="35" Width="140" Margin="0,0,10,0" Click="BtnViewExpenses_Click"
                                 Style="{StaticResource SecondaryButtonStyle}"/>
                     </StackPanel>
@@ -87,7 +87,7 @@
             </TabItem>
 
             <!-- Expenses Tab -->
-            <TabItem Header="💰 Expenses">
+            <TabItem Header="Expenses" FontSize="14">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -97,13 +97,13 @@
 
                     <!-- Expense Controls -->
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-                        <Button x:Name="btnAddExpense" Content="➕ Add Expense"
+                        <Button x:Name="btnAddExpense" Content="Add Expense"
                                 Height="35" Width="130" Margin="0,0,10,0" Click="BtnAddExpense_Click"
                                 Style="{StaticResource SuccessButtonStyle}"/>
-                        <Button x:Name="btnEditExpense" Content="✏️ Edit Expense"
+                        <Button x:Name="btnEditExpense" Content="Edit Expense"
                                 Height="35" Width="130" Margin="0,0,10,0" Click="BtnEditExpense_Click"
                                 Style="{StaticResource PrimaryButtonStyle}"/>
-                        <Button x:Name="btnDeleteExpense" Content="🗑️ Delete Expense"
+                        <Button x:Name="btnDeleteExpense" Content="Delete Expense"
                                 Height="35" Width="150" Margin="0,0,10,0" Click="BtnDeleteExpense_Click"
                                 Style="{StaticResource DangerButtonStyle}"/>
                     </StackPanel>
@@ -161,7 +161,7 @@
             </TabItem>
 
             <!-- Dashboard Tab -->
-            <TabItem Header="📊 Dashboard">
+            <TabItem Header="Dashboard" FontSize="14">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
                     <Grid>
                         <Grid.RowDefinitions>

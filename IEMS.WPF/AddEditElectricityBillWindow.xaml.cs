@@ -1,8 +1,6 @@
 using System.Windows;
-using System.Windows.Controls;
 using IEMS.Application.DTOs;
 using IEMS.Application.Services;
-using IEMS.Core.Enums;
 using IEMS.WPF.Helpers;
 
 namespace IEMS.WPF;
@@ -26,8 +24,6 @@ public partial class AddEditElectricityBillWindow : Window
     {
         try
         {
-            InitializeComboBoxes();
-
             if (_billId.HasValue)
             {
                 lblTitle.Text = "Edit Electricity Bill";
@@ -45,9 +41,7 @@ public partial class AddEditElectricityBillWindow : Window
             else
             {
                 lblTitle.Text = "Add Electricity Bill";
-                dpDueDate.SelectedDate = DateTime.Now.AddDays(15);
-                cmbMonth.SelectedValue = DateTime.Now.Month;
-                cmbYear.SelectedValue = DateTime.Now.Year;
+                dpBillDate.SelectedDate = DateTime.Now;
             }
         }
         catch (Exception ex)
@@ -56,97 +50,13 @@ public partial class AddEditElectricityBillWindow : Window
         }
     }
 
-    private void InitializeComboBoxes()
-    {
-        // Initialize months
-        var months = new Dictionary<int, string>();
-        for (int i = 1; i <= 12; i++)
-        {
-            months.Add(i, new DateTime(2000, i, 1).ToString("MMMM"));
-        }
-        cmbMonth.ItemsSource = months;
-        cmbMonth.DisplayMemberPath = "Value";
-        cmbMonth.SelectedValuePath = "Key";
-
-        // Initialize years (current year - 5 to current year + 1)
-        var years = new List<int>();
-        for (int i = DateTime.Now.Year - 5; i <= DateTime.Now.Year + 1; i++)
-        {
-            years.Add(i);
-        }
-        cmbYear.ItemsSource = years;
-
-        // Initialize payment methods
-        cmbPaymentMethod.ItemsSource = Enum.GetValues<PaymentMethod>();
-    }
 
     private void PopulateForm(ElectricityBillDto bill)
     {
-        txtBillNumber.Text = bill.BillNumber;
-        cmbMonth.SelectedValue = bill.BillMonth;
-        cmbYear.SelectedValue = bill.BillYear;
-        txtUnits.Text = bill.Units.ToString();
-        txtUnitsRate.Text = bill.UnitsRate.ToString();
+        dpBillDate.SelectedDate = new DateTime(bill.BillYear, bill.BillMonth, 1);
         txtAmount.Text = bill.Amount.ToString();
-        dpDueDate.SelectedDate = bill.DueDate;
-        chkIsPaid.IsChecked = bill.IsPaid;
-        dpPaidDate.SelectedDate = bill.PaidDate;
-        cmbPaymentMethod.SelectedValue = bill.PaymentMethod;
-        txtTransactionId.Text = bill.TransactionId;
-        txtBankName.Text = bill.BankName;
-        txtChequeNumber.Text = bill.ChequeNumber;
-        txtNotes.Text = bill.Notes;
     }
 
-    private void TxtUnits_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        CalculateAmount();
-    }
-
-    private void TxtUnitsRate_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        CalculateAmount();
-    }
-
-    private void CalculateAmount()
-    {
-        if (decimal.TryParse(txtUnits.Text, out decimal units) &&
-            decimal.TryParse(txtUnitsRate.Text, out decimal rate))
-        {
-            var amount = units * rate;
-            txtAmount.Text = amount.ToString("F2");
-        }
-    }
-
-    private void ChkIsPaid_Checked(object sender, RoutedEventArgs e)
-    {
-        pnlPaymentDetails.Visibility = Visibility.Visible;
-        if (!dpPaidDate.SelectedDate.HasValue)
-        {
-            dpPaidDate.SelectedDate = DateTime.Now;
-        }
-    }
-
-    private void ChkIsPaid_Unchecked(object sender, RoutedEventArgs e)
-    {
-        pnlPaymentDetails.Visibility = Visibility.Collapsed;
-        dpPaidDate.SelectedDate = null;
-        cmbPaymentMethod.SelectedItem = null;
-        txtTransactionId.Clear();
-        txtBankName.Clear();
-        txtChequeNumber.Clear();
-    }
-
-    private void CmbPaymentMethod_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (cmbPaymentMethod.SelectedValue is PaymentMethod method)
-        {
-            // Enable/disable fields based on payment method
-            txtTransactionId.IsEnabled = method == PaymentMethod.ONLINE;
-            txtBankName.IsEnabled = method == PaymentMethod.CHEQUE || method == PaymentMethod.DD;
-            txtChequeNumber.IsEnabled = method == PaymentMethod.CHEQUE || method == PaymentMethod.DD;
-        }
-    }
 
     private void BtnSave_Click(object sender, RoutedEventArgs e)
     {
@@ -160,23 +70,24 @@ public partial class AddEditElectricityBillWindow : Window
             if (!ValidateForm())
                 return;
 
+            var billDate = dpBillDate.SelectedDate!.Value;
             var billDto = new ElectricityBillDto
             {
                 Id = _currentBill?.Id ?? 0,
-                BillNumber = txtBillNumber.Text.Trim(),
-                BillMonth = (int)cmbMonth.SelectedValue,
-                BillYear = (int)cmbYear.SelectedValue,
-                Units = decimal.Parse(txtUnits.Text),
-                UnitsRate = decimal.Parse(txtUnitsRate.Text),
+                BillNumber = $"{billDate:MMMM yyyy}",
+                BillMonth = billDate.Month,
+                BillYear = billDate.Year,
+                Units = 1,
+                UnitsRate = decimal.Parse(txtAmount.Text),
                 Amount = decimal.Parse(txtAmount.Text),
-                DueDate = dpDueDate.SelectedDate!.Value,
-                IsPaid = chkIsPaid.IsChecked ?? false,
-                PaidDate = dpPaidDate.SelectedDate,
-                PaymentMethod = cmbPaymentMethod.SelectedValue as PaymentMethod?,
-                TransactionId = txtTransactionId.Text.Trim(),
-                BankName = txtBankName.Text.Trim(),
-                ChequeNumber = txtChequeNumber.Text.Trim(),
-                Notes = txtNotes.Text.Trim()
+                DueDate = billDate.AddDays(15),
+                IsPaid = false,
+                PaidDate = null,
+                PaymentMethod = null,
+                TransactionId = string.Empty,
+                BankName = string.Empty,
+                ChequeNumber = string.Empty,
+                Notes = $"Simple electricity bill entry for {billDate:MMMM yyyy}"
             };
 
             if (_billId.HasValue)
@@ -199,38 +110,10 @@ public partial class AddEditElectricityBillWindow : Window
 
     private bool ValidateForm()
     {
-        if (string.IsNullOrWhiteSpace(txtBillNumber.Text))
+        if (!dpBillDate.SelectedDate.HasValue)
         {
-            MessageBox.Show("Please enter a bill number.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            txtBillNumber.Focus();
-            return false;
-        }
-
-        if (cmbMonth.SelectedValue == null)
-        {
-            MessageBox.Show("Please select a month.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            cmbMonth.Focus();
-            return false;
-        }
-
-        if (cmbYear.SelectedValue == null)
-        {
-            MessageBox.Show("Please select a year.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            cmbYear.Focus();
-            return false;
-        }
-
-        if (!decimal.TryParse(txtUnits.Text, out decimal units) || units <= 0)
-        {
-            MessageBox.Show("Please enter valid units consumed.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            txtUnits.Focus();
-            return false;
-        }
-
-        if (!decimal.TryParse(txtUnitsRate.Text, out decimal rate) || rate <= 0)
-        {
-            MessageBox.Show("Please enter valid rate per unit.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            txtUnitsRate.Focus();
+            MessageBox.Show("Please select a bill date.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            dpBillDate.Focus();
             return false;
         }
 
@@ -239,30 +122,6 @@ public partial class AddEditElectricityBillWindow : Window
             MessageBox.Show("Please enter valid amount.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             txtAmount.Focus();
             return false;
-        }
-
-        if (!dpDueDate.SelectedDate.HasValue)
-        {
-            MessageBox.Show("Please select a due date.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-            dpDueDate.Focus();
-            return false;
-        }
-
-        if (chkIsPaid.IsChecked == true)
-        {
-            if (!dpPaidDate.SelectedDate.HasValue)
-            {
-                MessageBox.Show("Please select a paid date.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                dpPaidDate.Focus();
-                return false;
-            }
-
-            if (cmbPaymentMethod.SelectedValue == null)
-            {
-                MessageBox.Show("Please select a payment method.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                cmbPaymentMethod.Focus();
-                return false;
-            }
         }
 
         return true;

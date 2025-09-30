@@ -3,135 +3,172 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Add/Edit Student" Height="600" Width="700"
         WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Background="{StaticResource BackgroundBrush}">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <Border Style="{StaticResource CardStyle}">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="150"/>
-                <ColumnDefinition Width="200"/>
-                <ColumnDefinition Width="150"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+    <Border Style="{StaticResource CardStyle}">
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <Grid Margin="20">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-            <!-- Row 0: Serial No and Standard -->
-            <Label Grid.Row="0" Grid.Column="0" Content="Serial No:" VerticalAlignment="Center"/>
-            <TextBox x:Name="txtSerialNo" Grid.Row="0" Grid.Column="1" Height="25" Margin="0,5"/>
+                <!-- Basic Information Section -->
+                <GroupBox Grid.Row="0" Header="Basic Information" Margin="0,0,0,15" Padding="15">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="2" Content="Standard:" VerticalAlignment="Center"/>
-            <TextBox x:Name="txtStandard" Grid.Row="0" Grid.Column="3" Height="25" Margin="0,5"/>
+                        <Label Grid.Row="0" Grid.Column="0" Content="Serial No:" VerticalAlignment="Center"/>
+                        <TextBox x:Name="txtSerialNo" Grid.Row="0" Grid.Column="1" Height="35" Margin="0,5"/>
 
-            <!-- Row 1: Class Division and Student Number -->
-            <Label Grid.Row="1" Grid.Column="0" Content="Class Division:" VerticalAlignment="Center"/>
-            <TextBox x:Name="txtClassDivision" Grid.Row="1" Grid.Column="1" Height="25" Margin="0,5"/>
+                        <Label Grid.Row="0" Grid.Column="3" Content="Standard:" VerticalAlignment="Center"/>
+                        <TextBox x:Name="txtStandard" Grid.Row="0" Grid.Column="4" Height="35" Margin="0,5"/>
 
-            <Label Grid.Row="1" Grid.Column="2" Content="Student Number:" VerticalAlignment="Center"/>
-            <TextBox x:Name="txtStudentNumber" Grid.Row="1" Grid.Column="3" Height="25" Margin="0,5"/>
+                        <Label Grid.Row="1" Grid.Column="0" Content="Class Division:" VerticalAlignment="Center"/>
+                        <TextBox x:Name="txtClassDivision" Grid.Row="1" Grid.Column="1" Height="35" Margin="0,5"/>
 
-            <!-- Row 2: First Name and Surname -->
-            <Label Grid.Row="2" Grid.Column="0" Content="First Name:" VerticalAlignment="Center"/>
-            <TextBox x:Name="txtFirstName" Grid.Row="2" Grid.Column="1" Height="25" Margin="0,5"/>
+                        <Label Grid.Row="1" Grid.Column="3" Content="Student Number:" VerticalAlignment="Center"/>
+                        <TextBox x:Name="txtStudentNumber" Grid.Row="1" Grid.Column="4" Height="35" Margin="0,5"/>
 
-            <Label Grid.Row="2" Grid.Column="2" Content="Surname:" VerticalAlignment="Center"/>
-            <TextBox x:Name="txtSurname" Grid.Row="2" Grid.Column="3" Height="25" Margin="0,5"/>
+                        <Label Grid.Row="2" Grid.Column="0" Content="First Name:" VerticalAlignment="Center"/>
+                        <TextBox x:Name="txtFirstName" Grid.Row="2" Grid.Column="1" Height="35" Margin="0,5"/>
 
-            <!-- Row 3: Father's Name and Mother's Name -->
-            <Label Grid.Row="3" Grid.Column="0" Content="Father's Name:" VerticalAlignment="Center"/>
-            <TextBox x:Name="txtFatherName" Grid.Row="3" Grid.Column="1" Height="25" Margin="0,5"/>
+                        <Label Grid.Row="2" Grid.Column="3" Content="Surname:" VerticalAlignment="Center"/>
+                        <TextBox x:Name="txtSurname" Grid.Row="2" Grid.Column="4" Height="35" Margin="0,5"/>
 
-            <Label Grid.Row="3" Grid.Column="2" Content="Mother's Name:" VerticalAlignment="Center"/>
-            <TextBox x:Name="txtMotherName" Grid.Row="3" Grid.Column="3" Height="25" Margin="0,5"/>
+                        <Label Grid.Row="3" Grid.Column="0" Content="Date of Birth:" VerticalAlignment="Center"/>
+                        <DatePicker x:Name="dpDateOfBirth" Grid.Row="3" Grid.Column="1" Height="35" Margin="0,5"/>
 
-            <!-- Row 4: Date of Birth and Gender -->
-            <Label Grid.Row="4" Grid.Column="0" Content="Date of Birth:" VerticalAlignment="Center"/>
-            <DatePicker x:Name="dpDateOfBirth" Grid.Row="4" Grid.Column="1" Height="25" Margin="0,5"/>
+                        <Label Grid.Row="3" Grid.Column="3" Content="Gender:" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="cmbGender" Grid.Row="3" Grid.Column="4" Height="35" Margin="0,5">
+                            <ComboBoxItem Content="Male"/>
+                            <ComboBoxItem Content="Female"/>
+                            <ComboBoxItem Content="Other"/>
+                        </ComboBox>
 
-            <Label Grid.Row="4" Grid.Column="2" Content="Gender:" VerticalAlignment="Center"/>
-            <ComboBox x:Name="cmbGender" Grid.Row="4" Grid.Column="3" Height="25" Margin="0,5">
-                <ComboBoxItem Content="Male"/>
-                <ComboBoxItem Content="Female"/>
-                <ComboBoxItem Content="Other"/>
-            </ComboBox>
+                        <Label Grid.Row="4" Grid.Column="0" Content="Class:" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="cmbClass" Grid.Row="4" Grid.Column="1" Height="35" Margin="0,5"
+                                  DisplayMemberPath="Name" SelectedValuePath="Id"/>
+                    </Grid>
+                </GroupBox>
 
-            <!-- Row 5: Admission Date and Caste Category -->
-            <Label Grid.Row="5" Grid.Column="0" Content="Admission Date:" VerticalAlignment="Center"/>
-            <DatePicker x:Name="dpAdmissionDate" Grid.Row="5" Grid.Column="1" Height="25" Margin="0,5"/>
+                <!-- Family Information Section -->
+                <GroupBox Grid.Row="1" Header="Family Information" Margin="0,0,0,15" Padding="15">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="5" Grid.Column="2" Content="Caste Category:" VerticalAlignment="Center"/>
-            <ComboBox x:Name="cmbCasteCategory" Grid.Row="5" Grid.Column="3" Height="25" Margin="0,5">
-                <ComboBoxItem Content="General"/>
-                <ComboBoxItem Content="SC"/>
-                <ComboBoxItem Content="ST"/>
-                <ComboBoxItem Content="OBC"/>
-                <ComboBoxItem Content="Other"/>
-            </ComboBox>
+                        <Label Grid.Row="0" Grid.Column="0" Content="Father's Name:" VerticalAlignment="Center"/>
+                        <TextBox x:Name="txtFatherName" Grid.Row="0" Grid.Column="1" Height="35" Margin="0,5"/>
 
-            <!-- Row 6: Religion and Parent Mobile -->
-            <Label Grid.Row="6" Grid.Column="0" Content="Religion:" VerticalAlignment="Center"/>
-            <ComboBox x:Name="cmbReligion" Grid.Row="6" Grid.Column="1" Height="25" Margin="0,5">
-                <ComboBoxItem Content="Hindu"/>
-                <ComboBoxItem Content="Muslim"/>
-                <ComboBoxItem Content="Christian"/>
-                <ComboBoxItem Content="Sikh"/>
-                <ComboBoxItem Content="Buddhist"/>
-                <ComboBoxItem Content="Jain"/>
-                <ComboBoxItem Content="Other"/>
-            </ComboBox>
+                        <Label Grid.Row="0" Grid.Column="3" Content="Mother's Name:" VerticalAlignment="Center"/>
+                        <TextBox x:Name="txtMotherName" Grid.Row="0" Grid.Column="4" Height="35" Margin="0,5"/>
 
-            <Label Grid.Row="6" Grid.Column="2" Content="Parent Mobile:" VerticalAlignment="Center"/>
-            <TextBox x:Name="txtParentMobile" Grid.Row="6" Grid.Column="3" Height="25" Margin="0,5"/>
+                        <Label Grid.Row="1" Grid.Column="0" Content="Parent Mobile:" VerticalAlignment="Center"/>
+                        <TextBox x:Name="txtParentMobile" Grid.Row="1" Grid.Column="1" Height="35" Margin="0,5"/>
 
-            <!-- Row 7: BPL and Semi-English checkboxes -->
-            <Label Grid.Row="7" Grid.Column="0" Content="BPL Status:" VerticalAlignment="Center"/>
-            <CheckBox x:Name="chkBPL" Grid.Row="7" Grid.Column="1" Content="BPL (Below Poverty Line)" VerticalAlignment="Center" Margin="0,5"/>
+                        <Label Grid.Row="2" Grid.Column="0" Content="Address:" VerticalAlignment="Top" Margin="0,8,0,0"/>
+                        <TextBox x:Name="txtAddress" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4"
+                                 Height="60" Margin="0,5" TextWrapping="Wrap" AcceptsReturn="True"
+                                 VerticalScrollBarVisibility="Auto"/>
+                    </Grid>
+                </GroupBox>
 
-            <Label Grid.Row="7" Grid.Column="2" Content="Semi-English:" VerticalAlignment="Center"/>
-            <CheckBox x:Name="chkSemiEnglish" Grid.Row="7" Grid.Column="3" Content="Semi-English Medium" VerticalAlignment="Center" Margin="0,5"/>
+                <!-- Academic Information Section -->
+                <GroupBox Grid.Row="2" Header="Academic Information" Margin="0,0,0,15" Padding="15">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
 
-            <!-- Row 8: Address (spanning all columns) -->
-            <Label Grid.Row="8" Grid.Column="0" Content="Address:" VerticalAlignment="Top" Margin="0,10,0,0"/>
-            <TextBox x:Name="txtAddress" Grid.Row="8" Grid.Column="1" Grid.ColumnSpan="3"
-                     Height="60" Margin="0,5" TextWrapping="Wrap" AcceptsReturn="True"
-                     VerticalScrollBarVisibility="Auto"/>
+                        <Label Grid.Row="0" Grid.Column="0" Content="Admission Date:" VerticalAlignment="Center"/>
+                        <DatePicker x:Name="dpAdmissionDate" Grid.Row="0" Grid.Column="1" Height="35" Margin="0,5"/>
 
-            <!-- Row 9: City/Village -->
-            <Label Grid.Row="9" Grid.Column="0" Content="City/Village:" VerticalAlignment="Center"/>
-            <TextBox x:Name="txtCityVillage" Grid.Row="9" Grid.Column="1" Grid.ColumnSpan="3" Height="25" Margin="0,5"/>
+                        <Label Grid.Row="0" Grid.Column="3" Content="Caste Category:" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="cmbCasteCategory" Grid.Row="0" Grid.Column="4" Height="35" Margin="0,5">
+                            <ComboBoxItem Content="General"/>
+                            <ComboBoxItem Content="OBC"/>
+                            <ComboBoxItem Content="SC"/>
+                            <ComboBoxItem Content="ST"/>
+                            <ComboBoxItem Content="Other"/>
+                        </ComboBox>
 
-            <!-- Row 10: Class -->
-            <Label Grid.Row="10" Grid.Column="0" Content="Class:" VerticalAlignment="Center"/>
-            <ComboBox x:Name="cmbClass" Grid.Row="10" Grid.Column="1" Height="25" Margin="0,5"
-                      DisplayMemberPath="Name" SelectedValuePath="Id"/>
+                        <Label Grid.Row="1" Grid.Column="0" Content="Religion:" VerticalAlignment="Center"/>
+                        <ComboBox x:Name="cmbReligion" Grid.Row="1" Grid.Column="1" Height="35" Margin="0,5">
+                            <ComboBoxItem Content="Hindu"/>
+                            <ComboBoxItem Content="Muslim"/>
+                            <ComboBoxItem Content="Christian"/>
+                            <ComboBoxItem Content="Sikh"/>
+                            <ComboBoxItem Content="Buddhist"/>
+                            <ComboBoxItem Content="Jain"/>
+                            <ComboBoxItem Content="Other"/>
+                        </ComboBox>
 
-            <!-- Row 11: Buttons -->
-            <StackPanel Grid.Row="11" Grid.Column="0" Grid.ColumnSpan="4"
-                        Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-                <Button x:Name="btnSave" Content="Save" Width="80" Height="30" Margin="0,0,10,0" Click="BtnSave_Click" Style="{StaticResource SuccessButtonStyle}"/>
-                <Button x:Name="btnCancel" Content="Cancel" Width="80" Height="30" IsCancel="True" Click="BtnCancel_Click" Style="{StaticResource SecondaryButtonStyle}"/>
-            </StackPanel>
-        </Grid>
-        </Border>
-    </ScrollViewer>
+                        <Label Grid.Row="2" Grid.Column="0" Content="City/Village:" VerticalAlignment="Center"/>
+                        <TextBox x:Name="txtCityVillage" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="4" Height="35" Margin="0,5"/>
+                    </Grid>
+                </GroupBox>
+
+                <!-- Additional Information Section -->
+                <GroupBox Grid.Row="3" Header="Additional Information" Margin="0,0,0,15" Padding="15">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="20"/>
+                            <ColumnDefinition Width="140"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <CheckBox x:Name="chkBPL" Grid.Row="0" Grid.Column="0" Content="BPL" VerticalAlignment="Center" Margin="0,5"/>
+                        <CheckBox x:Name="chkSemiEnglish" Grid.Row="0" Grid.Column="3" Content="Semi-English" VerticalAlignment="Center" Margin="0,5"/>
+                    </Grid>
+                </GroupBox>
+
+                <!-- Action Buttons -->
+                <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+                    <Button x:Name="btnSave" Content="Save" Width="100" Height="35" Margin="0,0,10,0"
+                            Click="BtnSave_Click" Style="{StaticResource SuccessButtonStyle}"/>
+                    <Button x:Name="btnCancel" Content="Cancel" Width="100" Height="35" IsCancel="True"
+                            Click="BtnCancel_Click" Style="{StaticResource SecondaryButtonStyle}"/>
+                </StackPanel>
+            </Grid>
+        </ScrollViewer>
+    </Border>
 </Window>

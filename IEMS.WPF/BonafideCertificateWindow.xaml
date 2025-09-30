@@ -132,13 +132,13 @@
         <!-- Action Buttons -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center"
                     Margin="0,20,0,0">
-            <Button Name="GenerateButton" Content="Generate Certificate" Width="150" Height="40"
+            <Button Name="GenerateButton" Content="Generate Certificate" Width="150" Height="35"
                     Margin="0,0,10,0" Background="#3498DB" Foreground="White"
                     FontWeight="Bold" Click="GenerateButton_Click"/>
-            <Button Name="PrintButton" Content="Print Certificate" Width="150" Height="40"
+            <Button Name="PrintButton" Content="Print Certificate" Width="150" Height="35"
                     Margin="10,0,10,0" Background="#27AE60" Foreground="White"
                     FontWeight="Bold" Click="PrintButton_Click"/>
-            <Button Name="CloseButton" Content="Close" Width="100" Height="40"
+            <Button Name="CloseButton" Content="Close" Width="100" Height="35"
                     Margin="10,0,0,0" Background="#95A5A6" Foreground="White"
                     FontWeight="Bold" Click="CloseButton_Click"/>
         </StackPanel>

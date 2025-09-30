@@ -23,7 +23,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" Content="Class Name:" VerticalAlignment="Center"/>
-            <ComboBox x:Name="cmbClassName" Grid.Column="1" Height="25" VerticalAlignment="Center"/>
+            <ComboBox x:Name="cmbClassName" Grid.Column="1" Height="35" VerticalAlignment="Center"/>
         </Grid>
 
         <Grid Grid.Row="2" Margin="0,0,0,15">
@@ -32,7 +32,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" Content="Section (Optional):" VerticalAlignment="Center"/>
-            <TextBox x:Name="txtSection" Grid.Column="1" Height="25" VerticalAlignment="Center" MaxLength="10" ToolTip="Optional - Leave empty if not needed"/>
+            <TextBox x:Name="txtSection" Grid.Column="1" Height="35" VerticalAlignment="Center" MaxLength="10" ToolTip="Optional - Leave empty if not needed"/>
         </Grid>
 
         <Grid Grid.Row="3" Margin="0,0,0,15">
@@ -41,7 +41,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Label Grid.Column="0" Content="Teacher:" VerticalAlignment="Center"/>
-            <ComboBox x:Name="cmbTeacher" Grid.Column="1" Height="25" VerticalAlignment="Center"
+            <ComboBox x:Name="cmbTeacher" Grid.Column="1" Height="35" VerticalAlignment="Center"
                       DisplayMemberPath="DisplayName" SelectedValuePath="Id"/>
         </Grid>
 
@@ -49,9 +49,9 @@
                    Visibility="Collapsed" Margin="0,0,0,10"/>
 
         <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
-            <Button x:Name="btnSave" Content="Save" Width="80" Height="30" Margin="0,0,10,0"
+            <Button x:Name="btnSave" Content="Save" Width="100" Height="35" Margin="0,0,10,0"
                     Click="BtnSave_Click" IsDefault="True" Style="{StaticResource SuccessButtonStyle}"/>
-            <Button x:Name="btnCancel" Content="Cancel" Width="80" Height="30"
+            <Button x:Name="btnCancel" Content="Cancel" Width="100" Height="35"
                     Click="BtnCancel_Click" IsCancel="True" Style="{StaticResource SecondaryButtonStyle}"/>
         </StackPanel>
     </Grid>

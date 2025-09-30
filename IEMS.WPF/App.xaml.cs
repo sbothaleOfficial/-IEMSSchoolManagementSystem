@@ -38,6 +38,7 @@ public partial class App : System.Windows.Application
                     services.AddScoped<IElectricityBillRepository, ElectricityBillRepository>();
                     services.AddScoped<IOtherExpenseRepository, OtherExpenseRepository>();
                     services.AddScoped<IAcademicYearRepository, AcademicYearRepository>();
+                    services.AddScoped<IUserRepository, UserRepository>();
 
                     // Configuration
                     var bulkPromotionConfig = new BulkPromotionConfiguration
@@ -64,6 +65,7 @@ public partial class App : System.Windows.Application
                     services.AddScoped<StudentPromotionService>();
                     services.AddScoped<StudentEligibilityValidator>();
                     services.AddScoped<ClassProgressionValidator>();
+                    services.AddScoped<PasswordHashingService>();
 
                     // Application Services
                     services.AddScoped<StudentService>();
@@ -80,9 +82,10 @@ public partial class App : System.Windows.Application
                     services.AddScoped<BulkPromotionService>();
                     services.AddScoped<IBackupService, BackupService>();
                     services.AddScoped<ISystemSettingsService, SystemSettingsService>();
+                    services.AddScoped<UserService>();
                     services.AddHostedService<AutomaticBackupService>();
 
-                    services.AddSingleton<MainWindow>();
+                    services.AddTransient<MainWindow>();
                     services.AddTransient<FeeStructureManagementWindow>();
                     services.AddTransient<AddEditFeeStructureWindow>();
                 })
@@ -96,11 +99,15 @@ public partial class App : System.Windows.Application
             {
                 var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                 context.Database.EnsureCreated();
+
+                // Ensure default admin user exists
+                var userService = scope.ServiceProvider.GetRequiredService<UserService>();
+                await userService.EnsureDefaultAdminExistsAsync();
             }
 
-            var mainWindow = _host.Services.GetRequiredService<MainWindow>();
-            this.MainWindow = mainWindow;
-            mainWindow.Show();
+            // Show login window first
+            var loginWindow = new LoginWindow();
+            loginWindow.Show();
 
             base.OnStartup(e);
         }
