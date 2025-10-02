@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Windows;
 using IEMS.Application.Services;
 using IEMS.Core.Entities;
@@ -113,9 +114,40 @@ namespace IEMS.WPF
                         return;
                     }
 
-                    if (txtPassword.Password.Length < 8)
+                    var password = txtPassword.Password;
+
+                    // Comprehensive password validation matching UserService requirements
+                    if (password.Length < 8)
                     {
-                        ShowError("Password must be at least 8 characters");
+                        ShowError("Password must be at least 8 characters long");
+                        txtPassword.Focus();
+                        return;
+                    }
+
+                    if (!password.Any(char.IsUpper))
+                    {
+                        ShowError("Password must contain at least one uppercase letter");
+                        txtPassword.Focus();
+                        return;
+                    }
+
+                    if (!password.Any(char.IsLower))
+                    {
+                        ShowError("Password must contain at least one lowercase letter");
+                        txtPassword.Focus();
+                        return;
+                    }
+
+                    if (!password.Any(char.IsDigit))
+                    {
+                        ShowError("Password must contain at least one number");
+                        txtPassword.Focus();
+                        return;
+                    }
+
+                    if (!password.Any(c => !char.IsLetterOrDigit(c)))
+                    {
+                        ShowError("Password must contain at least one special character");
                         txtPassword.Focus();
                         return;
                     }

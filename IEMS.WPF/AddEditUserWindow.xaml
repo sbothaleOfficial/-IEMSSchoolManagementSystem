@@ -56,7 +56,8 @@
                 <StackPanel x:Name="pnlPassword" Visibility="Visible">
                     <TextBlock Text="Password *" FontWeight="SemiBold" Margin="0,0,0,5"/>
                     <PasswordBox x:Name="txtPassword" Height="35" Margin="0,0,0,5"/>
-                    <TextBlock Text="Minimum 8 characters" FontSize="11"
+                    <TextBlock Text="Must be 8+ characters with uppercase, lowercase, number, and special character"
+                               FontSize="11" TextWrapping="Wrap"
                                Foreground="{StaticResource TextSecondaryBrush}" Margin="0,0,0,15"/>
 
                     <TextBlock Text="Confirm Password *" FontWeight="SemiBold" Margin="0,0,0,5"/>

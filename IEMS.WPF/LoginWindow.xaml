@@ -112,8 +112,7 @@
                                    Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,5"/>
                         <Border Background="#F8F9FA" CornerRadius="8" Padding="15,12" Margin="0,0,0,20">
                             <TextBox x:Name="txtUsername" FontSize="14" Background="Transparent"
-                                     BorderThickness="0" VerticalAlignment="Center"
-                                     Text="admin"/>
+                                     BorderThickness="0" VerticalAlignment="Center"/>
                         </Border>
 
                         <!-- Password Field -->
@@ -121,8 +120,7 @@
                                    Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,5"/>
                         <Border Background="#F8F9FA" CornerRadius="8" Padding="15,12" Margin="0,0,0,10">
                             <PasswordBox x:Name="txtPassword" FontSize="14" Background="Transparent"
-                                         BorderThickness="0" VerticalAlignment="Center"
-                                         Password="admin123"/>
+                                         BorderThickness="0" VerticalAlignment="Center"/>
                         </Border>
 
                         <!-- Remember Me -->

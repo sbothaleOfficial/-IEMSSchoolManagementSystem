@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Mail;
 using System.Threading.Tasks;
 using IEMS.Core.Entities;
+using IEMS.Core.Enums;
 using IEMS.Core.Interfaces;
 using IEMS.Core.Services;
 
@@ -33,11 +36,30 @@ namespace IEMS.Application.Services
                 return null;
             }
 
-            // Update last login
-            user.LastLogin = DateTime.Now;
-            await _userRepository.UpdateAsync(user);
+            // Update last login with race condition protection
+            try
+            {
+                // Re-fetch user to ensure we have the latest state before updating
+                var currentUser = await _userRepository.GetByIdAsync(user.Id);
 
-            return user;
+                // Verify user is still active before updating LastLogin
+                if (currentUser == null || !currentUser.IsActive)
+                {
+                    return null;
+                }
+
+                currentUser.LastLogin = DateTime.Now;
+                await _userRepository.UpdateAsync(currentUser);
+
+                return currentUser;
+            }
+            catch (Exception ex)
+            {
+                // Log the error but still return the authenticated user
+                // The LastLogin update is not critical for authentication success
+                System.Diagnostics.Debug.WriteLine($"Warning: Failed to update LastLogin for user '{username}': {ex.Message}");
+                return user;
+            }
         }
 
         public async Task<User?> GetByIdAsync(int id)
@@ -62,6 +84,21 @@ namespace IEMS.Application.Services
 
         public async Task<User> CreateUserAsync(string username, string password, string fullName, string role, string email, string createdBy)
         {
+            // Normalize username to lowercase for consistency
+            username = username?.Trim().ToLower() ?? throw new InvalidOperationException("Username cannot be empty.");
+
+            // Validate password strength
+            ValidatePasswordStrength(password);
+
+            // Validate email format
+            ValidateEmail(email);
+
+            // Validate role
+            if (!IsValidRole(role))
+            {
+                throw new InvalidOperationException($"Invalid role '{role}'. Valid roles are: {string.Join(", ", GetValidRoles())}");
+            }
+
             // Check if username already exists
             if (await _userRepository.UsernameExistsAsync(username))
             {
@@ -86,6 +123,15 @@ namespace IEMS.Application.Services
 
         public async Task UpdateUserAsync(User user, string modifiedBy)
         {
+            // Validate email format
+            ValidateEmail(user.Email);
+
+            // Validate role
+            if (!IsValidRole(user.Role))
+            {
+                throw new InvalidOperationException($"Invalid role '{user.Role}'. Valid roles are: {string.Join(", ", GetValidRoles())}");
+            }
+
             user.ModifiedDate = DateTime.Now;
             user.ModifiedBy = modifiedBy;
             await _userRepository.UpdateAsync(user);
@@ -93,11 +139,17 @@ namespace IEMS.Application.Services
 
         public async Task ResetPasswordAsync(int userId, string newPassword, string modifiedBy)
         {
+            // Validate password strength
+            ValidatePasswordStrength(newPassword);
+
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
             {
                 throw new InvalidOperationException("User not found.");
             }
+
+            // Audit trail for password reset
+            System.Diagnostics.Debug.WriteLine($"[AUDIT] Password reset for user '{user.Username}' (ID: {userId}) by '{modifiedBy}' at {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
 
             user.PasswordHash = _passwordHashingService.HashPassword(newPassword);
             user.MustChangePassword = true;
@@ -105,10 +157,16 @@ namespace IEMS.Application.Services
             user.ModifiedBy = modifiedBy;
 
             await _userRepository.UpdateAsync(user);
+
+            // Confirm audit trail
+            System.Diagnostics.Debug.WriteLine($"[AUDIT] Password reset completed successfully for user '{user.Username}'");
         }
 
         public async Task ChangePasswordAsync(int userId, string currentPassword, string newPassword)
         {
+            // Validate password strength
+            ValidatePasswordStrength(newPassword);
+
             var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
             {
@@ -121,11 +179,17 @@ namespace IEMS.Application.Services
                 throw new InvalidOperationException("Current password is incorrect.");
             }
 
+            // Audit trail for password change
+            System.Diagnostics.Debug.WriteLine($"[AUDIT] Password changed by user '{user.Username}' (ID: {userId}) at {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+
             user.PasswordHash = _passwordHashingService.HashPassword(newPassword);
             user.MustChangePassword = false;
             user.ModifiedDate = DateTime.Now;
 
             await _userRepository.UpdateAsync(user);
+
+            // Confirm audit trail
+            System.Diagnostics.Debug.WriteLine($"[AUDIT] Password change completed successfully for user '{user.Username}'");
         }
 
         public async Task DisableUserAsync(int userId, string modifiedBy)
@@ -134,6 +198,18 @@ namespace IEMS.Application.Services
             if (user == null)
             {
                 throw new InvalidOperationException("User not found.");
+            }
+
+            // Protect last admin from being disabled
+            if (user.Role == "Admin" && user.IsActive)
+            {
+                var allUsers = await _userRepository.GetAllAsync();
+                var activeAdminCount = allUsers.Count(u => u.Role == "Admin" && u.IsActive && u.Id != userId);
+
+                if (activeAdminCount == 0)
+                {
+                    throw new InvalidOperationException("Cannot disable the last active administrator. At least one active admin account is required.");
+                }
             }
 
             user.IsActive = false;
@@ -175,15 +251,107 @@ namespace IEMS.Application.Services
 
             if (userCount == 0)
             {
-                // Create default admin account
+                // Create default admin account with strong password
+                // IMPORTANT: Change this password immediately after first login
+                var defaultPassword = GenerateStrongPassword();
                 await CreateUserAsync(
                     username: "admin",
-                    password: "admin123",
+                    password: defaultPassword,
                     fullName: "System Administrator",
                     role: "Admin",
                     email: "admin@iemsschool.edu.in",
                     createdBy: "System"
                 );
+
+                // Log the default password for first-time setup
+                // In production, this should be logged to a secure file or shown once in setup wizard
+                System.Diagnostics.Debug.WriteLine($"[IMPORTANT] Default admin password: {defaultPassword}");
+                System.Diagnostics.Debug.WriteLine($"[IMPORTANT] Please change this password immediately after first login!");
+            }
+        }
+
+        private string GenerateStrongPassword()
+        {
+            // Generate a cryptographically secure random 16-character password with mixed characters
+            const string validChars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%";
+            var chars = new char[16];
+
+            using (var rng = System.Security.Cryptography.RandomNumberGenerator.Create())
+            {
+                var randomBytes = new byte[16];
+                rng.GetBytes(randomBytes);
+
+                for (int i = 0; i < 16; i++)
+                {
+                    chars[i] = validChars[randomBytes[i] % validChars.Length];
+                }
+            }
+
+            return new string(chars);
+        }
+
+        private bool IsValidRole(string role)
+        {
+            return Enum.TryParse<UserRole>(role, true, out _);
+        }
+
+        private IEnumerable<string> GetValidRoles()
+        {
+            return Enum.GetNames(typeof(UserRole));
+        }
+
+        private void ValidatePasswordStrength(string password)
+        {
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                throw new InvalidOperationException("Password cannot be empty.");
+            }
+
+            if (password.Length < 8)
+            {
+                throw new InvalidOperationException("Password must be at least 8 characters long.");
+            }
+
+            if (!password.Any(char.IsUpper))
+            {
+                throw new InvalidOperationException("Password must contain at least one uppercase letter.");
+            }
+
+            if (!password.Any(char.IsLower))
+            {
+                throw new InvalidOperationException("Password must contain at least one lowercase letter.");
+            }
+
+            if (!password.Any(char.IsDigit))
+            {
+                throw new InvalidOperationException("Password must contain at least one number.");
+            }
+
+            if (!password.Any(c => !char.IsLetterOrDigit(c)))
+            {
+                throw new InvalidOperationException("Password must contain at least one special character.");
+            }
+        }
+
+        private void ValidateEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new InvalidOperationException("Email address cannot be empty.");
+            }
+
+            try
+            {
+                var mailAddress = new MailAddress(email);
+                // Additional check to ensure the parsed address matches the input
+                if (mailAddress.Address != email)
+                {
+                    throw new InvalidOperationException("Invalid email address format.");
+                }
+            }
+            catch (FormatException)
+            {
+                throw new InvalidOperationException("Invalid email address format.");
             }
         }
     }

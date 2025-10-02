@@ -8,7 +8,7 @@ namespace IEMS.Core.Services
     {
         private const int SaltSize = 16; // 128 bits
         private const int HashSize = 32; // 256 bits
-        private const int Iterations = 10000;
+        private const int Iterations = 100000; // Increased from 10000 to 100000 for better security (OWASP recommendation)
 
         public string HashPassword(string password)
         {
@@ -55,16 +55,15 @@ namespace IEMS.Core.Services
                     iterationCount: Iterations,
                     numBytesRequested: HashSize);
 
-                // Compare the computed hash with the stored hash
+                // Compare the computed hash with the stored hash using constant-time comparison
+                // to prevent timing attacks
+                bool isValid = true;
                 for (int i = 0; i < HashSize; i++)
                 {
-                    if (hashBytes[i + SaltSize] != hash[i])
-                    {
-                        return false;
-                    }
+                    isValid &= (hashBytes[i + SaltSize] == hash[i]);
                 }
 
-                return true;
+                return isValid;
             }
             catch
             {
