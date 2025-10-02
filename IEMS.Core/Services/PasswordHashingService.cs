@@ -8,7 +8,7 @@ namespace IEMS.Core.Services
     {
         private const int SaltSize = 16; // 128 bits
         private const int HashSize = 32; // 256 bits
-        private const int Iterations = 100000; // Increased from 10000 to 100000 for better security (OWASP recommendation)
+        private const int Iterations = 10000; // Keep at 10000 for backward compatibility with existing password hashes
 
         public string HashPassword(string password)
         {
