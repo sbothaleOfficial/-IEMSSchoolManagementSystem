@@ -159,8 +159,12 @@ public class FeePaymentService
             student.ClassId, createDto.FeeType, createDto.AcademicYear);
 
         var totalFeeAmount = feeStructure?.Amount ?? 0;
-        var effectiveAmount = createDto.AmountPaid - createDto.Discount + createDto.LateFee;
-        var newRemainingBalance = Math.Max(0, previousBalance + totalFeeAmount - effectiveAmount);
+
+        // CORRECT CALCULATION:
+        // Total owed = previousBalance + feeAmount + lateFee - discount
+        // Remaining = totalOwed - amountPaid
+        var totalOwed = previousBalance + totalFeeAmount + createDto.LateFee - createDto.Discount;
+        var newRemainingBalance = Math.Max(0, totalOwed - createDto.AmountPaid);
 
         var feePayment = new FeePayment
         {
@@ -257,12 +261,18 @@ public class FeePaymentService
 
         // Calculate basic analytics
         var totalCollection = currentYearPayments.Sum(fp => fp.AmountPaid);
-        var totalPending = currentYearPayments.Sum(fp => fp.RemainingBalance);
+
+        // Calculate total pending correctly - take the LATEST payment's remaining balance per student per fee type
+        var totalPending = currentYearPayments
+            .GroupBy(fp => new { fp.StudentId, fp.FeeType })
+            .Select(g => g.OrderByDescending(fp => fp.PaymentDate).First().RemainingBalance)
+            .Sum();
 
         // Students with pending fees
         var studentsWithPending = currentYearPayments
-            .Where(fp => fp.RemainingBalance > 0)
-            .Select(fp => fp.StudentId)
+            .GroupBy(fp => new { fp.StudentId, fp.FeeType })
+            .Where(g => g.OrderByDescending(fp => fp.PaymentDate).First().RemainingBalance > 0)
+            .Select(g => g.Key.StudentId)
             .Distinct()
             .Count();
 
@@ -304,13 +314,19 @@ public class FeePaymentService
             var classStudents = classItem.Students.ToList();
             var classPayments = currentYearPayments.Where(fp => classStudents.Any(s => s.Id == fp.StudentId)).ToList();
 
+            // Calculate total pending correctly - take the LATEST payment's remaining balance per student per fee type
+            var totalPending = classPayments
+                .GroupBy(fp => new { fp.StudentId, fp.FeeType })
+                .Select(g => g.OrderByDescending(fp => fp.PaymentDate).First().RemainingBalance)
+                .Sum();
+
             var studentsWithPending = classPayments
-                .Where(fp => fp.RemainingBalance > 0)
-                .Select(fp => fp.StudentId)
+                .GroupBy(fp => new { fp.StudentId, fp.FeeType })
+                .Where(g => g.OrderByDescending(fp => fp.PaymentDate).First().RemainingBalance > 0)
+                .Select(g => g.Key.StudentId)
                 .Distinct()
                 .Count();
 
-            var totalPending = classPayments.Sum(fp => fp.RemainingBalance);
             var totalCollected = classPayments.Sum(fp => fp.AmountPaid);
             var collectionPercentage = (totalCollected + totalPending) > 0 ?
                 (totalCollected / (totalCollected + totalPending)) * 100 : 0;

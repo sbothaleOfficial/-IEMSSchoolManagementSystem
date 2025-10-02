@@ -15,9 +15,13 @@ public class FeeCalculationService
         if (discount < 0) throw new ArgumentException("Discount cannot be negative");
         if (lateFee < 0) throw new ArgumentException("Late fee cannot be negative");
 
-        var effectiveAmount = amountPaid - discount + lateFee;
-        var newRemainingBalance = Math.Max(0, previousBalance + totalFeeAmount - effectiveAmount);
-        var isOverpayment = effectiveAmount > (previousBalance + totalFeeAmount);
+        // CORRECT CALCULATION:
+        // Total owed = previousBalance + feeAmount + lateFee - discount
+        // Remaining = totalOwed - amountPaid
+        var totalOwed = previousBalance + totalFeeAmount + lateFee - discount;
+        var newRemainingBalance = Math.Max(0, totalOwed - amountPaid);
+        var isOverpayment = amountPaid > totalOwed;
+        var effectiveAmount = amountPaid; // Amount paid is the effective payment amount
 
         return new FeeCalculationResult
         {
@@ -25,7 +29,7 @@ public class FeeCalculationService
             RemainingBalance = newRemainingBalance,
             IsFullyPaid = newRemainingBalance == 0,
             IsOverpayment = isOverpayment,
-            OverpaymentAmount = isOverpayment ? effectiveAmount - (previousBalance + totalFeeAmount) : 0,
+            OverpaymentAmount = isOverpayment ? amountPaid - totalOwed : 0,
             PaidAmount = amountPaid,
             DiscountApplied = discount,
             LateFeeApplied = lateFee

@@ -729,7 +729,7 @@ namespace IEMS.WPF
                 // For monthly/yearly view, calculate pro-rated salaries
                 if (rbMonthly?.IsChecked == true)
                 {
-                    salariesTotal = salariesTotal; // Monthly salary total
+                    // Monthly salary total (no calculation needed - already monthly)
                 }
                 else if (rbYearly?.IsChecked == true)
                 {
