@@ -146,9 +146,15 @@ public partial class AddEditVehicleWindow : Window
             return false;
         }
 
-        if (txtVehicleNumber.Text.Trim().Length < 5)
+        var vehicleNumber = txtVehicleNumber.Text.Trim().ToUpper();
+
+        // Indian vehicle number format: XX00XX0000 (e.g., MH12AB1234)
+        // Allow variations: XX-00-XX-0000 or XX00XX0000
+        var cleanVehicleNumber = vehicleNumber.Replace("-", "").Replace(" ", "");
+
+        if (!System.Text.RegularExpressions.Regex.IsMatch(cleanVehicleNumber, @"^[A-Z]{2}\d{2}[A-Z]{1,2}\d{4}$"))
         {
-            ShowValidationError("Vehicle Number must be at least 5 characters long.");
+            ShowValidationError("Vehicle Number must be in Indian format (e.g., MH12AB1234 or DL01CA9999).");
             txtVehicleNumber.Focus();
             return false;
         }
@@ -176,19 +182,23 @@ public partial class AddEditVehicleWindow : Window
             return false;
         }
 
-        // Phone validation (optional but if provided, should be valid)
-        if (!string.IsNullOrWhiteSpace(txtDriverPhone.Text))
+        // Phone validation (REQUIRED for school transport safety)
+        if (string.IsNullOrWhiteSpace(txtDriverPhone.Text))
         {
-            var phone = txtDriverPhone.Text.Trim();
-            // Remove any spaces, dashes, or other formatting characters
-            var cleanPhone = new string(phone.Where(char.IsDigit).ToArray());
+            ShowValidationError("Driver Phone is required for safety purposes.");
+            txtDriverPhone.Focus();
+            return false;
+        }
 
-            if (cleanPhone.Length < 10)
-            {
-                ShowValidationError("Driver Phone should be at least 10 digits.");
-                txtDriverPhone.Focus();
-                return false;
-            }
+        var phone = txtDriverPhone.Text.Trim();
+        // Remove any spaces, dashes, or other formatting characters
+        var cleanPhone = new string(phone.Where(char.IsDigit).ToArray());
+
+        if (!System.Text.RegularExpressions.Regex.IsMatch(cleanPhone, @"^[6-9]\d{9}$"))
+        {
+            ShowValidationError("Driver Phone must be a valid 10-digit Indian mobile number starting with 6-9.");
+            txtDriverPhone.Focus();
+            return false;
         }
 
         HideValidationError();

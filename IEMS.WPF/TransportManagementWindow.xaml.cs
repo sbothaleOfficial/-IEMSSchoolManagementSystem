@@ -195,6 +195,21 @@ public partial class TransportManagementWindow : Window
             {
                 if (dgVehicles.SelectedItem is VehicleDto selectedVehicle)
                 {
+                    // Check if vehicle has related expenses
+                    var vehicleExpenses = _allExpenses.Where(e => e.VehicleId == selectedVehicle.Id).ToList();
+
+                    if (vehicleExpenses.Any())
+                    {
+                        MessageBox.Show(
+                            $"Cannot delete vehicle '{selectedVehicle.VehicleNumber}'.\n\n" +
+                            $"This vehicle has {vehicleExpenses.Count} expense record(s) associated with it.\n\n" +
+                            $"Please delete all related expenses first or contact your administrator.",
+                            "Delete Not Allowed",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+                        return;
+                    }
+
                     var result = MessageBox.Show(
                         $"Are you sure you want to delete vehicle '{selectedVehicle.VehicleNumber}'?\n\nThis action cannot be undone.",
                         "Confirm Delete",
@@ -223,7 +238,7 @@ public partial class TransportManagementWindow : Window
 
     private void BtnViewExpenses_Click(object sender, RoutedEventArgs e)
     {
-        AsyncHelper.SafeFireAndForget(async () =>
+        try
         {
             if (dgVehicles.SelectedItem is VehicleDto selectedVehicle)
             {
@@ -243,7 +258,11 @@ public partial class TransportManagementWindow : Window
             {
                 MessageBox.Show("Please select a vehicle to view its expenses.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
-        }, "View Vehicle Expenses Error");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error viewing vehicle expenses: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     // Expense Management Event Handlers
@@ -336,32 +355,50 @@ public partial class TransportManagementWindow : Window
     // Filter Event Handlers
     private void CmbFilterVehicle_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        AsyncHelper.SafeFireAndForget(async () =>
+        try
         {
             ApplyExpenseFilters();
-        }, "Vehicle Filter Selection Error");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error applying vehicle filter: {ex.Message}", "Filter Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void CmbFilterCategory_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        AsyncHelper.SafeFireAndForget(async () =>
+        try
         {
             ApplyExpenseFilters();
-        }, "Category Filter Selection Error");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error applying category filter: {ex.Message}", "Filter Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void DateFilter_Changed(object sender, SelectionChangedEventArgs e)
     {
-        AsyncHelper.SafeFireAndForget(async () =>
+        try
         {
             ApplyExpenseFilters();
-        }, "Date Filter Change Error");
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error applying date filter: {ex.Message}", "Filter Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     private void ApplyExpenseFilters()
     {
         try
         {
+            if (cmbFilterVehicle == null || cmbFilterCategory == null ||
+                dpFromDate == null || dpToDate == null || dgExpenses == null)
+            {
+                return; // Controls not initialized yet
+            }
+
             var filteredExpenses = _allExpenses.AsEnumerable();
 
             // Vehicle filter
@@ -386,11 +423,17 @@ public partial class TransportManagementWindow : Window
 
             if (dpToDate.SelectedDate.HasValue)
             {
-                filteredExpenses = filteredExpenses.Where(e => e.ExpenseDate <= dpToDate.SelectedDate.Value);
+                // End date is inclusive (includes entire day)
+                var endOfDay = dpToDate.SelectedDate.Value.Date.AddDays(1).AddSeconds(-1);
+                filteredExpenses = filteredExpenses.Where(e => e.ExpenseDate <= endOfDay);
             }
 
             dgExpenses.ItemsSource = filteredExpenses.ToList();
-            lblStatus.Text = $"Showing {filteredExpenses.Count()} expenses";
+
+            if (lblStatus != null)
+            {
+                lblStatus.Text = $"Showing {filteredExpenses.Count()} expenses";
+            }
         }
         catch (Exception ex)
         {

@@ -283,6 +283,13 @@ public partial class AddEditTransportExpenseWindow : Window
             return false;
         }
 
+        if (amount > 1000000)
+        {
+            ShowValidationError("Amount cannot exceed ₹10,00,000. Please verify the entered amount.");
+            txtAmount.Focus();
+            return false;
+        }
+
         // Quantity validation
         if (string.IsNullOrWhiteSpace(txtQuantity.Text))
         {
@@ -294,6 +301,13 @@ public partial class AddEditTransportExpenseWindow : Window
         if (!decimal.TryParse(txtQuantity.Text, out decimal quantity) || quantity <= 0)
         {
             ShowValidationError("Please enter a valid quantity greater than zero.");
+            txtQuantity.Focus();
+            return false;
+        }
+
+        if (quantity > 10000)
+        {
+            ShowValidationError("Quantity cannot exceed 10,000 units. Please verify the entered quantity.");
             txtQuantity.Focus();
             return false;
         }
@@ -311,6 +325,28 @@ public partial class AddEditTransportExpenseWindow : Window
             ShowValidationError("Expense date cannot be in the future.");
             dpExpenseDate.Focus();
             return false;
+        }
+
+        // Driver Name validation (optional but if provided, should be valid)
+        if (!string.IsNullOrWhiteSpace(txtDriverName.Text))
+        {
+            if (txtDriverName.Text.Trim().Length < 2)
+            {
+                ShowValidationError("Driver Name must be at least 2 characters long.");
+                txtDriverName.Focus();
+                return false;
+            }
+        }
+
+        // Invoice Number validation (optional but if provided, should be valid)
+        if (!string.IsNullOrWhiteSpace(txtInvoiceNumber.Text))
+        {
+            if (txtInvoiceNumber.Text.Trim().Length < 3)
+            {
+                ShowValidationError("Invoice Number must be at least 3 characters long.");
+                txtInvoiceNumber.Focus();
+                return false;
+            }
         }
 
         HideValidationError();
