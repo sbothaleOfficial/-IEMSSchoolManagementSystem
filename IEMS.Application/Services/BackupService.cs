@@ -23,8 +23,9 @@ namespace IEMS.Application.Services
         public BackupService(IServiceProvider? serviceProvider = null)
         {
             _serviceProvider = serviceProvider;
-            // Use current working directory like Entity Framework does
-            _databasePath = Path.Combine(Directory.GetCurrentDirectory(), "school.db");
+            // FIXED BUG #1: Use AppDomain.CurrentDomain.BaseDirectory for consistency with UI
+            // This ensures we always backup/restore the correct database file
+            _databasePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "school.db");
             _connectionString = $"Data Source={_databasePath}";
             _backupRootPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "IEMS_Backups");
             _metadataPath = Path.Combine(_backupRootPath, "backup_metadata.json");
@@ -66,13 +67,21 @@ namespace IEMS.Application.Services
                     // For manual backups, save to Desktop
                     var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
                     backupPath = Path.Combine(desktopPath, "IEMS_Backups", backupFileName);
-                    Directory.CreateDirectory(Path.GetDirectoryName(backupPath));
+
+                    // FIXED BUG #10: Check for null before creating directory
+                    var backupDir = Path.GetDirectoryName(backupPath);
+                    if (!string.IsNullOrEmpty(backupDir))
+                        Directory.CreateDirectory(backupDir);
                 }
                 else
                 {
                     // Automatic backups go to Documents folder
                     backupPath = Path.Combine(_backupRootPath, GetBackupSubfolder(backupType), backupFileName);
-                    Directory.CreateDirectory(Path.GetDirectoryName(backupPath));
+
+                    // FIXED BUG #10: Check for null before creating directory
+                    var backupDir = Path.GetDirectoryName(backupPath);
+                    if (!string.IsNullOrEmpty(backupDir))
+                        Directory.CreateDirectory(backupDir);
                 }
 
                 // Handle backup type logic
@@ -99,14 +108,30 @@ namespace IEMS.Application.Services
                 // Copy the database file
                 File.Copy(_databasePath, backupPath, true);
 
-                // Also copy WAL and SHM files if they exist (for consistency)
+                // FIXED BUG #2: Also copy WAL and SHM files if they exist (for consistency)
+                // Any failure in copying these files should fail the entire backup
                 var walPath = _databasePath + "-wal";
                 var shmPath = _databasePath + "-shm";
 
-                if (File.Exists(walPath))
-                    File.Copy(walPath, backupPath + "-wal", true);
-                if (File.Exists(shmPath))
-                    File.Copy(shmPath, backupPath + "-shm", true);
+                try
+                {
+                    if (File.Exists(walPath))
+                        File.Copy(walPath, backupPath + "-wal", true);
+                    if (File.Exists(shmPath))
+                        File.Copy(shmPath, backupPath + "-shm", true);
+                }
+                catch (Exception ex)
+                {
+                    // If WAL/SHM copy fails, cleanup and fail the backup
+                    if (File.Exists(backupPath))
+                        File.Delete(backupPath);
+                    if (File.Exists(backupPath + "-wal"))
+                        File.Delete(backupPath + "-wal");
+                    if (File.Exists(backupPath + "-shm"))
+                        File.Delete(backupPath + "-shm");
+
+                    throw new InvalidOperationException($"Failed to copy WAL/SHM files: {ex.Message}", ex);
+                }
 
                 // Calculate checksum for integrity verification
                 backupInfo.Checksum = await CalculateChecksumAsync(backupPath);
@@ -197,13 +222,27 @@ namespace IEMS.Application.Services
 
                 if (currentDbInfo.LastWriteTime > backupDbInfo.LastWriteTime)
                 {
-                    // Current database is newer - require confirmation
+                    // FIXED BUG #12: Better time difference display showing hours for recent backups
                     var timeDiff = currentDbInfo.LastWriteTime - backupDbInfo.LastWriteTime;
+                    string timeDiffStr;
+                    if (timeDiff.TotalHours < 24)
+                    {
+                        timeDiffStr = $"{(int)timeDiff.TotalHours} hours";
+                    }
+                    else if (timeDiff.TotalDays < 7)
+                    {
+                        timeDiffStr = $"{timeDiff.Days} days";
+                    }
+                    else
+                    {
+                        timeDiffStr = $"{timeDiff.Days} days ({timeDiff.Days / 7} weeks)";
+                    }
+
                     return new RestoreResult
                     {
                         Success = false,
                         RequiresConfirmation = true,
-                        Message = $"Current database is {timeDiff.Days} days newer than the backup. Are you sure you want to restore?",
+                        Message = $"Current database is {timeDiffStr} newer than the backup. Are you sure you want to restore?",
                         SafetyBackupPath = safetyBackup?.BackupPath
                     };
                 }
@@ -217,14 +256,23 @@ namespace IEMS.Application.Services
                 // Perform the restore with retry logic
                 await RestoreDatabaseFileWithRetryAsync(backupPath);
 
-                // Also restore WAL and SHM files if they exist
+                // FIXED BUG #3: Also restore WAL and SHM files if they exist
+                // Any failure in restoring these files should fail the entire restore
                 var walBackupPath = backupPath + "-wal";
                 var shmBackupPath = backupPath + "-shm";
 
-                if (File.Exists(walBackupPath))
-                    File.Copy(walBackupPath, _databasePath + "-wal", true);
-                if (File.Exists(shmBackupPath))
-                    File.Copy(shmBackupPath, _databasePath + "-shm", true);
+                try
+                {
+                    if (File.Exists(walBackupPath))
+                        File.Copy(walBackupPath, _databasePath + "-wal", true);
+                    if (File.Exists(shmBackupPath))
+                        File.Copy(shmBackupPath, _databasePath + "-shm", true);
+                }
+                catch (Exception ex)
+                {
+                    // If WAL/SHM restore fails, the database is in an inconsistent state
+                    throw new InvalidOperationException($"Failed to restore WAL/SHM files. Database may be in inconsistent state: {ex.Message}", ex);
+                }
 
                 // Log the restore operation
                 await LogRestoreOperationAsync(backupPath, safetyBackup?.BackupPath);
@@ -513,11 +561,12 @@ namespace IEMS.Application.Services
             }
         }
 
+        // FIXED BUG #13: Use SHA256 instead of MD5 for better security and collision resistance
         private async Task<string> CalculateChecksumAsync(string filePath)
         {
-            using var md5 = MD5.Create();
+            using var sha256 = System.Security.Cryptography.SHA256.Create();
             using var stream = File.OpenRead(filePath);
-            var hash = await Task.Run(() => md5.ComputeHash(stream));
+            var hash = await Task.Run(() => sha256.ComputeHash(stream));
             return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
         }
 
@@ -734,7 +783,8 @@ namespace IEMS.Application.Services
             });
         }
 
-        private async Task<BackupInfo> GetLastFullBackupAsync()
+        // FIXED BUG #9: Return nullable BackupInfo to match FirstOrDefault behavior
+        private async Task<BackupInfo?> GetLastFullBackupAsync()
         {
             var history = await GetBackupHistoryAsync();
             // Include both Full backups and Incremental backups that were converted to Full
@@ -779,22 +829,55 @@ namespace IEMS.Application.Services
             {
                 try
                 {
+                    bool mainFileDeleted = false;
+                    bool walFileDeleted = true;  // Assume success if file doesn't exist
+                    bool shmFileDeleted = true;  // Assume success if file doesn't exist
+
                     if (File.Exists(backup.BackupPath))
                     {
                         File.Delete(backup.BackupPath);
+                        mainFileDeleted = true;
 
-                        // Also delete associated WAL and SHM files if they exist
+                        // FIXED BUG #15: Also delete associated WAL and SHM files with proper error logging
                         var walPath = backup.BackupPath + "-wal";
                         var shmPath = backup.BackupPath + "-shm";
 
                         if (File.Exists(walPath))
-                            File.Delete(walPath);
+                        {
+                            try
+                            {
+                                File.Delete(walPath);
+                            }
+                            catch (Exception walEx)
+                            {
+                                walFileDeleted = false;
+                                System.Diagnostics.Debug.WriteLine($"Failed to delete WAL file {walPath}: {walEx.Message}");
+                            }
+                        }
+
                         if (File.Exists(shmPath))
-                            File.Delete(shmPath);
+                        {
+                            try
+                            {
+                                File.Delete(shmPath);
+                            }
+                            catch (Exception shmEx)
+                            {
+                                shmFileDeleted = false;
+                                System.Diagnostics.Debug.WriteLine($"Failed to delete SHM file {shmPath}: {shmEx.Message}");
+                            }
+                        }
                     }
 
-                    // Track successfully deleted backups for metadata cleanup
-                    deletedBackupIds.Add(backup.Id);
+                    // Only track as deleted if all files were successfully deleted
+                    if (mainFileDeleted && walFileDeleted && shmFileDeleted)
+                    {
+                        deletedBackupIds.Add(backup.Id);
+                    }
+                    else
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Partial deletion for backup {backup.BackupPath} - not removing from metadata");
+                    }
                 }
                 catch (Exception ex)
                 {

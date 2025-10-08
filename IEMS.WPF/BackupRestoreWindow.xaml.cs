@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Win32;
 using IEMS.Application.Services;
 
@@ -20,7 +21,9 @@ namespace IEMS.WPF
         public BackupRestoreWindow()
         {
             InitializeComponent();
-            _backupService = new BackupService();
+            // FIXED BUG #4: Use DI container to get BackupService with IServiceProvider
+            // This ensures database connections can be properly closed during backup/restore
+            _backupService = App.ServiceProvider.GetRequiredService<IBackupService>();
             Loaded += Window_Loaded;
         }
 
@@ -323,8 +326,22 @@ namespace IEMS.WPF
                         var currentInfo = new FileInfo(currentDbPath);
                         if (fileInfo.LastWriteTime < currentInfo.LastWriteTime)
                         {
+                            // FIXED BUG #12: Better time difference display showing hours for recent backups
                             var timeDiff = currentInfo.LastWriteTime - fileInfo.LastWriteTime;
-                            RestoreStatusText.Text = $"⚠️ Warning: This backup is {timeDiff.Days} days older than current database";
+                            string timeDiffStr;
+                            if (timeDiff.TotalHours < 24)
+                            {
+                                timeDiffStr = $"{(int)timeDiff.TotalHours} hours";
+                            }
+                            else if (timeDiff.TotalDays < 7)
+                            {
+                                timeDiffStr = $"{timeDiff.Days} days";
+                            }
+                            else
+                            {
+                                timeDiffStr = $"{timeDiff.Days} days ({timeDiff.Days / 7} weeks)";
+                            }
+                            RestoreStatusText.Text = $"⚠️ Warning: This backup is {timeDiffStr} older than current database";
                         }
                     }
 
@@ -380,20 +397,45 @@ namespace IEMS.WPF
                                             $"Safety backup saved at: {result.SafetyBackupPath}\n" +
                                             $"The application will now restart...";
 
-                    MessageBox.Show(
-                        "Database restored successfully!\n\n" +
-                        "The application needs to restart to load the restored data.",
-                        "Restore Complete",
-                        MessageBoxButton.OK,
-                        MessageBoxImage.Information);
-
-                    // Restart the application
+                    // FIXED BUG #14: Handle automatic restart failure properly
                     var exePath = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName;
+
                     if (!string.IsNullOrEmpty(exePath))
                     {
-                        Process.Start(exePath);
+                        MessageBox.Show(
+                            "Database restored successfully!\n\n" +
+                            "The application will now restart to load the restored data.",
+                            "Restore Complete",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Information);
+
+                        try
+                        {
+                            Process.Start(exePath);
+                            System.Windows.Application.Current.Shutdown();
+                        }
+                        catch (Exception restartEx)
+                        {
+                            MessageBox.Show(
+                                "Database restored successfully, but automatic restart failed.\n\n" +
+                                $"Error: {restartEx.Message}\n\n" +
+                                "Please manually restart the application to load the restored data.",
+                                "Manual Restart Required",
+                                MessageBoxButton.OK,
+                                MessageBoxImage.Warning);
+                            System.Windows.Application.Current.Shutdown();
+                        }
                     }
-                    System.Windows.Application.Current.Shutdown();
+                    else
+                    {
+                        MessageBox.Show(
+                            "Database restored successfully!\n\n" +
+                            "Please manually restart the application to load the restored data.",
+                            "Manual Restart Required",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+                        System.Windows.Application.Current.Shutdown();
+                    }
                 }
                 else if (result.RequiresConfirmation)
                 {
@@ -405,23 +447,51 @@ namespace IEMS.WPF
 
                     if (overwriteResult == MessageBoxResult.Yes)
                     {
-                        // Force restore - always validate checksum, skip safety backup
-                        result = await _backupService.RestoreBackupAsync(_selectedBackupPath, validateChecksum: true, skipSafetyBackup: true);
+                        // FIXED BUG #6: Force restore should ALWAYS create safety backup for data protection
+                        result = await _backupService.RestoreBackupAsync(_selectedBackupPath, validateChecksum: true, skipSafetyBackup: false);
                         if (result.Success)
                         {
-                            MessageBox.Show(
-                                "Database restored successfully!\n\n" +
-                                "Please restart the application.",
-                                "Success",
-                                MessageBoxButton.OK,
-                                MessageBoxImage.Information);
-
+                            // FIXED BUG #14: Handle automatic restart failure properly
                             var exePath = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName;
+
                             if (!string.IsNullOrEmpty(exePath))
                             {
-                                Process.Start(exePath);
+                                MessageBox.Show(
+                                    "Database restored successfully!\n\n" +
+                                    $"Safety backup saved at: {result.SafetyBackupPath}\n\n" +
+                                    "The application will now restart to load the restored data.",
+                                    "Restore Complete",
+                                    MessageBoxButton.OK,
+                                    MessageBoxImage.Information);
+
+                                try
+                                {
+                                    Process.Start(exePath);
+                                    System.Windows.Application.Current.Shutdown();
+                                }
+                                catch (Exception restartEx)
+                                {
+                                    MessageBox.Show(
+                                        "Database restored successfully, but automatic restart failed.\n\n" +
+                                        $"Error: {restartEx.Message}\n\n" +
+                                        "Please manually restart the application to load the restored data.",
+                                        "Manual Restart Required",
+                                        MessageBoxButton.OK,
+                                        MessageBoxImage.Warning);
+                                    System.Windows.Application.Current.Shutdown();
+                                }
                             }
-                            System.Windows.Application.Current.Shutdown();
+                            else
+                            {
+                                MessageBox.Show(
+                                    "Database restored successfully!\n\n" +
+                                    $"Safety backup saved at: {result.SafetyBackupPath}\n\n" +
+                                    "Please manually restart the application to load the restored data.",
+                                    "Manual Restart Required",
+                                    MessageBoxButton.OK,
+                                    MessageBoxImage.Warning);
+                                System.Windows.Application.Current.Shutdown();
+                            }
                         }
                     }
                 }
@@ -446,6 +516,13 @@ namespace IEMS.WPF
         {
             try
             {
+                // FIXED BUG #11: Use Enum.TryParse instead of Enum.Parse to avoid exceptions
+                var weeklyDayString = GetSelectedComboBoxText(WeeklyBackupDayComboBox) ?? "Friday";
+                if (!Enum.TryParse<DayOfWeek>(weeklyDayString, out var weeklyDay))
+                {
+                    weeklyDay = DayOfWeek.Friday; // Default fallback
+                }
+
                 var schedule = new BackupSchedule
                 {
                     EnableDaily = EnableDailyBackupCheckBox.IsChecked ?? false,
@@ -453,7 +530,7 @@ namespace IEMS.WPF
                     EnableMonthly = EnableMonthlyBackupCheckBox.IsChecked ?? false,
                     EnableIncremental = EnableIncrementalBackupCheckBox.IsChecked ?? false,
                     DailyTime = ParseTimeString(GetSelectedComboBoxText(DailyBackupTimeComboBox) ?? "6:00 PM"),
-                    WeeklyDay = (DayOfWeek)Enum.Parse(typeof(DayOfWeek), GetSelectedComboBoxText(WeeklyBackupDayComboBox) ?? "Friday"),
+                    WeeklyDay = weeklyDay,
                     MonthlyDay = ParseMonthlyDay(GetSelectedComboBoxText(MonthlyBackupDayComboBox) ?? "1st"),
                     IncrementalIntervalHours = 6
                 };

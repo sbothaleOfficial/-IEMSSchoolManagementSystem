@@ -28,9 +28,9 @@ namespace IEMS.Application.Services
         {
             _logger.LogInformation("Automatic backup service started");
 
-            // Check for scheduled backups every hour
+            // FIXED BUG #5: Properly handle async callback in Timer to prevent unhandled exceptions
             _timer = new Timer(
-                async _ => await CheckAndExecuteScheduledBackups(),
+                _ => SafeCheckAndExecuteScheduledBackups(),
                 null,
                 TimeSpan.Zero, // Start immediately
                 TimeSpan.FromHours(1) // Check every hour
@@ -40,6 +40,29 @@ namespace IEMS.Application.Services
             while (!stoppingToken.IsCancellationRequested)
             {
                 await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
+            }
+        }
+
+        private void SafeCheckAndExecuteScheduledBackups()
+        {
+            try
+            {
+                // Fire and forget with proper exception handling
+                _ = Task.Run(async () =>
+                {
+                    try
+                    {
+                        await CheckAndExecuteScheduledBackups();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error in scheduled backup execution");
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error starting scheduled backup task");
             }
         }
 
@@ -135,10 +158,12 @@ namespace IEMS.Application.Services
         {
             var lastExecution = await GetLastBackupTimeAsync(BackupType.Weekly);
 
-            // Check if today is the scheduled day and we haven't executed this week
+            // FIXED BUG #8: Check if today is the scheduled day and we haven't executed today
+            // This ensures weekly backups run consistently on the scheduled day of the week
             if (now.DayOfWeek == schedule.WeeklyDay)
             {
-                if (lastExecution == null || (now - lastExecution.Value).TotalDays >= 7)
+                // Run if never executed, or if last execution was on a different date
+                if (lastExecution == null || lastExecution.Value.Date < now.Date)
                 {
                     return true;
                 }
@@ -164,13 +189,12 @@ namespace IEMS.Application.Services
                 targetDay = Math.Min(schedule.MonthlyDay, daysInMonth);
             }
 
-            // Check if we're on or past the target day AND haven't run this month
-            var passedTargetDay = now.Day >= targetDay;
-            var notRunThisMonth = lastExecution == null ||
-                                 lastExecution.Value.Month != now.Month ||
-                                 lastExecution.Value.Year != now.Year;
+            // FIXED BUG #7: Check if we're on the target day AND haven't run TODAY (not just this month)
+            // This prevents running the backup multiple times per day
+            var isTargetDay = now.Day == targetDay;
+            var notRunToday = lastExecution == null || lastExecution.Value.Date < now.Date;
 
-            return passedTargetDay && notRunThisMonth;
+            return isTargetDay && notRunToday;
         }
 
         private async Task<bool> ShouldExecuteIncrementalBackup(BackupSchedule schedule, DateTime now)
