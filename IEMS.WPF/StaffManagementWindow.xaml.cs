@@ -27,9 +27,7 @@ public partial class StaffManagementWindow : Window
         _staffService = staffService;
 
         SetupSearchControls();
-        AsyncHelper.SafeFireAndForget(LoadTeachersAsync);
-        AsyncHelper.SafeFireAndForget(LoadStaffAsync);
-        AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync);
+        AsyncHelper.SafeFireAndForget(LoadAllDataAsync);
         lblStatus.Text = "Staff Management loaded successfully";
     }
 
@@ -38,6 +36,22 @@ public partial class StaffManagementWindow : Window
         cmbStaffPosition.SelectedIndex = 0; // Select "All Positions" by default
         txtSearchTeacher.Text = string.Empty;
         txtSearchStaff.Text = string.Empty;
+    }
+
+    private async Task LoadAllDataAsync()
+    {
+        try
+        {
+            // Load teachers and staff data first (can run in parallel)
+            await Task.WhenAll(LoadTeachersAsync(), LoadStaffAsync());
+
+            // Then load dashboard data (depends on teachers and staff being loaded)
+            await LoadDashboardDataAsync();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error loading staff management data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
     }
 
     // Teachers Tab Methods
@@ -60,7 +74,7 @@ public partial class StaffManagementWindow : Window
 
     private void ApplyTeacherSearch()
     {
-        var searchText = txtSearchTeacher?.Text?.ToLower() ?? string.Empty;
+        var searchText = txtSearchTeacher?.Text?.Trim().ToLower() ?? string.Empty;
         var filteredTeachers = _allTeachers.AsEnumerable();
 
         if (!string.IsNullOrEmpty(searchText))
@@ -188,7 +202,7 @@ public partial class StaffManagementWindow : Window
 
     private void ApplyStaffSearch()
     {
-        var searchText = txtSearchStaff?.Text?.ToLower() ?? string.Empty;
+        var searchText = txtSearchStaff?.Text?.Trim().ToLower() ?? string.Empty;
         var selectedPosition = (cmbStaffPosition?.SelectedItem as ComboBoxItem)?.Content?.ToString();
         var filteredStaff = _allStaff.AsEnumerable();
 
@@ -392,19 +406,33 @@ public partial class StaffManagementWindow : Window
                                       .Concat(_allStaff.Select(s => s.Position))
                                       .ToList();
 
+        // Handle case when there are no employees
+        if (allPositions.Count == 0)
+        {
+            dgPositionStats.ItemsSource = null;
+            return;
+        }
+
         var allSalariesWithPositions = _allTeachers.Select(t => new { Position = "Teacher", Salary = t.MonthlySalary })
                                                   .Concat(_allStaff.Select(s => new { Position = s.Position, Salary = s.MonthlySalary }))
                                                   .ToList();
 
         var positionStats = allPositions
             .GroupBy(p => p)
-            .Select(g => new
+            .Select(g =>
             {
-                Position = g.Key,
-                Count = g.Count(),
-                FormattedAvgSalary = $"₹{allSalariesWithPositions.Where(x => x.Position == g.Key).Average(x => x.Salary):N0}",
-                FormattedTotalSalary = $"₹{allSalariesWithPositions.Where(x => x.Position == g.Key).Sum(x => x.Salary):N0}",
-                Percentage = $"{(g.Count() * 100.0 / allPositions.Count):F1}%"
+                var positionSalaries = allSalariesWithPositions.Where(x => x.Position == g.Key).ToList();
+                var avgSalary = positionSalaries.Any() ? positionSalaries.Average(x => x.Salary) : 0;
+                var totalSalary = positionSalaries.Sum(x => x.Salary);
+
+                return new
+                {
+                    Position = g.Key,
+                    Count = g.Count(),
+                    FormattedAvgSalary = $"₹{avgSalary:N0}",
+                    FormattedTotalSalary = $"₹{totalSalary:N0}",
+                    Percentage = $"{(g.Count() * 100.0 / allPositions.Count):F1}%"
+                };
             })
             .OrderByDescending(x => x.Count)
             .ToList();
@@ -512,53 +540,10 @@ public partial class StaffManagementWindow : Window
 
             cmbEmployee.ItemsSource = allEmployees;
 
-            // Enhanced debug: Show how many employees were loaded with salary details
+            // Update status with employee count (without sensitive salary data)
             if (lblStatus != null)
             {
-                var debugInfo = $"Payslip ready: {allEmployees.Count} employees loaded ({_allTeachers?.Count ?? 0} teachers, {_allStaff?.Count ?? 0} staff)";
-
-                // Debug ALL employees and their salaries using reflection
-                if (allEmployees.Count > 0)
-                {
-                    debugInfo += "\nEmployee details:";
-                    foreach (var emp in allEmployees)
-                    {
-                        var empType = emp.GetType();
-                        var fullNameProp = empType.GetProperty("FullName");
-                        var salaryProp = empType.GetProperty("MonthlySalary");
-                        var employeeIdProp = empType.GetProperty("EmployeeId");
-
-                        var fullName = fullNameProp?.GetValue(emp)?.ToString() ?? "Unknown";
-                        var salary = salaryProp?.GetValue(emp) ?? 0;
-                        var employeeId = employeeIdProp?.GetValue(emp)?.ToString() ?? "Unknown";
-
-                        debugInfo += $"\n- {fullName} ({employeeId}): ₹{salary}";
-                    }
-                }
-
-                // Also debug the raw teacher data from database
-                if (_allTeachers != null && _allTeachers.Count > 0)
-                {
-                    debugInfo += "\n\nRaw Teacher data from DB:";
-                    foreach (var teacher in _allTeachers)
-                    {
-                        debugInfo += $"\n- {teacher.FullName} ({teacher.EmployeeId}): ₹{teacher.MonthlySalary}";
-                    }
-                }
-
-                // Debug the raw staff data from database
-                if (_allStaff != null && _allStaff.Count > 0)
-                {
-                    debugInfo += "\n\nRaw Staff data from DB:";
-                    foreach (var staff in _allStaff)
-                    {
-                        debugInfo += $"\n- {staff.FullName} ({staff.EmployeeId}): ₹{staff.MonthlySalary}";
-                    }
-                }
-
-                lblStatus.Text = debugInfo;
-
-                // Debug info removed for normal operation
+                lblStatus.Text = $"Payslip ready: {allEmployees.Count} employees loaded ({_allTeachers?.Count ?? 0} teachers, {_allStaff?.Count ?? 0} staff)";
             }
         }
         catch (Exception ex)

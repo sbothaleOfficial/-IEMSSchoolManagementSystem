@@ -1,0 +1,63 @@
+<Window x:Class="IEMS.WPF.ColumnPickerDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Select Columns to Export" Height="600" Width="500"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Background="{StaticResource BackgroundBrush}">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" Text="📊 Select Columns to Export" FontSize="18" FontWeight="Bold"
+                   Margin="0,0,0,15" Foreground="{StaticResource TextPrimaryBrush}"/>
+
+        <!-- Selection Controls -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,15">
+            <Button x:Name="btnSelectAll" Content="✓ Select All" Width="140" Height="35" Margin="0,0,10,0"
+                    Click="BtnSelectAll_Click" Style="{StaticResource PrimaryButtonStyle}"/>
+            <Button x:Name="btnDeselectAll" Content="✗ Deselect All" Width="140" Height="35"
+                    Click="BtnDeselectAll_Click" Style="{StaticResource SecondaryButtonStyle}"/>
+        </StackPanel>
+
+        <!-- Column List -->
+        <Border Grid.Row="2" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1"
+                CornerRadius="5" Padding="10" Background="{StaticResource SurfaceBrush}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="ColumnListPanel">
+                    <CheckBox x:Name="chkSerialNo" Content="Serial No" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkStudentNumber" Content="Student Number" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkFirstName" Content="First Name" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkFatherName" Content="Father's Name" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkSurname" Content="Surname" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkMotherName" Content="Mother's Name" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkDateOfBirth" Content="Date of Birth" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkGender" Content="Gender" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkStandard" Content="Standard" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkDivision" Content="Division" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkAdmissionDate" Content="Admission Date" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkCasteCategory" Content="Caste Category" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkReligion" Content="Religion" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkBPL" Content="BPL" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkSemiEnglish" Content="Semi-English" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkAddress" Content="Address" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkCityVillage" Content="City/Village" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkParentMobile" Content="Parent Mobile" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkAadhaarNumber" Content="Aadhaar Number" Margin="5" IsChecked="True"/>
+                    <CheckBox x:Name="chkOutstandingFees" Content="Outstanding Fees" Margin="5" IsChecked="True"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button x:Name="btnExport" Content="Export" Width="100" Height="35" Margin="0,0,10,0"
+                    Click="BtnExport_Click" Style="{StaticResource SuccessButtonStyle}"/>
+            <Button x:Name="btnCancel" Content="Cancel" Width="100" Height="35" IsCancel="True"
+                    Click="BtnCancel_Click" Style="{StaticResource SecondaryButtonStyle}"/>
+        </StackPanel>
+    </Grid>
+</Window>

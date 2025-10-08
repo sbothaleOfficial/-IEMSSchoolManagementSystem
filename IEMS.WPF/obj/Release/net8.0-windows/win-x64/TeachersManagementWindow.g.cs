@@ -123,7 +123,7 @@ namespace IEMS.WPF {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/IEMS.WPF;component/teachersmanagementwindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/IEMS;component/teachersmanagementwindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\TeachersManagementWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

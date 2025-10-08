@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("IEMS.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d22b988c6c0a14220b555acdc665323d8ad629bc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+51678af74ca1ed9bb0896e05b96dd36be1ff0a10")]
 [assembly: System.Reflection.AssemblyProductAttribute("IEMS.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("IEMS.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -131,7 +131,7 @@ namespace IEMS.WPF {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/IEMS.WPF;component/classesmanagementwindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/IEMS;component/classesmanagementwindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\ClassesManagementWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

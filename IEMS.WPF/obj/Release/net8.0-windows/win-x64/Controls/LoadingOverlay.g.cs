@@ -67,7 +67,7 @@ namespace IEMS.WPF.Controls {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/IEMS.WPF;component/controls/loadingoverlay.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/IEMS;component/controls/loadingoverlay.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\..\Controls\LoadingOverlay.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

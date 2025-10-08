@@ -91,7 +91,7 @@ namespace IEMS.WPF {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/IEMS.WPF;component/addeditelectricitybillwindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/IEMS;component/addeditelectricitybillwindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\AddEditElectricityBillWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

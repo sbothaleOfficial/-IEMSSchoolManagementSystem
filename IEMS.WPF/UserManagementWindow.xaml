@@ -13,27 +13,19 @@
 
         <!-- Header -->
         <Border Grid.Row="0" Background="{StaticResource PrimaryBrush}" Padding="20">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-
-                <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <TextBlock Text="👥" FontSize="32" VerticalAlignment="Center" Margin="0,0,15,0"/>
-                    <StackPanel VerticalAlignment="Center">
-                        <TextBlock Text="User Management" FontSize="24" FontWeight="Bold"
-                                   Foreground="{StaticResource TextOnPrimaryBrush}"/>
-                        <TextBlock Text="Manage system users and permissions" FontSize="12"
-                                   Foreground="{StaticResource PrimaryLightBrush}" Margin="0,2,0,0"/>
-                    </StackPanel>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <Button x:Name="btnBack" Content="← Back"
+                        Click="BtnClose_Click"
+                        Background="White" Foreground="Black" BorderBrush="#CCCCCC" BorderThickness="1"
+                        Width="100" Height="35" Margin="0,0,20,0" FontWeight="SemiBold"/>
+                <TextBlock Text="👥" FontSize="32" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="User Management" FontSize="24" FontWeight="Bold"
+                               Foreground="{StaticResource TextOnPrimaryBrush}"/>
+                    <TextBlock Text="Manage system users and permissions" FontSize="12"
+                               Foreground="{StaticResource PrimaryLightBrush}" Margin="0,2,0,0"/>
                 </StackPanel>
-
-                <Button Grid.Column="2" Content="✕ Close" Click="BtnClose_Click"
-                        Style="{StaticResource SecondaryButtonStyle}"
-                        Width="100" Height="35"/>
-            </Grid>
+            </StackPanel>
         </Border>
 
         <!-- Main Content -->

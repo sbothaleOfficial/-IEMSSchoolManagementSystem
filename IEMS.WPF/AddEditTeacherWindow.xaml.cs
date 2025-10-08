@@ -129,6 +129,14 @@ public partial class AddEditTeacherWindow : Window
             return false;
         }
 
+        var phoneNumber = txtPhoneNumber.Text.Trim();
+        if (!System.Text.RegularExpressions.Regex.IsMatch(phoneNumber, @"^[6-9]\d{9}$"))
+        {
+            MessageBox.Show("Please enter a valid 10-digit Indian mobile number starting with 6-9.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            txtPhoneNumber.Focus();
+            return false;
+        }
+
         if (string.IsNullOrWhiteSpace(txtAddress.Text))
         {
             MessageBox.Show("Address is required.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
@@ -143,9 +151,16 @@ public partial class AddEditTeacherWindow : Window
             return false;
         }
 
-        if (!decimal.TryParse(txtMonthlySalary.Text.Trim(), out var salary) || salary < 0)
+        if (dpJoiningDate.SelectedDate.Value > DateTime.Today)
         {
-            MessageBox.Show("Please enter a valid monthly salary.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("Joining date cannot be in the future.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            dpJoiningDate.Focus();
+            return false;
+        }
+
+        if (!decimal.TryParse(txtMonthlySalary.Text.Trim(), out var salary) || salary <= 0)
+        {
+            MessageBox.Show("Please enter a valid monthly salary greater than zero.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             txtMonthlySalary.Focus();
             txtMonthlySalary.SelectAll();
             return false;
@@ -157,6 +172,39 @@ public partial class AddEditTeacherWindow : Window
             MessageBox.Show("Please enter a valid email address.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
             txtEmail.Focus();
             return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(txtAadharNumber.Text))
+        {
+            var aadhaar = txtAadharNumber.Text.Trim();
+            if (!System.Text.RegularExpressions.Regex.IsMatch(aadhaar, @"^\d{12}$"))
+            {
+                MessageBox.Show("Aadhaar number must be exactly 12 digits.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtAadharNumber.Focus();
+                return false;
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(txtPANNumber.Text))
+        {
+            var pan = txtPANNumber.Text.Trim().ToUpper();
+            if (!System.Text.RegularExpressions.Regex.IsMatch(pan, @"^[A-Z]{5}[0-9]{4}[A-Z]{1}$"))
+            {
+                MessageBox.Show("PAN number must be in format: 5 letters, 4 digits, 1 letter (e.g., ABCDE1234F).", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtPANNumber.Focus();
+                return false;
+            }
+        }
+
+        if (!string.IsNullOrWhiteSpace(txtBankAccount.Text))
+        {
+            var bankAccount = txtBankAccount.Text.Trim();
+            if (!System.Text.RegularExpressions.Regex.IsMatch(bankAccount, @"^\d{9,18}$"))
+            {
+                MessageBox.Show("Bank account number must be 9 to 18 digits.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                txtBankAccount.Focus();
+                return false;
+            }
         }
 
         return true;

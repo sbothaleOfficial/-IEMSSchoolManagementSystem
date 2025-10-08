@@ -98,8 +98,9 @@ namespace IEMS.Application.Services
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Error updating setting '{key}': {ex.Message}");
                 return false;
             }
         }
@@ -108,10 +109,18 @@ namespace IEMS.Application.Services
         {
             try
             {
+                // Fetch all settings to update in one query to avoid N+1 problem
+                var settingKeys = settings.Select(s => s.Key).ToList();
+                var existingSettings = await _context.SystemSettings
+                    .Where(s => settingKeys.Contains(s.Key))
+                    .ToListAsync();
+
+                // Create a dictionary for fast lookup
+                var existingDict = existingSettings.ToDictionary(s => s.Key);
+
                 foreach (var settingUpdate in settings)
                 {
-                    var existing = await GetSettingAsync(settingUpdate.Key);
-                    if (existing != null && !existing.IsReadOnly)
+                    if (existingDict.TryGetValue(settingUpdate.Key, out var existing) && !existing.IsReadOnly)
                     {
                         existing.Value = settingUpdate.Value;
                         existing.ModifiedAt = DateTime.UtcNow;
@@ -121,8 +130,9 @@ namespace IEMS.Application.Services
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Error updating settings: {ex.Message}\nStack Trace: {ex.StackTrace}");
                 return false;
             }
         }
@@ -141,8 +151,9 @@ namespace IEMS.Application.Services
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Error resetting setting '{key}' to default: {ex.Message}");
                 return false;
             }
         }
@@ -166,8 +177,9 @@ namespace IEMS.Application.Services
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Error resetting category '{category}' to defaults: {ex.Message}");
                 return false;
             }
         }
@@ -191,8 +203,9 @@ namespace IEMS.Application.Services
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Error resetting all settings to defaults: {ex.Message}");
                 return false;
             }
         }

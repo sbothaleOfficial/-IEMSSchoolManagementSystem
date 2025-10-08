@@ -219,7 +219,7 @@ namespace IEMS.WPF {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/IEMS.WPF;component/expensemanagementwindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/IEMS;component/expensemanagementwindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\ExpenseManagementWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

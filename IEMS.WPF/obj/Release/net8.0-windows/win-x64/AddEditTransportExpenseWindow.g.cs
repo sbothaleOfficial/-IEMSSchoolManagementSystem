@@ -171,7 +171,7 @@ namespace IEMS.WPF {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/IEMS.WPF;component/addedittransportexpensewindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/IEMS;component/addedittransportexpensewindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\AddEditTransportExpenseWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

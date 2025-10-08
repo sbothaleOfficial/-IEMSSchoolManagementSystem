@@ -113,6 +113,21 @@ namespace IEMS.Application.Services
                 backupInfo.BackupPath = backupPath;
                 backupInfo.FileSize = new FileInfo(backupPath).Length;
 
+                // Verify backup integrity
+                var verificationResult = await VerifyBackupIntegrityAsync(backupPath);
+                if (!verificationResult.IsValid)
+                {
+                    // Delete the corrupted backup file
+                    if (File.Exists(backupPath))
+                        File.Delete(backupPath);
+
+                    return new BackupResult
+                    {
+                        Success = false,
+                        Message = $"Backup verification failed: {verificationResult.Message}. The corrupted backup file has been deleted."
+                    };
+                }
+
                 // Save backup metadata
                 await SaveBackupMetadataAsync(backupInfo);
 
@@ -383,39 +398,119 @@ namespace IEMS.Application.Services
             const int maxRetries = 5;
             const int retryDelayMs = 1000;
 
-            for (int retry = 0; retry < maxRetries; retry++)
+            // Create temporary backup of current database for rollback
+            string? tempBackupPath = null;
+            string? tempWalPath = null;
+            string? tempShmPath = null;
+
+            try
             {
-                try
+                // Create temp backup
+                tempBackupPath = _databasePath + ".restore_temp_" + DateTime.Now.Ticks;
+                if (File.Exists(_databasePath))
                 {
-                    // Try to copy the backup file over the current database
-                    File.Copy(backupPath, _databasePath, true);
-                    return; // Success
-                }
-                catch (UnauthorizedAccessException) when (retry < maxRetries - 1)
-                {
-                    // File is locked, wait and retry
-                    await Task.Delay(retryDelayMs * (retry + 1));
+                    File.Copy(_databasePath, tempBackupPath, true);
 
-                    // Try more aggressive cleanup
-                    SqliteConnection.ClearAllPools();
-                    GC.Collect();
-                    GC.WaitForPendingFinalizers();
-                }
-                catch (IOException ex) when (ex.Message.Contains("user-mapped section") && retry < maxRetries - 1)
-                {
-                    // Specific handling for the shared memory file issue
-                    await Task.Delay(retryDelayMs * (retry + 1));
+                    // Also backup WAL and SHM files if they exist
+                    var walPath = _databasePath + "-wal";
+                    var shmPath = _databasePath + "-shm";
 
-                    // Force connection pool cleanup
-                    SqliteConnection.ClearAllPools();
-                    await Task.Delay(500);
+                    if (File.Exists(walPath))
+                    {
+                        tempWalPath = walPath + ".restore_temp_" + DateTime.Now.Ticks;
+                        File.Copy(walPath, tempWalPath, true);
+                    }
+
+                    if (File.Exists(shmPath))
+                    {
+                        tempShmPath = shmPath + ".restore_temp_" + DateTime.Now.Ticks;
+                        File.Copy(shmPath, tempShmPath, true);
+                    }
                 }
+
+                // Attempt restore with retry logic
+                for (int retry = 0; retry < maxRetries; retry++)
+                {
+                    try
+                    {
+                        // Try to copy the backup file over the current database
+                        File.Copy(backupPath, _databasePath, true);
+
+                        // Success - delete temp backup and return
+                        CleanupTempFiles(tempBackupPath, tempWalPath, tempShmPath);
+                        return;
+                    }
+                    catch (UnauthorizedAccessException) when (retry < maxRetries - 1)
+                    {
+                        // File is locked, wait and retry
+                        await Task.Delay(retryDelayMs * (retry + 1));
+
+                        // Try more aggressive cleanup
+                        SqliteConnection.ClearAllPools();
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                    }
+                    catch (IOException ex) when (ex.Message.Contains("user-mapped section") && retry < maxRetries - 1)
+                    {
+                        // Specific handling for the shared memory file issue
+                        await Task.Delay(retryDelayMs * (retry + 1));
+
+                        // Force connection pool cleanup
+                        SqliteConnection.ClearAllPools();
+                        await Task.Delay(500);
+                    }
+                }
+
+                // If we get here, all retries failed - restore from temp backup
+                throw new InvalidOperationException(
+                    "Unable to restore database file. The database may be in use by another process.");
             }
+            catch (Exception)
+            {
+                // Rollback - restore from temp backup
+                if (tempBackupPath != null && File.Exists(tempBackupPath))
+                {
+                    try
+                    {
+                        File.Copy(tempBackupPath, _databasePath, true);
 
-            // If we get here, all retries failed
-            throw new InvalidOperationException(
-                "Unable to restore database file. The database may be in use by another process. " +
-                "Please ensure no other applications are accessing the database and try again.");
+                        if (tempWalPath != null && File.Exists(tempWalPath))
+                            File.Copy(tempWalPath, _databasePath + "-wal", true);
+
+                        if (tempShmPath != null && File.Exists(tempShmPath))
+                            File.Copy(tempShmPath, _databasePath + "-shm", true);
+
+                        System.Diagnostics.Debug.WriteLine("Restore failed - database rolled back to previous state");
+                    }
+                    catch (Exception rollbackEx)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Rollback failed: {rollbackEx.Message}");
+                    }
+                    finally
+                    {
+                        CleanupTempFiles(tempBackupPath, tempWalPath, tempShmPath);
+                    }
+                }
+
+                throw; // Re-throw the original exception
+            }
+        }
+
+        private void CleanupTempFiles(string? tempBackupPath, string? tempWalPath, string? tempShmPath)
+        {
+            try
+            {
+                if (tempBackupPath != null && File.Exists(tempBackupPath))
+                    File.Delete(tempBackupPath);
+                if (tempWalPath != null && File.Exists(tempWalPath))
+                    File.Delete(tempWalPath);
+                if (tempShmPath != null && File.Exists(tempShmPath))
+                    File.Delete(tempShmPath);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Failed to cleanup temp files: {ex.Message}");
+            }
         }
 
         private async Task<string> CalculateChecksumAsync(string filePath)
@@ -424,6 +519,58 @@ namespace IEMS.Application.Services
             using var stream = File.OpenRead(filePath);
             var hash = await Task.Run(() => md5.ComputeHash(stream));
             return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+        }
+
+        private async Task<ValidationResult> VerifyBackupIntegrityAsync(string backupPath)
+        {
+            try
+            {
+                // First check the SQLite header
+                var headerValidation = await ValidateBackupFileAsync(backupPath);
+                if (!headerValidation.IsValid)
+                    return headerValidation;
+
+                // Try to open and verify the database
+                var connectionString = $"Data Source={backupPath};Mode=ReadOnly";
+                using (var connection = new SqliteConnection(connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    // Run integrity check
+                    var command = connection.CreateCommand();
+                    command.CommandText = "PRAGMA integrity_check;";
+                    var result = await command.ExecuteScalarAsync();
+
+                    if (result?.ToString() != "ok")
+                    {
+                        return new ValidationResult
+                        {
+                            IsValid = false,
+                            Message = $"Database integrity check failed: {result}"
+                        };
+                    }
+
+                    // Check if we can query basic structure
+                    command.CommandText = "SELECT COUNT(*) FROM sqlite_master WHERE type='table';";
+                    await command.ExecuteScalarAsync();
+
+                    await connection.CloseAsync();
+                }
+
+                return new ValidationResult
+                {
+                    IsValid = true,
+                    Message = "Backup file verified successfully"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ValidationResult
+                {
+                    IsValid = false,
+                    Message = $"Backup verification failed: {ex.Message}"
+                };
+            }
         }
 
         private async Task<ValidationResult> ValidateBackupFileAsync(string backupPath)
@@ -573,14 +720,15 @@ namespace IEMS.Application.Services
                         File.WriteAllText(tempPath, updatedJson);
                         File.Move(tempPath, _metadataPath, true);
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         // Cleanup temp file on failure
                         if (File.Exists(tempPath))
                         {
                             try { File.Delete(tempPath); } catch { }
                         }
-                        throw;
+                        System.Diagnostics.Debug.WriteLine($"Failed to save backup metadata: {ex.Message}");
+                        throw; // Re-throw to preserve original exception
                     }
                 }
             });
@@ -664,37 +812,55 @@ namespace IEMS.Application.Services
 
         private async Task RemoveBackupsFromMetadataAsync(List<string> backupIds)
         {
-            try
+            await Task.Run(() =>
             {
-                var metadata = new BackupMetadata();
-
-                if (File.Exists(_metadataPath))
+                lock (_metadataLock) // Prevent concurrent access
                 {
-                    var json = await File.ReadAllTextAsync(_metadataPath);
-                    metadata = JsonSerializer.Deserialize<BackupMetadata>(json) ?? new BackupMetadata();
-                }
+                    // Use atomic write with temp file to prevent corruption
+                    var tempPath = _metadataPath + ".tmp";
 
-                // Remove deleted backups from metadata
-                metadata.Backups = metadata.Backups.Where(b => !backupIds.Contains(b.Id)).ToList();
+                    try
+                    {
+                        var metadata = new BackupMetadata();
 
-                // Update last backup date
-                if (metadata.Backups.Any())
-                {
-                    metadata.LastBackupDate = metadata.Backups.Max(b => b.Timestamp);
-                }
-                else
-                {
-                    metadata.LastBackupDate = DateTime.MinValue;
-                }
+                        if (File.Exists(_metadataPath))
+                        {
+                            var json = File.ReadAllText(_metadataPath);
+                            metadata = JsonSerializer.Deserialize<BackupMetadata>(json) ?? new BackupMetadata();
+                        }
 
-                // Save updated metadata
-                var updatedJson = JsonSerializer.Serialize(metadata, new JsonSerializerOptions { WriteIndented = true });
-                await File.WriteAllTextAsync(_metadataPath, updatedJson);
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Failed to update backup metadata: {ex.Message}");
-            }
+                        // Remove deleted backups from metadata
+                        metadata.Backups = metadata.Backups.Where(b => !backupIds.Contains(b.Id)).ToList();
+
+                        // Update last backup date
+                        if (metadata.Backups.Any())
+                        {
+                            metadata.LastBackupDate = metadata.Backups.Max(b => b.Timestamp);
+                        }
+                        else
+                        {
+                            metadata.LastBackupDate = DateTime.MinValue;
+                        }
+
+                        // Save updated metadata using atomic write
+                        var updatedJson = JsonSerializer.Serialize(metadata, new JsonSerializerOptions { WriteIndented = true });
+
+                        // Atomic write: temp file then move
+                        File.WriteAllText(tempPath, updatedJson);
+                        File.Move(tempPath, _metadataPath, true);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Cleanup temp file on failure
+                        if (File.Exists(tempPath))
+                        {
+                            try { File.Delete(tempPath); } catch { }
+                        }
+                        System.Diagnostics.Debug.WriteLine($"Failed to update backup metadata: {ex.Message}");
+                        throw; // Re-throw to preserve original exception
+                    }
+                }
+            });
         }
 
         private async Task LogRestoreOperationAsync(string restoredFrom, string? safetyBackupPath)
@@ -718,6 +884,11 @@ namespace IEMS.Application.Services
             var updatedJson = JsonSerializer.Serialize(logs, new JsonSerializerOptions { WriteIndented = true });
             await File.WriteAllTextAsync(logPath, updatedJson);
         }
+
+        public async Task RemoveBackupFromMetadataAsync(string backupId)
+        {
+            await RemoveBackupsFromMetadataAsync(new List<string> { backupId });
+        }
     }
 
     public interface IBackupService
@@ -726,6 +897,7 @@ namespace IEMS.Application.Services
         Task<RestoreResult> RestoreBackupAsync(string backupPath, bool validateChecksum = true, bool skipSafetyBackup = false);
         Task<List<BackupInfo>> GetBackupHistoryAsync();
         Task<BackupScheduleResult> SetupAutomaticBackupAsync(BackupSchedule schedule);
+        Task RemoveBackupFromMetadataAsync(string backupId);
     }
 
     public enum BackupType

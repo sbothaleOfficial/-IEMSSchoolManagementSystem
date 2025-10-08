@@ -155,7 +155,7 @@ namespace IEMS.WPF {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/IEMS.WPF;component/addeditteacherwindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/IEMS;component/addeditteacherwindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\AddEditTeacherWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

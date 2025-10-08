@@ -44,6 +44,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Address).HasMaxLength(200);
             entity.Property(e => e.CityVillage).HasMaxLength(100);
             entity.Property(e => e.ParentMobileNumber).HasMaxLength(15);
+            entity.Property(e => e.AadhaarNumber).HasMaxLength(12);
             entity.HasIndex(e => e.StudentNumber).IsUnique();
             entity.HasIndex(e => e.SerialNo).IsUnique();
 
@@ -227,6 +228,34 @@ public class ApplicationDbContext : DbContext
         SeedData(modelBuilder);
     }
 
+    private static string GenerateInitialAdminHash()
+    {
+        // Generate hash for "admin123" password
+        // Using PBKDF2 with HMACSHA256, 10000 iterations
+        const int SaltSize = 16;
+        const int HashSize = 32;
+        const int Iterations = 10000;
+
+        string password = "admin123";
+
+        // Use a fixed salt for the initial admin user for consistency across deployments
+        // In production, you might want to regenerate this
+        byte[] salt = new byte[SaltSize] { 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10 };
+
+        byte[] hash = Microsoft.AspNetCore.Cryptography.KeyDerivation.KeyDerivation.Pbkdf2(
+            password: password,
+            salt: salt,
+            prf: Microsoft.AspNetCore.Cryptography.KeyDerivation.KeyDerivationPrf.HMACSHA256,
+            iterationCount: Iterations,
+            numBytesRequested: HashSize);
+
+        byte[] hashBytes = new byte[SaltSize + HashSize];
+        Array.Copy(salt, 0, hashBytes, 0, SaltSize);
+        Array.Copy(hash, 0, hashBytes, SaltSize, HashSize);
+
+        return Convert.ToBase64String(hashBytes);
+    }
+
     private static void SeedData(ModelBuilder modelBuilder)
     {
         // 10 Teachers
@@ -243,21 +272,24 @@ public class ApplicationDbContext : DbContext
             new Teacher { Id = 10, EmployeeId = "T010", FirstName = "Rohit", LastName = "Mishra", PhoneNumber = "9876543210", Address = "707 Park Street, Kolkata", JoiningDate = new DateTime(2018, 12, 10), MonthlySalary = 65000, Email = "rohit.mishra@iemsschool.edu.in", BankAccountNumber = "UNION8901234567", AadharNumber = "0123-4567-8901", PANNumber = "FGHIJ2345F", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
         );
 
-        // 10 Classes across different standards
+        // 13 Classes: Nursery, KG1, KG2, and 1st-10th (single section each)
         modelBuilder.Entity<Class>().HasData(
-            new Class { Id = 1, Name = "Class 10", Section = "A", TeacherId = 1 },
-            new Class { Id = 2, Name = "Class 10", Section = "B", TeacherId = 2 },
-            new Class { Id = 3, Name = "Class 9", Section = "A", TeacherId = 3 },
-            new Class { Id = 4, Name = "Class 9", Section = "B", TeacherId = 4 },
-            new Class { Id = 5, Name = "Class 8", Section = "A", TeacherId = 5 },
-            new Class { Id = 6, Name = "Class 8", Section = "B", TeacherId = 6 },
-            new Class { Id = 7, Name = "Class 7", Section = "A", TeacherId = 7 },
-            new Class { Id = 8, Name = "Class 6", Section = "A", TeacherId = 8 },
-            new Class { Id = 9, Name = "Class 5", Section = "A", TeacherId = 9 },
-            new Class { Id = 10, Name = "Class 1", Section = "A", TeacherId = 10 }
+            new Class { Id = 1, Name = "Nursery", Section = "A", TeacherId = 1 },
+            new Class { Id = 2, Name = "KG1", Section = "A", TeacherId = 2 },
+            new Class { Id = 3, Name = "KG2", Section = "A", TeacherId = 3 },
+            new Class { Id = 4, Name = "Class 1", Section = "A", TeacherId = 4 },
+            new Class { Id = 5, Name = "Class 2", Section = "A", TeacherId = 5 },
+            new Class { Id = 6, Name = "Class 3", Section = "A", TeacherId = 6 },
+            new Class { Id = 7, Name = "Class 4", Section = "A", TeacherId = 7 },
+            new Class { Id = 8, Name = "Class 5", Section = "A", TeacherId = 8 },
+            new Class { Id = 9, Name = "Class 6", Section = "A", TeacherId = 9 },
+            new Class { Id = 10, Name = "Class 7", Section = "A", TeacherId = 10 },
+            new Class { Id = 11, Name = "Class 8", Section = "A", TeacherId = 1 },
+            new Class { Id = 12, Name = "Class 9", Section = "A", TeacherId = 2 },
+            new Class { Id = 13, Name = "Class 10", Section = "A", TeacherId = 3 }
         );
 
-        // 100+ Students distributed across 10 classes
+        // 260 Students distributed across 13 classes (20 students each)
         var students = new List<Student>();
         var firstNames = new[] { "Aarav", "Ananya", "Arjun", "Diya", "Ishaan", "Kavya", "Karan", "Myra", "Riya", "Vihaan", "Saanvi", "Reyansh", "Anvi", "Vivaan", "Aadya", "Aayan", "Pihu", "Krishna", "Advik", "Samaira", "Kiaan", "Avni", "Aryan", "Pari", "Sai", "Atharv", "Ira", "Ayaan", "Navya", "Rudra", "Anaya", "Om", "Tara", "Shaurya", "Kashvi", "Mihir", "Prisha", "Aadhya", "Dev", "Krisha", "Arnav", "Janvi", "Yug", "Shanaya", "Arjun", "Anika", "Vedant", "Reet", "Aarush", "Khushi" };
         var surnames = new[] { "Sharma", "Patel", "Singh", "Kumar", "Gupta", "Agarwal", "Verma", "Jain", "Shah", "Yadav", "Reddy", "Khan", "Mishra", "Chopra", "Bansal", "Agrawal", "Malhotra", "Kapoor", "Mittal", "Joshi", "Saxena", "Srivastava", "Pandey", "Tiwari", "Dubey" };
@@ -266,12 +298,24 @@ public class ApplicationDbContext : DbContext
         var casteCategories = new[] { "General", "OBC", "SC", "ST" };
 
         int studentId = 1;
-        for (int classId = 1; classId <= 10; classId++)
+        for (int classId = 1; classId <= 13; classId++)
         {
-            string className = classId == 1 ? "10th" : classId == 2 ? "10th" : classId == 3 ? "9th" : classId == 4 ? "9th" : classId == 5 ? "8th" : classId == 6 ? "8th" : classId == 7 ? "7th" : classId == 8 ? "6th" : classId == 9 ? "5th" : "1st";
-            string section = classId == 1 ? "A" : classId == 2 ? "B" : classId == 3 ? "A" : classId == 4 ? "B" : classId == 5 ? "A" : classId == 6 ? "B" : classId == 7 ? "A" : classId == 8 ? "A" : classId == 9 ? "A" : "A";
+            // Map classId to class names: 1=Nursery, 2=KG1, 3=KG2, 4=1st, 5=2nd, ..., 13=10th
+            string className = classId == 1 ? "Nursery" :
+                              classId == 2 ? "KG1" :
+                              classId == 3 ? "KG2" :
+                              classId == 4 ? "1st" :
+                              classId == 5 ? "2nd" :
+                              classId == 6 ? "3rd" :
+                              classId == 7 ? "4th" :
+                              classId == 8 ? "5th" :
+                              classId == 9 ? "6th" :
+                              classId == 10 ? "7th" :
+                              classId == 11 ? "8th" :
+                              classId == 12 ? "9th" : "10th";
+            string section = "A";
 
-            int studentsPerClass = classId <= 2 ? 15 : classId <= 4 ? 12 : 10; // More students in higher classes
+            int studentsPerClass = 20; // 20 students per class = 260 total students
 
             for (int i = 0; i < studentsPerClass; i++)
             {
@@ -290,13 +334,19 @@ public class ApplicationDbContext : DbContext
                     FirstName = firstName,
                     FatherName = $"{surnames[(studentId + 10) % surnames.Length]} {surnames[(studentId + 5) % surnames.Length]}",
                     Surname = surname,
-                    DateOfBirth = className == "10th" ? new DateTime(2008, (studentId % 12) + 1, (studentId % 28) + 1) :
-                                  className == "9th" ? new DateTime(2009, (studentId % 12) + 1, (studentId % 28) + 1) :
-                                  className == "8th" ? new DateTime(2010, (studentId % 12) + 1, (studentId % 28) + 1) :
-                                  className == "7th" ? new DateTime(2011, (studentId % 12) + 1, (studentId % 28) + 1) :
-                                  className == "6th" ? new DateTime(2012, (studentId % 12) + 1, (studentId % 28) + 1) :
-                                  className == "5th" ? new DateTime(2013, (studentId % 12) + 1, (studentId % 28) + 1) :
-                                  new DateTime(2017, (studentId % 12) + 1, (studentId % 28) + 1),
+                    DateOfBirth = className == "Nursery" ? new DateTime(2021, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  className == "KG1" ? new DateTime(2020, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  className == "KG2" ? new DateTime(2019, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  className == "1st" ? new DateTime(2018, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  className == "2nd" ? new DateTime(2017, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  className == "3rd" ? new DateTime(2016, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  className == "4th" ? new DateTime(2015, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  className == "5th" ? new DateTime(2014, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  className == "6th" ? new DateTime(2013, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  className == "7th" ? new DateTime(2012, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  className == "8th" ? new DateTime(2011, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  className == "9th" ? new DateTime(2010, (studentId % 12) + 1, (studentId % 28) + 1) :
+                                  new DateTime(2009, (studentId % 12) + 1, (studentId % 28) + 1),
                     Gender = studentId % 2 == 0 ? "Female" : "Male",
                     MotherName = $"{firstNames[(studentId + 15) % firstNames.Length]} {surname}",
                     StudentNumber = $"S{studentId:D3}",
@@ -308,13 +358,14 @@ public class ApplicationDbContext : DbContext
                     Address = $"{studentId * 10 + 1} Test Street, {city}",
                     CityVillage = city,
                     ParentMobileNumber = $"98765{(43210 + studentId):D5}",
+                    AadhaarNumber = $"{(1000 + studentId):D4}{(5000 + studentId):D4}{(9000 + studentId):D4}",
                     ClassId = classId
                 });
 
                 studentId++;
-                if (studentId > 120) break; // Ensure we don't exceed reasonable limits
+                if (studentId > 260) break; // Exactly 260 students
             }
-            if (studentId > 120) break;
+            if (studentId > 260) break;
         }
 
         modelBuilder.Entity<Student>().HasData(students.ToArray());
@@ -333,8 +384,9 @@ public class ApplicationDbContext : DbContext
             new Staff { Id = 10, EmployeeId = "ST010", FirstName = "Geeta", LastName = "Sharma", PhoneNumber = "9876543224", JoiningDate = new DateTime(2022, 1, 20), Address = "101 Canteen Block, Lucknow", Position = "Cook", MonthlySalary = 17000, Email = "geeta.sharma@school.edu", BankAccountNumber = "0123456789", AadharNumber = "012345678901", PANNumber = "JKLMN0123O" }
         );
 
-        // 10 FeeStructure records across different classes and fee types
+        // Comprehensive FeeStructure records for all classes and fee types
         modelBuilder.Entity<FeeStructure>().HasData(
+            // TUITION fees for all classes
             new FeeStructure { Id = 1, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 60000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 10-A" },
             new FeeStructure { Id = 2, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 60000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 10-B" },
             new FeeStructure { Id = 3, ClassId = 3, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 55000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 9-A" },
@@ -344,7 +396,37 @@ public class ApplicationDbContext : DbContext
             new FeeStructure { Id = 7, ClassId = 7, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 45000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 7-A" },
             new FeeStructure { Id = 8, ClassId = 8, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 40000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 6-A" },
             new FeeStructure { Id = 9, ClassId = 9, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 38000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 5-A" },
-            new FeeStructure { Id = 10, ClassId = 10, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 35000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 1-A" }
+            new FeeStructure { Id = 10, ClassId = 10, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 35000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 1-A" },
+
+            // ADMISSION fees (one-time for new students)
+            new FeeStructure { Id = 11, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.ADMISSION, Amount = 5000, AcademicYear = "2024-25", Description = "Admission Fee for Class 10-A" },
+            new FeeStructure { Id = 12, ClassId = 10, FeeType = IEMS.Core.Enums.FeeType.ADMISSION, Amount = 3000, AcademicYear = "2024-25", Description = "Admission Fee for Class 1-A" },
+
+            // EXAM fees (per academic year)
+            new FeeStructure { Id = 13, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 2000, AcademicYear = "2024-25", Description = "Examination Fee for Class 10-A" },
+            new FeeStructure { Id = 14, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 2000, AcademicYear = "2024-25", Description = "Examination Fee for Class 10-B" },
+            new FeeStructure { Id = 15, ClassId = 3, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 1800, AcademicYear = "2024-25", Description = "Examination Fee for Class 9-A" },
+
+            // TRANSPORT fees (annual)
+            new FeeStructure { Id = 16, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 12000, AcademicYear = "2024-25", Description = "Annual Transport Fee for Class 10-A" },
+            new FeeStructure { Id = 17, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 12000, AcademicYear = "2024-25", Description = "Annual Transport Fee for Class 10-B" },
+            new FeeStructure { Id = 18, ClassId = 5, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 10000, AcademicYear = "2024-25", Description = "Annual Transport Fee for Class 8-A" },
+
+            // SPORTS fees (annual)
+            new FeeStructure { Id = 19, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.SPORTS, Amount = 3000, AcademicYear = "2024-25", Description = "Annual Sports Fee for Class 10-A" },
+            new FeeStructure { Id = 20, ClassId = 3, FeeType = IEMS.Core.Enums.FeeType.SPORTS, Amount = 2500, AcademicYear = "2024-25", Description = "Annual Sports Fee for Class 9-A" },
+
+            // LIBRARY fees (annual)
+            new FeeStructure { Id = 21, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.LIBRARY, Amount = 1500, AcademicYear = "2024-25", Description = "Annual Library Fee for Class 10-A" },
+            new FeeStructure { Id = 22, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.LIBRARY, Amount = 1500, AcademicYear = "2024-25", Description = "Annual Library Fee for Class 10-B" },
+            new FeeStructure { Id = 23, ClassId = 10, FeeType = IEMS.Core.Enums.FeeType.LIBRARY, Amount = 800, AcademicYear = "2024-25", Description = "Annual Library Fee for Class 1-A" },
+
+            // UNIFORM fees
+            new FeeStructure { Id = 24, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.UNIFORM, Amount = 4000, AcademicYear = "2024-25", Description = "Uniform Fee for Class 10-A" },
+            new FeeStructure { Id = 25, ClassId = 10, FeeType = IEMS.Core.Enums.FeeType.UNIFORM, Amount = 3000, AcademicYear = "2024-25", Description = "Uniform Fee for Class 1-A" },
+
+            // MISCELLANEOUS fees
+            new FeeStructure { Id = 26, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.MISCELLANEOUS, Amount = 2000, AcademicYear = "2024-25", Description = "Miscellaneous Charges for Class 10-A" }
         );
 
         // 10 Vehicles for transport
@@ -403,18 +485,30 @@ public class ApplicationDbContext : DbContext
             new OtherExpense { Id = 10, Category = IEMS.Core.Enums.OtherExpenseCategory.STATIONERY, ExpenseType = "Library Books", Description = "New textbooks and reference books for library", Amount = 18500, ExpenseDate = DateTime.Today.AddDays(-40), PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "345678", BankName = "SBI Bank", VendorName = "Academic Publishers", InvoiceNumber = "INV010", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
         );
 
+        // FIXED BUG #1: Corrected seed data - PreviousBalance should be 0 for first payments
+        // Calculation: RemainingBalance = PreviousBalance (0) + FeeStructureAmount + LateFee - Discount - AmountPaid
         // 10 FeePayment records across different students
         modelBuilder.Entity<FeePayment>().HasData(
-            new FeePayment { Id = 1, StudentId = 1, ReceiptNumber = "REC001", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 15000, PaymentDate = DateTime.Today.AddDays(-20), PreviousBalance = 60000, RemainingBalance = 45000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new FeePayment { Id = 2, StudentId = 2, ReceiptNumber = "REC002", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 20000, PaymentDate = DateTime.Today.AddDays(-18), PreviousBalance = 60000, RemainingBalance = 40000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN112233", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new FeePayment { Id = 3, StudentId = 3, ReceiptNumber = "REC003", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 18000, PaymentDate = DateTime.Today.AddDays(-15), PreviousBalance = 60000, RemainingBalance = 42500, LateFee = 500, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "CH445566", BankName = "HDFC Bank", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new FeePayment { Id = 4, StudentId = 10, ReceiptNumber = "REC004", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 10000, PaymentDate = DateTime.Today.AddDays(-25), PreviousBalance = 35000, RemainingBalance = 24000, LateFee = 0, Discount = 1000, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new FeePayment { Id = 5, StudentId = 15, ReceiptNumber = "REC005", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 12000, PaymentDate = DateTime.Today.AddDays(-12), PreviousBalance = 55000, RemainingBalance = 43000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN223344", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new FeePayment { Id = 6, StudentId = 20, ReceiptNumber = "REC006", FeeType = IEMS.Core.Enums.FeeType.ADMISSION, AmountPaid = 5000, PaymentDate = DateTime.Today.AddDays(-30), PreviousBalance = 5000, RemainingBalance = 0, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new FeePayment { Id = 7, StudentId = 25, ReceiptNumber = "REC007", FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, AmountPaid = 4000, PaymentDate = DateTime.Today.AddDays(-22), PreviousBalance = 12000, RemainingBalance = 8000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN334455", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new FeePayment { Id = 8, StudentId = 30, ReceiptNumber = "REC008", FeeType = IEMS.Core.Enums.FeeType.EXAM, AmountPaid = 2000, PaymentDate = DateTime.Today.AddDays(-5), PreviousBalance = 2000, RemainingBalance = 0, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new FeePayment { Id = 9, StudentId = 35, ReceiptNumber = "REC009", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 8000, PaymentDate = DateTime.Today.AddDays(-8), PreviousBalance = 38000, RemainingBalance = 29700, LateFee = 200, Discount = 500, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "CH556677", BankName = "SBI Bank", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
-            new FeePayment { Id = 10, StudentId = 40, ReceiptNumber = "REC010", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 16000, PaymentDate = DateTime.Today.AddDays(-3), PreviousBalance = 50000, RemainingBalance = 34000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN445566", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+            // Student 1 (ClassId=1): TUITION fee ₹60,000, paid ₹15,000, remaining ₹45,000
+            new FeePayment { Id = 1, StudentId = 1, ReceiptNumber = "REC001", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 15000, PaymentDate = DateTime.Today.AddDays(-20), PreviousBalance = 0, RemainingBalance = 45000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            // Student 2 (ClassId=1): TUITION fee ₹60,000, paid ₹20,000, remaining ₹40,000
+            new FeePayment { Id = 2, StudentId = 2, ReceiptNumber = "REC002", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 20000, PaymentDate = DateTime.Today.AddDays(-18), PreviousBalance = 0, RemainingBalance = 40000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN112233", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            // Student 3 (ClassId=1): TUITION fee ₹60,000 + ₹500 late fee, paid ₹18,000, remaining ₹42,500
+            new FeePayment { Id = 3, StudentId = 3, ReceiptNumber = "REC003", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 18000, PaymentDate = DateTime.Today.AddDays(-15), PreviousBalance = 0, RemainingBalance = 42500, LateFee = 500, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "CH445566", BankName = "HDFC Bank", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            // Student 10 (ClassId=1): TUITION fee ₹60,000 - ₹1,000 discount, paid ₹10,000, remaining ₹49,000
+            new FeePayment { Id = 4, StudentId = 10, ReceiptNumber = "REC004", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 10000, PaymentDate = DateTime.Today.AddDays(-25), PreviousBalance = 0, RemainingBalance = 49000, LateFee = 0, Discount = 1000, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            // Student 15 (ClassId=2): TUITION fee ₹60,000, paid ₹12,000, remaining ₹48,000
+            new FeePayment { Id = 5, StudentId = 15, ReceiptNumber = "REC005", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 12000, PaymentDate = DateTime.Today.AddDays(-12), PreviousBalance = 0, RemainingBalance = 48000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN223344", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            // Student 20 (ClassId=1): ADMISSION fee ₹5,000, paid ₹5,000 (fully paid), remaining ₹0
+            new FeePayment { Id = 6, StudentId = 20, ReceiptNumber = "REC006", FeeType = IEMS.Core.Enums.FeeType.ADMISSION, AmountPaid = 5000, PaymentDate = DateTime.Today.AddDays(-30), PreviousBalance = 0, RemainingBalance = 0, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            // Student 25 (ClassId=2): TRANSPORT fee ₹12,000, paid ₹4,000, remaining ₹8,000
+            new FeePayment { Id = 7, StudentId = 25, ReceiptNumber = "REC007", FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, AmountPaid = 4000, PaymentDate = DateTime.Today.AddDays(-22), PreviousBalance = 0, RemainingBalance = 8000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN334455", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            // Student 30 (ClassId=2): EXAM fee ₹2,000, paid ₹2,000 (fully paid), remaining ₹0
+            new FeePayment { Id = 8, StudentId = 30, ReceiptNumber = "REC008", FeeType = IEMS.Core.Enums.FeeType.EXAM, AmountPaid = 2000, PaymentDate = DateTime.Today.AddDays(-5), PreviousBalance = 0, RemainingBalance = 0, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            // Student 35 (ClassId=3): TUITION fee ₹55,000 + ₹200 late fee - ₹500 discount, paid ₹8,000, remaining ₹46,700
+            new FeePayment { Id = 9, StudentId = 35, ReceiptNumber = "REC009", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 8000, PaymentDate = DateTime.Today.AddDays(-8), PreviousBalance = 0, RemainingBalance = 46700, LateFee = 200, Discount = 500, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "CH556677", BankName = "SBI Bank", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            // Student 40 (ClassId=3): TUITION fee ₹55,000, paid ₹16,000, remaining ₹39,000
+            new FeePayment { Id = 10, StudentId = 40, ReceiptNumber = "REC010", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 16000, PaymentDate = DateTime.Today.AddDays(-3), PreviousBalance = 0, RemainingBalance = 39000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN445566", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
         );
 
         modelBuilder.Entity<AcademicYear>().HasData(
@@ -422,6 +516,26 @@ public class ApplicationDbContext : DbContext
             new AcademicYear { Id = 2, Year = "2023-24", StartDate = new DateTime(2023, 6, 1), EndDate = new DateTime(2024, 5, 31), IsCurrent = false, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             new AcademicYear { Id = 3, Year = "2024-25", StartDate = new DateTime(2024, 6, 1), EndDate = new DateTime(2025, 5, 31), IsCurrent = true, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             new AcademicYear { Id = 4, Year = "2025-26", StartDate = new DateTime(2025, 6, 1), EndDate = new DateTime(2026, 5, 31), IsCurrent = false, CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+        );
+
+        // Default Users
+        // Note: Password for admin is "admin123" - hashed using PBKDF2 with HMACSHA256
+        // To generate new hash, use the PasswordHashingService.HashPassword method
+        modelBuilder.Entity<User>().HasData(
+            new User
+            {
+                Id = 1,
+                Username = "admin",
+                // This hash represents "admin123" - 16 byte salt + 32 byte hash in Base64
+                PasswordHash = GenerateInitialAdminHash(),
+                FullName = "System Administrator",
+                Role = "Admin",
+                Email = "admin@iems.school",
+                IsActive = true,
+                CreatedDate = DateTime.Now,
+                CreatedBy = "System",
+                MustChangePassword = false
+            }
         );
 
         // SystemSettings seed data - Only Academic Year and Backup Settings
@@ -432,7 +546,22 @@ public class ApplicationDbContext : DbContext
             // Backup Settings
             new SystemSetting { Key = "Backup.AutoBackupEnabled", Value = "true", Description = "Enable automatic backup", Category = "Backup", DataType = "Boolean", DefaultValue = "true", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
             new SystemSetting { Key = "Backup.RetentionDays", Value = "30", Description = "Days to retain backup files", Category = "Backup", DataType = "Integer", DefaultValue = "30", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
-            new SystemSetting { Key = "Backup.BackupPath", Value = "C:\\Users\\SP\\Documents\\IEMS_Backups", Description = "Default backup directory path", Category = "Backup", DataType = "DirectoryPath", DefaultValue = "", IsReadOnly = false, CreatedAt = DateTime.UtcNow }
+            new SystemSetting { Key = "Backup.BackupPath", Value = "C:\\Users\\SP\\Documents\\IEMS_Backups", Description = "Default backup directory path", Category = "Backup", DataType = "DirectoryPath", DefaultValue = "", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+
+            // School Information Settings
+            new SystemSetting { Key = "School.ManagementName", Value = "Mahalakmi Bahuddeshiy Sanstha, Chikhalgaon", Description = "Name of school management organization", Category = "School", DataType = "String", DefaultValue = "Mahalakmi Bahuddeshiy Sanstha, Chikhalgaon", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "School.Name", Value = "Inspire English Medium School, Mardi", Description = "Official school name", Category = "School", DataType = "String", DefaultValue = "Inspire English Medium School, Mardi", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "School.AddressLine1", Value = "Tah. Maregaon, Dist. Yavatmal (Maharashtra)", Description = "School address line 1", Category = "School", DataType = "String", DefaultValue = "Tah. Maregaon, Dist. Yavatmal (Maharashtra)", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "School.PinCode", Value = "445303", Description = "School pin code", Category = "School", DataType = "String", DefaultValue = "445303", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "School.AccreditationNumber", Value = "115381/2016", Description = "School accreditation number", Category = "School", DataType = "String", DefaultValue = "115381/2016", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "School.UDISECode", Value = "27140806704", Description = "U-DISE code for school", Category = "School", DataType = "String", DefaultValue = "27140806704", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "School.Board", Value = "State", Description = "Educational board affiliation", Category = "School", DataType = "String", DefaultValue = "State", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+
+            // School Contact Information
+            new SystemSetting { Key = "School.Phone", Value = "8483949981", Description = "School primary phone number", Category = "School", DataType = "String", DefaultValue = "8483949981", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "School.AlternatePhone", Value = "", Description = "School alternate phone number", Category = "School", DataType = "String", DefaultValue = "", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "School.Email", Value = "inspire.mardi@gmail.com", Description = "School official email address", Category = "School", DataType = "String", DefaultValue = "inspire.mardi@gmail.com", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "School.Website", Value = "", Description = "School website URL", Category = "School", DataType = "String", DefaultValue = "", IsReadOnly = false, CreatedAt = DateTime.UtcNow }
         );
     }
 }

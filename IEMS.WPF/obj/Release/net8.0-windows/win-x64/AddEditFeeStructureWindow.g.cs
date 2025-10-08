@@ -155,7 +155,7 @@ namespace IEMS.WPF {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/IEMS.WPF;component/addeditfeestructurewindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/IEMS;component/addeditfeestructurewindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\AddEditFeeStructureWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

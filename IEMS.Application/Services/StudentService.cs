@@ -41,6 +41,7 @@ public class StudentService
             Address = student.Address,
             CityVillage = student.CityVillage,
             ParentMobileNumber = student.ParentMobileNumber,
+            AadhaarNumber = student.AadhaarNumber,
             ClassId = student.ClassId,
             ClassName = student.Class?.Name ?? "Unknown"
         }).ToList();
@@ -73,6 +74,7 @@ public class StudentService
             Address = student.Address,
             CityVillage = student.CityVillage,
             ParentMobileNumber = student.ParentMobileNumber,
+            AadhaarNumber = student.AadhaarNumber,
             ClassId = student.ClassId,
             ClassName = student.Class?.Name ?? "Unknown"
         };
@@ -100,6 +102,7 @@ public class StudentService
             Address = studentDto.Address,
             CityVillage = studentDto.CityVillage,
             ParentMobileNumber = studentDto.ParentMobileNumber,
+            AadhaarNumber = studentDto.AadhaarNumber,
             ClassId = studentDto.ClassId
         };
 
@@ -129,6 +132,7 @@ public class StudentService
             student.Address = studentDto.Address;
             student.CityVillage = studentDto.CityVillage;
             student.ParentMobileNumber = studentDto.ParentMobileNumber;
+            student.AadhaarNumber = studentDto.AadhaarNumber;
             student.ClassId = studentDto.ClassId;
             student.UpdatedAt = DateTime.UtcNow;
 

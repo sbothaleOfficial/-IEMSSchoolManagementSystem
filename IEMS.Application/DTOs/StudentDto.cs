@@ -21,6 +21,7 @@ public class StudentDto
     public string Address { get; set; } = string.Empty;
     public string CityVillage { get; set; } = string.Empty;
     public string ParentMobileNumber { get; set; } = string.Empty;
+    public string? AadhaarNumber { get; set; }
     public int ClassId { get; set; }
     public string ClassName { get; set; } = string.Empty;
     public decimal OutstandingFees { get; set; }

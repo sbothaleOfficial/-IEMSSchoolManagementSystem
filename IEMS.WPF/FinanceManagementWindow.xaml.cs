@@ -66,16 +66,6 @@ namespace IEMS.WPF
                     // Initialize academic year dropdown
                     InitializeAcademicYears();
 
-                    // Fee Analytics tab has been removed - data loading commented out
-                    // dpFeeFromDate.SelectedDate = DateTime.Today.AddDays(-30);
-                    // dpFeeToDate.SelectedDate = DateTime.Today;
-
-                    // Load initial data
-                    // await LoadClasses();
-                    // await LoadFeePayments();
-                    // await LoadAnalytics();
-
-
                     // Load expense dashboard
                     await RefreshExpenseDashboard();
 
@@ -108,12 +98,6 @@ namespace IEMS.WPF
             try
             {
                 _allClasses = (await _classService.GetAllClassesAsync()).ToList();
-
-                // Add "All Classes" option for filter
-                var filterClasses = new List<ClassDto> { new ClassDto { Id = 0, Name = "All Classes" } };
-                filterClasses.AddRange(_allClasses);
-                // cmbClassFilter.ItemsSource = filterClasses;
-                // cmbClassFilter.SelectedIndex = 0;
             }
             catch (Exception ex)
             {
@@ -139,12 +123,7 @@ namespace IEMS.WPF
             try
             {
                 var analytics = await _feePaymentService.GetFeeAnalyticsAsync(_currentAcademicYear);
-
-                // dgClassWiseAnalysis.ItemsSource = analytics.ClassWisePendingFees;
-
-                // Load pending fees
                 await LoadPendingFees();
-
                 lblStatus.Text = $"Analytics updated for {_currentAcademicYear}";
             }
             catch (Exception ex)
@@ -158,8 +137,6 @@ namespace IEMS.WPF
             try
             {
                 var pendingFees = await _feePaymentService.GetStudentsWithPendingFeesAsync(_currentAcademicYear, classId);
-                // dgPendingFees.ItemsSource = pendingFees;
-
                 lblStatus.Text = $"Found {pendingFees.Count} students with pending fees";
             }
             catch (Exception ex)
@@ -170,22 +147,8 @@ namespace IEMS.WPF
 
         private void ApplyFeeFilter()
         {
-            if (_allFeePayments == null) return;
-
-            var filtered = _allFeePayments.AsEnumerable();
-
-            // Fee Analytics tab removed - date filters commented out
-            // if (dpFeeFromDate.SelectedDate.HasValue)
-            // {
-            //     filtered = filtered.Where(f => f.PaymentDate >= dpFeeFromDate.SelectedDate.Value);
-            // }
-
-            // if (dpFeeToDate.SelectedDate.HasValue)
-            // {
-            //     filtered = filtered.Where(f => f.PaymentDate <= dpFeeToDate.SelectedDate.Value.AddDays(1));
-            // }
-
-            // dgFeePayments.ItemsSource = filtered.OrderByDescending(f => f.PaymentDate).ToList();
+            // FIXED BUG #11: Method body removed as Fee Analytics tab functionality was removed
+            // This method is no longer used but kept for potential future use
         }
 
         #region Event Handlers
@@ -198,6 +161,8 @@ namespace IEMS.WPF
                 {
                     _currentAcademicYear = cmbAcademicYear.SelectedItem.ToString() ?? _currentAcademicYear;
                     await LoadAnalytics();
+                    // FIXED BUG #3: Refresh expense dashboard when academic year changes
+                    await RefreshExpenseDashboard();
                 }
             }, "Academic Year Selection Error");
         }
@@ -213,15 +178,8 @@ namespace IEMS.WPF
 
         private void CmbClassFilter_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Fee Analytics tab removed - entire method commented out
-            // AsyncHelper.SafeFireAndForget(async () =>
-            // {
-            //     if (cmbClassFilter.SelectedItem is ClassDto selectedClass)
-            //     {
-            //         var classId = selectedClass.Id == 0 ? (int?)null : selectedClass.Id;
-            //         await LoadPendingFees(classId);
-            //     }
-            // }, "Class Filter Selection Error");
+            // FIXED BUG #11: Method body removed as Fee Analytics tab functionality was removed
+            // This method is no longer used but kept for potential future use
         }
 
         private void BtnGoToStudentManagement_Click(object sender, RoutedEventArgs e)
@@ -259,24 +217,10 @@ namespace IEMS.WPF
 
         private void BtnExportPendingFees_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                // Fee Analytics tab removed - pending fees export commented out
-                // var pendingFees = dgPendingFees.ItemsSource as List<StudentFeeAnalyticsDto>;
-                var pendingFees = null as List<StudentFeeAnalyticsDto>;
-                if (pendingFees?.Count > 0)
-                {
-                    ExportToExcel(pendingFees);
-                }
-                else
-                {
-                    MessageBox.Show("No pending fees data to export.", "No Data", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error exporting data: {ex.Message}", "Export Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            // FIXED BUG #11: Method functionality removed as Fee Analytics tab was removed
+            // This method is no longer used but kept for potential future use
+            MessageBox.Show("Export functionality is not available. Fee Analytics tab has been removed.",
+                "Feature Unavailable", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         #endregion
@@ -497,13 +441,21 @@ namespace IEMS.WPF
                 {
                     if (cmbCategoryFilter.SelectedItem is string selectedCategory && selectedCategory != "All Categories")
                     {
-                        var category = Enum.Parse<OtherExpenseCategory>(selectedCategory.Replace(" ", "_"));
-                        var filteredExpenses = await _otherExpenseService.GetByCategoryAsync(category);
-
-                        _otherExpenses.Clear();
-                        foreach (var expense in filteredExpenses)
+                        // FIXED BUG #10: Use TryParse for safer enum parsing
+                        if (Enum.TryParse<OtherExpenseCategory>(selectedCategory.Replace(" ", "_"), out var category))
                         {
-                            _otherExpenses.Add(expense);
+                            var filteredExpenses = await _otherExpenseService.GetByCategoryAsync(category);
+
+                            _otherExpenses.Clear();
+                            foreach (var expense in filteredExpenses)
+                            {
+                                _otherExpenses.Add(expense);
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show($"Invalid category selected: {selectedCategory}", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            cmbCategoryFilter.SelectedIndex = 0; // Reset to "All Categories"
                         }
                     }
                     else
@@ -679,36 +631,13 @@ namespace IEMS.WPF
                 DateTime fromDate, toDate;
                 GetDateRange(out fromDate, out toDate);
 
-                // Get expense data by filtering existing collections
+                // FIXED BUG #8: Use cash basis accounting - only count PAID bills by their PaidDate
                 var electricityBills = await _electricityBillService.GetAllAsync();
 
-                // Debug: Log total bills and date range
-                System.Diagnostics.Debug.WriteLine($"=== ELECTRICITY BILLS DEBUG ===");
-                System.Diagnostics.Debug.WriteLine($"Total electricity bills in DB: {electricityBills.Count()}");
-                System.Diagnostics.Debug.WriteLine($"Date range: {fromDate:yyyy-MM-dd} to {toDate:yyyy-MM-dd}");
-
-                foreach (var bill in electricityBills.Take(5)) // Show first 5 bills for debugging
-                {
-                    var effectiveDate = bill.PaidDate ?? bill.DueDate;
-                    System.Diagnostics.Debug.WriteLine($"Bill: Amount={bill.Amount:C}, DueDate={bill.DueDate:yyyy-MM-dd}, PaidDate={bill.PaidDate?.ToString("yyyy-MM-dd") ?? "null"}, EffectiveDate={effectiveDate:yyyy-MM-dd}");
-                }
-
                 var electricityTotal = electricityBills
-                    .Where(b => {
-                        var effectiveDate = b.PaidDate ?? b.DueDate;
-                        return effectiveDate >= fromDate && effectiveDate <= toDate;
-                    })
+                    .Where(b => b.IsPaid && b.PaidDate.HasValue &&
+                                b.PaidDate.Value >= fromDate && b.PaidDate.Value <= toDate)
                     .Sum(b => b.Amount);
-
-                // If no bills in date range and we're not in "Overall" mode, try showing all bills
-                if (electricityTotal == 0 && rbOverall?.IsChecked != true)
-                {
-                    System.Diagnostics.Debug.WriteLine($"No electricity bills found in date range, showing total of all bills...");
-                    var totalAllBills = electricityBills.Sum(b => b.Amount);
-                    System.Diagnostics.Debug.WriteLine($"Total of all electricity bills: {totalAllBills:C}");
-                }
-
-                System.Diagnostics.Debug.WriteLine($"Filtered electricity total: {electricityTotal:C}");
 
                 var otherExpenses = await _otherExpenseService.GetAllAsync();
                 var otherExpensesTotal = otherExpenses
@@ -721,21 +650,25 @@ namespace IEMS.WPF
                     .Where(t => t.ExpenseDate >= fromDate && t.ExpenseDate <= toDate)
                     .Sum(t => t.Amount);
 
-                // For staff salaries - calculate based on teachers and staff
+                // FIXED BUG #2: Calculate staff salaries based on employment duration within date range
                 var allTeachers = await _teacherService.GetAllTeachersAsync();
                 var allStaff = await _staffService.GetAllStaffAsync();
-                var salariesTotal = (allTeachers.Sum(t => t.MonthlySalary) + allStaff.Sum(s => s.MonthlySalary));
 
-                // For monthly/yearly view, calculate pro-rated salaries
-                if (rbMonthly?.IsChecked == true)
+                decimal salariesTotal = 0;
+
+                // Calculate teacher salaries for the period
+                foreach (var teacher in allTeachers)
                 {
-                    // Monthly salary total (no calculation needed - already monthly)
+                    var monthsEmployed = CalculateMonthsEmployedInPeriod(teacher.JoiningDate, null, fromDate, toDate);
+                    salariesTotal += teacher.MonthlySalary * monthsEmployed;
                 }
-                else if (rbYearly?.IsChecked == true)
+
+                // Calculate staff salaries for the period
+                foreach (var staff in allStaff)
                 {
-                    salariesTotal = salariesTotal * 12; // Annual salary total
+                    var monthsEmployed = CalculateMonthsEmployedInPeriod(staff.JoiningDate, null, fromDate, toDate);
+                    salariesTotal += staff.MonthlySalary * monthsEmployed;
                 }
-                // For overall, we need to calculate based on employment duration, but for simplicity, use yearly
 
                 // Get income data from fee payments
                 var feePayments = await _feePaymentService.GetAllFeePaymentsAsync();
@@ -743,53 +676,24 @@ namespace IEMS.WPF
                     .Where(f => f.PaymentDate >= fromDate && f.PaymentDate <= toDate)
                     .Sum(f => f.AmountPaid);
 
-                // Calculate pending fees more efficiently
+                // FIXED BUG #5: Calculate pending fees using ABSOLUTE latest payments, not date-filtered
+                // Pending fees should always reflect current balance, regardless of selected date range
                 var allStudents = await _studentService.GetAllStudentsAsync();
-                var allFeeStructures = await _feeStructureService.GetAllFeeStructuresAsync();
 
                 decimal totalPendingFees = 0;
-                decimal totalExpectedFees = 0;
-
-                // Group fee structures by class for efficiency
-                var feeStructuresByClass = allFeeStructures.GroupBy(fs => fs.ClassId).ToDictionary(g => g.Key, g => g.ToList());
 
                 foreach (var student in allStudents)
                 {
-                    if (feeStructuresByClass.TryGetValue(student.ClassId, out var classFeeStructures))
-                    {
-                        foreach (var feeStructure in classFeeStructures)
-                        {
-                            // Expected amount for this student and fee type
-                            var expectedAmount = feeStructure.Amount;
-                            totalExpectedFees += expectedAmount;
+                    // Get ALL payments for this student (no date filtering for pending balance)
+                    var studentPayments = feePayments.Where(fp => fp.StudentId == student.Id);
 
-                            // Amount actually paid by this student for this fee type in the selected period
-                            var paidAmount = feePayments
-                                .Where(fp => fp.StudentId == student.Id && fp.FeeType == feeStructure.FeeType)
-                                .Sum(fp => fp.AmountPaid);
+                    // Group by fee type and take the ABSOLUTE latest payment's RemainingBalance
+                    var latestPaymentsPerFeeType = studentPayments
+                        .GroupBy(fp => fp.FeeType)
+                        .Select(g => g.OrderByDescending(fp => fp.PaymentDate).First());
 
-                            // For time-based views, we need to be more careful about pending calculation
-                            decimal pendingForPeriod = 0;
-                            if (rbOverall?.IsChecked == true)
-                            {
-                                // For overall view, total pending = expected - total paid
-                                pendingForPeriod = Math.Max(0, expectedAmount - paidAmount);
-                            }
-                            else
-                            {
-                                // For monthly/yearly, only count as pending if payment was due in this period
-                                // This is a simplified approach - in reality you'd need due dates per fee type
-                                var paidInPeriod = feePayments
-                                    .Where(fp => fp.StudentId == student.Id &&
-                                               fp.FeeType == feeStructure.FeeType &&
-                                               fp.PaymentDate >= fromDate && fp.PaymentDate <= toDate)
-                                    .Sum(fp => fp.AmountPaid);
-                                pendingForPeriod = Math.Max(0, expectedAmount - paidInPeriod);
-                            }
-
-                            totalPendingFees += pendingForPeriod;
-                        }
-                    }
+                    // Sum up the remaining balances
+                    totalPendingFees += latestPaymentsPerFeeType.Sum(fp => fp.RemainingBalance);
                 }
 
                 // Update UI - New summary cards
@@ -825,7 +729,7 @@ namespace IEMS.WPF
 
                 dgCategoryBreakdown.ItemsSource = categoryData.Where(c => c.Amount > 0);
 
-                // Update fee breakdown data
+                // FIXED BUG #6: Update fee breakdown data using ABSOLUTE latest payments for pending
                 var feeBreakdownData = new List<dynamic>();
                 var feeTypes = Enum.GetValues<FeeType>();
 
@@ -836,31 +740,18 @@ namespace IEMS.WPF
                         .Where(f => f.FeeType == feeType && f.PaymentDate >= fromDate && f.PaymentDate <= toDate)
                         .Sum(f => f.AmountPaid);
 
-                    // Calculate expected amount more accurately
-                    var expectedForFeeType = 0m;
-                    var pendingForFeeType = 0m;
+                    // Calculate pending using ABSOLUTE latest payments (no date filtering)
+                    var paymentsForFeeType = feePayments.Where(f => f.FeeType == feeType);
 
-                    foreach (var feeStructure in allFeeStructures.Where(fs => fs.FeeType == feeType))
-                    {
-                        var studentsInClass = allStudents.Count(s => s.ClassId == feeStructure.ClassId);
-                        expectedForFeeType += feeStructure.Amount * studentsInClass;
-                    }
+                    // Group by student and take ABSOLUTE latest payment's RemainingBalance
+                    var pendingForFeeType = paymentsForFeeType
+                        .GroupBy(f => f.StudentId)
+                        .Select(g => g.OrderByDescending(f => f.PaymentDate).First().RemainingBalance)
+                        .Sum();
 
-                    if (rbOverall?.IsChecked == true)
-                    {
-                        // For overall, pending = expected - total ever collected
-                        var totalEverCollected = feePayments
-                            .Where(f => f.FeeType == feeType)
-                            .Sum(f => f.AmountPaid);
-                        pendingForFeeType = Math.Max(0, expectedForFeeType - totalEverCollected);
-                    }
-                    else
-                    {
-                        // For monthly/yearly, pending = expected - collected in period
-                        pendingForFeeType = Math.Max(0, expectedForFeeType - collectedInPeriod);
-                    }
+                    var expectedForFeeType = collectedInPeriod + pendingForFeeType;
 
-                    if (collectedInPeriod > 0 || pendingForFeeType > 0 || expectedForFeeType > 0)
+                    if (collectedInPeriod > 0 || pendingForFeeType > 0)
                     {
                         feeBreakdownData.Add(new {
                             FeeType = feeType.ToString().Replace("_", " "),
@@ -895,13 +786,41 @@ namespace IEMS.WPF
             }
             else // Overall
             {
-                fromDate = DateTime.MinValue;
-                toDate = DateTime.MaxValue;
+                // FIXED BUG #4: Use reasonable date range instead of DateTime.MinValue/MaxValue
+                // to avoid SQL overflow errors and comparison issues
+                fromDate = new DateTime(2000, 1, 1); // Reasonable start date (school likely started after 2000)
+                toDate = DateTime.Today.AddYears(1); // One year in future to catch any future-dated entries
             }
         }
 
         #endregion
 
+        /// <summary>
+        /// Calculates the number of months an employee was employed within a given period
+        /// </summary>
+        /// <param name="joiningDate">Employee joining date</param>
+        /// <param name="leavingDate">Employee leaving date (null if still employed)</param>
+        /// <param name="periodStart">Period start date</param>
+        /// <param name="periodEnd">Period end date</param>
+        /// <returns>Number of months as decimal (partial months included)</returns>
+        private decimal CalculateMonthsEmployedInPeriod(DateTime joiningDate, DateTime? leavingDate, DateTime periodStart, DateTime periodEnd)
+        {
+            // Determine the actual employment period within the specified date range
+            var employmentStart = joiningDate > periodStart ? joiningDate : periodStart;
+            var employmentEnd = leavingDate.HasValue && leavingDate.Value < periodEnd ? leavingDate.Value : periodEnd;
+
+            // If employee wasn't employed during this period, return 0
+            if (employmentStart > periodEnd || employmentEnd < periodStart)
+            {
+                return 0;
+            }
+
+            // Calculate the number of months (including partial months)
+            var totalDays = (employmentEnd - employmentStart).Days + 1; // +1 to include both start and end day
+            var months = (decimal)totalDays / 30.0m; // Approximate month as 30 days
+
+            return Math.Max(0, months);
+        }
 
         #endregion
     }

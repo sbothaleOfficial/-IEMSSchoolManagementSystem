@@ -46,7 +46,7 @@
                         <TextBox x:Name="txtLastName" Grid.Row="1" Grid.Column="4" Height="35" Margin="0,0,0,15"/>
 
                         <Label Grid.Row="2" Grid.Column="0" Content="Position:" VerticalAlignment="Center"/>
-                        <ComboBox x:Name="cmbPosition" Grid.Row="2" Grid.Column="1" Height="35" Margin="0,0,0,15">
+                        <ComboBox x:Name="cmbPosition" Grid.Row="2" Grid.Column="1" Height="35" Margin="0,0,0,15" IsEditable="False">
                             <ComboBoxItem Content="Peon"/>
                             <ComboBoxItem Content="Driver"/>
                             <ComboBoxItem Content="Clerk"/>

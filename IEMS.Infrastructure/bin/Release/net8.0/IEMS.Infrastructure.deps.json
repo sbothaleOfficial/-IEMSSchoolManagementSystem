@@ -11,7 +11,8 @@
           "IEMS.Core": "1.0.0",
           "Microsoft.EntityFrameworkCore": "8.0.0",
           "Microsoft.EntityFrameworkCore.Design": "8.0.0",
-          "Microsoft.EntityFrameworkCore.Sqlite": "8.0.0"
+          "Microsoft.EntityFrameworkCore.Sqlite": "8.0.0",
+          "Microsoft.NET.ILLink.Tasks": "8.0.20"
         },
         "runtime": {
           "IEMS.Infrastructure.dll": {}
@@ -473,6 +474,7 @@
           }
         }
       },
+      "Microsoft.NET.ILLink.Tasks/8.0.20": {},
       "Mono.TextTemplating/2.2.1": {
         "dependencies": {
           "System.CodeDom": "4.4.0"
@@ -937,6 +939,13 @@
       "sha512": "sha512-bXJEZrW9ny8vjMF1JV253WeLhpEVzFo1lyaZu1vQ4ZxWUlVvknZ/+ftFgVheLubb4eZPSwwxBeqS1JkCOjxd8g==",
       "path": "microsoft.extensions.primitives/8.0.0",
       "hashPath": "microsoft.extensions.primitives.8.0.0.nupkg.sha512"
+    },
+    "Microsoft.NET.ILLink.Tasks/8.0.20": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Rhcto2AjGvTO62+/VTmBpumBOmqIGp7nYEbTbmEXkCq4yPGxV8whju3/HsIA/bKyo2+DggaYk5+/8sxb1AbPTw==",
+      "path": "microsoft.net.illink.tasks/8.0.20",
+      "hashPath": "microsoft.net.illink.tasks.8.0.20.nupkg.sha512"
     },
     "Mono.TextTemplating/2.2.1": {
       "type": "package",

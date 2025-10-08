@@ -219,26 +219,6 @@ namespace IEMS.WPF
             return control;
         }
 
-        private void BrowseForPath(TextBox pathBox, bool isDirectory)
-        {
-            if (isDirectory)
-            {
-                var dialog = new Microsoft.Win32.OpenFolderDialog();
-                if (dialog.ShowDialog() == true)
-                {
-                    pathBox.Text = dialog.FolderName;
-                }
-            }
-            else
-            {
-                var dialog = new Microsoft.Win32.OpenFileDialog();
-                if (dialog.ShowDialog() == true)
-                {
-                    pathBox.Text = dialog.FileName;
-                }
-            }
-        }
-
         private async void CategoryComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (CategoryComboBox.SelectedItem is string selectedCategory)
@@ -252,19 +232,42 @@ namespace IEMS.WPF
             try
             {
                 var updatedSettings = new List<SystemSetting>();
+                var validationErrors = new List<string>();
 
                 foreach (var setting in _currentSettings)
                 {
                     if (setting.IsReadOnly) continue;
 
-                    var control = _settingControls[setting.Key];
+                    // Check if control exists in dictionary
+                    if (!_settingControls.TryGetValue(setting.Key, out var control))
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Warning: Control not found for setting '{setting.Key}'");
+                        continue;
+                    }
+
                     string newValue = GetControlValue(control, setting.DataType);
+
+                    // Validate input based on data type
+                    var validationResult = ValidateSettingValue(newValue, setting.DataType, setting.Key);
+                    if (!validationResult.IsValid)
+                    {
+                        validationErrors.Add(validationResult.ErrorMessage);
+                        continue;
+                    }
 
                     if (newValue != setting.Value)
                     {
                         setting.Value = newValue;
                         updatedSettings.Add(setting);
                     }
+                }
+
+                // Show validation errors if any
+                if (validationErrors.Any())
+                {
+                    var errorMessage = "Please fix the following errors:\n\n" + string.Join("\n", validationErrors);
+                    MessageBox.Show(errorMessage, "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
                 }
 
                 if (updatedSettings.Any())
@@ -308,6 +311,51 @@ namespace IEMS.WPF
                 default:
                     return string.Empty;
             }
+        }
+
+        private (bool IsValid, string ErrorMessage) ValidateSettingValue(string value, string dataType, string settingKey)
+        {
+            switch (dataType.ToLower())
+            {
+                case "integer":
+                    if (!int.TryParse(value, out _))
+                    {
+                        return (false, $"{settingKey.Split('.').Last()}: Must be a valid integer number");
+                    }
+                    break;
+
+                case "decimal":
+                    if (!decimal.TryParse(value, out _))
+                    {
+                        return (false, $"{settingKey.Split('.').Last()}: Must be a valid decimal number");
+                    }
+                    break;
+
+                case "boolean":
+                    if (!bool.TryParse(value, out _))
+                    {
+                        return (false, $"{settingKey.Split('.').Last()}: Must be true or false");
+                    }
+                    break;
+
+                case "filepath":
+                    // Optional: Validate file path format
+                    if (!string.IsNullOrEmpty(value) && value.IndexOfAny(System.IO.Path.GetInvalidPathChars()) >= 0)
+                    {
+                        return (false, $"{settingKey.Split('.').Last()}: Contains invalid path characters");
+                    }
+                    break;
+
+                case "directorypath":
+                    // Optional: Validate directory path format
+                    if (!string.IsNullOrEmpty(value) && value.IndexOfAny(System.IO.Path.GetInvalidPathChars()) >= 0)
+                    {
+                        return (false, $"{settingKey.Split('.').Last()}: Contains invalid path characters");
+                    }
+                    break;
+            }
+
+            return (true, string.Empty);
         }
 
         private async void ResetCategoryButton_Click(object sender, RoutedEventArgs e)

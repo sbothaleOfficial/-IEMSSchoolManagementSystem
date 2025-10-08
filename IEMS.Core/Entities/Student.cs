@@ -21,6 +21,7 @@ public class Student
     public string Address { get; set; } = string.Empty;
     public string CityVillage { get; set; } = string.Empty;
     public string ParentMobileNumber { get; set; } = string.Empty;
+    public string? AadhaarNumber { get; set; }
     public int ClassId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

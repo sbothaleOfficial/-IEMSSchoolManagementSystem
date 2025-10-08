@@ -15,6 +15,7 @@ namespace IEMS.WPF
     {
         private readonly IBackupService _backupService;
         private List<BackupInfoViewModel> _backupHistory;
+        private string _selectedBackupPath = string.Empty;
 
         public BackupRestoreWindow()
         {
@@ -252,8 +253,6 @@ namespace IEMS.WPF
             }
         }
 
-        private string _selectedBackupPath;
-
         private async void SelectBackupFileButton_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -389,7 +388,11 @@ namespace IEMS.WPF
                         MessageBoxImage.Information);
 
                     // Restart the application
-                    Process.Start(System.Windows.Application.ResourceAssembly.Location);
+                    var exePath = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName;
+                    if (!string.IsNullOrEmpty(exePath))
+                    {
+                        Process.Start(exePath);
+                    }
                     System.Windows.Application.Current.Shutdown();
                 }
                 else if (result.RequiresConfirmation)
@@ -402,8 +405,8 @@ namespace IEMS.WPF
 
                     if (overwriteResult == MessageBoxResult.Yes)
                     {
-                        // Force restore
-                        result = await _backupService.RestoreBackupAsync(_selectedBackupPath, false);
+                        // Force restore - always validate checksum, skip safety backup
+                        result = await _backupService.RestoreBackupAsync(_selectedBackupPath, validateChecksum: true, skipSafetyBackup: true);
                         if (result.Success)
                         {
                             MessageBox.Show(
@@ -413,7 +416,11 @@ namespace IEMS.WPF
                                 MessageBoxButton.OK,
                                 MessageBoxImage.Information);
 
-                            Process.Start(System.Windows.Application.ResourceAssembly.Location);
+                            var exePath = Environment.ProcessPath ?? Process.GetCurrentProcess().MainModule?.FileName;
+                            if (!string.IsNullOrEmpty(exePath))
+                            {
+                                Process.Start(exePath);
+                            }
                             System.Windows.Application.Current.Shutdown();
                         }
                     }
@@ -576,9 +583,42 @@ namespace IEMS.WPF
 
                     if (result == MessageBoxResult.Yes)
                     {
+                        bool deletionSuccessful = true;
+
                         if (File.Exists(backupInfo.BackupPath))
                         {
-                            File.Delete(backupInfo.BackupPath);
+                            try
+                            {
+                                File.Delete(backupInfo.BackupPath);
+
+                                // Verify main file was deleted
+                                if (File.Exists(backupInfo.BackupPath))
+                                {
+                                    deletionSuccessful = false;
+                                }
+                                else
+                                {
+                                    // Also delete associated WAL and SHM files if they exist
+                                    var walPath = backupInfo.BackupPath + "-wal";
+                                    var shmPath = backupInfo.BackupPath + "-shm";
+
+                                    if (File.Exists(walPath))
+                                        File.Delete(walPath);
+                                    if (File.Exists(shmPath))
+                                        File.Delete(shmPath);
+                                }
+                            }
+                            catch
+                            {
+                                deletionSuccessful = false;
+                                throw; // Re-throw to be caught by outer catch
+                            }
+                        }
+
+                        // Only update metadata if file deletion was successful
+                        if (deletionSuccessful)
+                        {
+                            await _backupService.RemoveBackupFromMetadataAsync(backupInfo.Id);
                             await LoadBackupHistory();
                             MessageBox.Show("Backup deleted successfully", "Success",
                                 MessageBoxButton.OK, MessageBoxImage.Information);
@@ -738,6 +778,11 @@ namespace IEMS.WPF
         private void ShowError(string message)
         {
             MessageBox.Show(message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
         }
 
         private class BackupInfoViewModel

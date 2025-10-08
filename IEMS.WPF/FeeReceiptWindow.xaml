@@ -47,7 +47,7 @@
                                            FontSize="16" FontWeight="Bold" HorizontalAlignment="Left" TextWrapping="Wrap"/>
                                 <TextBlock x:Name="txtSchoolAddress" Text="Tah. Maregaon, Dist. Yavatmal (Maharashtra) – 445303"
                                            FontSize="11" HorizontalAlignment="Left"/>
-                                <TextBlock x:Name="txtSchoolPhone" Text="Phone: +91 9876543210"
+                                <TextBlock x:Name="txtSchoolPhone" Text=""
                                            FontSize="10" HorizontalAlignment="Left"/>
                             </StackPanel>
                         </Grid>

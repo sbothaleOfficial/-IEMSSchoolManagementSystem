@@ -4,10 +4,11 @@ namespace IEMS.Application.DTOs;
 
 public class FeeReceiptDto
 {
-    public string SchoolName { get; set; } = "INSPIRE ENGLISH MEDIUM SCHOOL, MARDI";
-    public string SchoolAddress { get; set; } = "Tah. Maregaon, Dist. Yavatmal (Maharashtra) – 445303";
-    public string SchoolPhone { get; set; } = "+91 9876543210";
-    public string SchoolEmail { get; set; } = "info@iems.edu";
+    // School information loaded dynamically from System Settings
+    public string SchoolName { get; set; } = string.Empty;
+    public string SchoolAddress { get; set; } = string.Empty;
+    public string SchoolPhone { get; set; } = string.Empty;
+    public string SchoolEmail { get; set; } = string.Empty;
 
     public string ReceiptNumber { get; set; } = string.Empty;
     public DateTime ReceiptDate { get; set; }

@@ -59,6 +59,7 @@ public partial class AddEditStudentWindow : Window
             txtAddress.Text = _studentToEdit.Address;
             txtCityVillage.Text = _studentToEdit.CityVillage;
             txtParentMobile.Text = _studentToEdit.ParentMobileNumber;
+            txtAadhaarNumber.Text = _studentToEdit.AadhaarNumber ?? string.Empty;
             cmbClass.SelectedValue = _studentToEdit.ClassId;
         }
         else
@@ -102,6 +103,7 @@ public partial class AddEditStudentWindow : Window
             Address = txtAddress.Text.Trim(),
             CityVillage = txtCityVillage.Text.Trim(),
             ParentMobileNumber = txtParentMobile.Text.Trim(),
+            AadhaarNumber = string.IsNullOrWhiteSpace(txtAadhaarNumber.Text) ? null : txtAadhaarNumber.Text.Trim(),
             ClassId = (int)cmbClass.SelectedValue
         };
 

@@ -197,7 +197,7 @@ namespace IEMS.WPF
                         await _userService.ResetPasswordAsync(user.Id, newPassword, LoginWindow.CurrentUser?.Username ?? "System");
 
                         MessageBox.Show(
-                            $"Password reset successfully!\n\nNew password: {newPassword}\n\nPlease share this password securely with the user.",
+                            $"Password reset successfully for user '{user.Username}'!\n\nThe password has been reset. Please provide the new password to the user through a secure channel.\n\nThe user will be required to change the password on next login.",
                             "Password Reset",
                             MessageBoxButton.OK,
                             MessageBoxImage.Information);

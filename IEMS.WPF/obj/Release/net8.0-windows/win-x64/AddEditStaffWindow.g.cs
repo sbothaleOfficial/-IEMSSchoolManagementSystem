@@ -163,7 +163,7 @@ namespace IEMS.WPF {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/IEMS.WPF;component/addeditstaffwindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/IEMS;component/addeditstaffwindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\AddEditStaffWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

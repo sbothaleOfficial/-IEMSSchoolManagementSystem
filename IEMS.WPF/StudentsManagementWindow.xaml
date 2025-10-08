@@ -208,6 +208,10 @@
                                 Click="BtnDeleteStudent_Click" Style="{StaticResource DangerButtonStyle}"/>
                         <Button x:Name="btnRefreshStudents" Content="Refresh" Width="130" Height="35" Margin="0,0,10,0"
                                 Click="BtnRefreshStudents_Click" Style="{StaticResource SecondaryButtonStyle}"/>
+                        <Button x:Name="btnExportToExcel" Content="📊 Export to Excel" Width="150" Height="35" Margin="0,0,10,0"
+                                Click="BtnExportToExcel_Click" Background="#28A745" Foreground="White" BorderThickness="0" FontWeight="SemiBold"/>
+                        <Button x:Name="btnViewStudentFees" Content="💰 View Fees" Width="130" Height="35" Margin="0,0,10,0"
+                                Click="BtnViewStudentFees_Click" Style="{StaticResource PrimaryButtonStyle}"/>
                         <Separator Width="20"/>
                         <TextBlock Text="Class:" VerticalAlignment="Center" Margin="10,0,5,0" Foreground="{StaticResource TextPrimaryBrush}"/>
                         <ComboBox x:Name="cmbStudentClassFilter" Width="150" Height="25" VerticalAlignment="Center"
@@ -232,7 +236,8 @@
 
                     <DataGrid x:Name="dgStudents" Grid.Row="1" AutoGenerateColumns="False"
                               CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="True"
-                              GridLinesVisibility="Horizontal" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}">
+                              GridLinesVisibility="Horizontal" HeadersVisibility="Column" AlternatingRowBackground="{StaticResource SurfaceBrush}"
+                              MouseDoubleClick="DgStudents_MouseDoubleClick">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Serial No" Binding="{Binding SerialNo}" Width="70"/>
                             <DataGridTextColumn Header="Standard" Binding="{Binding Standard}" Width="70"/>
@@ -251,6 +256,7 @@
                             <DataGridTextColumn Header="Semi-English" Binding="{Binding IsSemiEnglish}" Width="100"/>
                             <DataGridTextColumn Header="Address" Binding="{Binding Address}" Width="150"/>
                             <DataGridTextColumn Header="Mobile" Binding="{Binding ParentMobileNumber}" Width="100"/>
+                            <DataGridTextColumn Header="Aadhaar Number" Binding="{Binding AadhaarNumber}" Width="120"/>
                             <DataGridTextColumn Header="Outstanding Fees" Binding="{Binding FormattedOutstandingFees}" Width="120">
                                 <DataGridTextColumn.ElementStyle>
                                     <Style TargetType="TextBlock">
@@ -260,17 +266,6 @@
                                     </Style>
                                 </DataGridTextColumn.ElementStyle>
                             </DataGridTextColumn>
-                            <DataGridTemplateColumn Header="Actions" Width="100">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <Button Content="View Fees" Width="80" Height="30"
-                                              Click="BtnViewStudentFees_Click"
-                                              Tag="{Binding Id}"
-                                              Style="{StaticResource PrimaryButtonStyle}"
-                                              FontSize="10" Padding="5,2"/>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
@@ -320,7 +315,7 @@
                             </Grid.RowDefinitions>
 
                             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,10">
-                                <Button x:Name="btnAddFeePayment" Content="+ Record Payment" Width="130" Height="35" Margin="0,0,10,0"
+                                <Button x:Name="btnAddFeePayment" Content="+ Record Payment" Width="150" Height="35" Margin="0,0,10,0"
                                         Click="BtnAddFeePayment_Click" Style="{StaticResource SuccessButtonStyle}"/>
                                 <Button x:Name="btnViewReceipt" Content="View Receipt" Width="130" Height="35" Margin="0,0,10,0"
                                         Click="BtnViewReceipt_Click" Style="{StaticResource PrimaryButtonStyle}"/>
@@ -677,10 +672,10 @@
                                 <TextBox x:Name="txtSerialNoOverride" Margin="0,0,0,15" Height="35" Tag="Override serial number if needed..."/>
 
                                 <TextBlock Text="Student ID:" FontWeight="Bold" Margin="0,0,0,5"/>
-                                <TextBox x:Name="txtStudentId" Margin="0,0,0,15" Height="35" Tag="Enter student ID..."/>
+                                <TextBox x:Name="txtStudentId" Margin="0,0,0,15" Height="35" Tag="Enter student ID..." TextChanged="LeavingCertField_TextChanged"/>
 
                                 <TextBlock Text="U.I.D. No. (Aadhaar Card No.):" FontWeight="Bold" Margin="0,0,0,5"/>
-                                <TextBox x:Name="txtAadhaarNumber" Margin="0,0,0,15" Height="35" Tag="Enter Aadhaar number..."/>
+                                <TextBox x:Name="txtAadhaarNumber" Margin="0,0,0,15" Height="35" Tag="Enter Aadhaar number..." TextChanged="LeavingCertField_TextChanged"/>
 
                                 <TextBlock Text="Phone No. (Optional):" FontWeight="Bold" Margin="0,0,0,5"/>
                                 <TextBox x:Name="txtPhoneNumber" Margin="0,0,0,15" Height="35" Tag="Enter phone number..."/>

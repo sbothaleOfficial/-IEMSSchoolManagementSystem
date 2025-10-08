@@ -58,16 +58,22 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0">
-                    <TextBlock Text="Database Backup &amp; Restore"
-                             FontSize="24"
-                             FontWeight="Bold"
-                             Foreground="White"/>
-                    <TextBlock Text="Secure your school data with regular backups"
-                             FontSize="14"
-                             Foreground="White"
-                             Opacity="0.9"
-                             Margin="0,5,0,0"/>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="btnBack" Content="← Back"
+                            Click="BtnClose_Click"
+                            Background="White" Foreground="Black" BorderBrush="#CCCCCC" BorderThickness="1"
+                            Width="100" Height="35" Margin="0,0,20,0" FontWeight="SemiBold"/>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="Database Backup &amp; Restore"
+                                 FontSize="24"
+                                 FontWeight="Bold"
+                                 Foreground="White"/>
+                        <TextBlock Text="Secure your school data with regular backups"
+                                 FontSize="14"
+                                 Foreground="White"
+                                 Opacity="0.9"
+                                 Margin="0,5,0,0"/>
+                    </StackPanel>
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">

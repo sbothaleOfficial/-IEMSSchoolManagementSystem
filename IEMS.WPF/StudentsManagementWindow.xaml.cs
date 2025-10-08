@@ -11,6 +11,7 @@ using IEMS.Application.DTOs;
 using IEMS.WPF.Controls;
 using IEMS.WPF.Helpers;
 using IEMS.Core.Interfaces;
+using ClosedXML.Excel;
 
 namespace IEMS.WPF;
 
@@ -209,6 +210,140 @@ public partial class StudentsManagementWindow : Window
         AsyncHelper.SafeFireAndForget(LoadStudentsAsync);
         txtSearchStudents.Text = ""; // Clear search when refreshing
         AsyncHelper.SafeFireAndForget(LoadDashboardDataAsync); // Refresh dashboard
+    }
+
+    private void BtnExportToExcel_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            // Get students to export (filtered list if search is active)
+            var studentsToExport = dgStudents.ItemsSource as System.Collections.IEnumerable;
+            if (studentsToExport == null || !studentsToExport.Cast<StudentDto>().Any())
+            {
+                MessageBox.Show("No students to export.", "Export Failed", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            // Show column picker dialog
+            var columnPicker = new ColumnPickerDialog();
+            columnPicker.Owner = this;
+            if (columnPicker.ShowDialog() != true)
+            {
+                return; // User cancelled column selection
+            }
+
+            var selectedColumns = columnPicker.SelectedColumns;
+
+            // Show save file dialog
+            var saveFileDialog = new SaveFileDialog
+            {
+                Filter = "Excel Files (*.xlsx)|*.xlsx",
+                FileName = $"Students_List_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.xlsx",
+                Title = "Export Students to Excel"
+            };
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                // Create Excel workbook
+                using (var workbook = new XLWorkbook())
+                {
+                    var worksheet = workbook.Worksheets.Add("Students");
+
+                    // Add headers for selected columns only
+                    int col = 1;
+                    var columnMapping = new Dictionary<string, int>(); // Maps column name to Excel column number
+
+                    if (selectedColumns["SerialNo"]) { worksheet.Cell(1, col).Value = "Serial No"; columnMapping["SerialNo"] = col++; }
+                    if (selectedColumns["StudentNumber"]) { worksheet.Cell(1, col).Value = "Student Number"; columnMapping["StudentNumber"] = col++; }
+                    if (selectedColumns["FirstName"]) { worksheet.Cell(1, col).Value = "First Name"; columnMapping["FirstName"] = col++; }
+                    if (selectedColumns["FatherName"]) { worksheet.Cell(1, col).Value = "Father's Name"; columnMapping["FatherName"] = col++; }
+                    if (selectedColumns["Surname"]) { worksheet.Cell(1, col).Value = "Surname"; columnMapping["Surname"] = col++; }
+                    if (selectedColumns["MotherName"]) { worksheet.Cell(1, col).Value = "Mother's Name"; columnMapping["MotherName"] = col++; }
+                    if (selectedColumns["DateOfBirth"]) { worksheet.Cell(1, col).Value = "Date of Birth"; columnMapping["DateOfBirth"] = col++; }
+                    if (selectedColumns["Gender"]) { worksheet.Cell(1, col).Value = "Gender"; columnMapping["Gender"] = col++; }
+                    if (selectedColumns["Standard"]) { worksheet.Cell(1, col).Value = "Standard"; columnMapping["Standard"] = col++; }
+                    if (selectedColumns["Division"]) { worksheet.Cell(1, col).Value = "Division"; columnMapping["Division"] = col++; }
+                    if (selectedColumns["AdmissionDate"]) { worksheet.Cell(1, col).Value = "Admission Date"; columnMapping["AdmissionDate"] = col++; }
+                    if (selectedColumns["CasteCategory"]) { worksheet.Cell(1, col).Value = "Caste Category"; columnMapping["CasteCategory"] = col++; }
+                    if (selectedColumns["Religion"]) { worksheet.Cell(1, col).Value = "Religion"; columnMapping["Religion"] = col++; }
+                    if (selectedColumns["BPL"]) { worksheet.Cell(1, col).Value = "BPL"; columnMapping["BPL"] = col++; }
+                    if (selectedColumns["SemiEnglish"]) { worksheet.Cell(1, col).Value = "Semi-English"; columnMapping["SemiEnglish"] = col++; }
+                    if (selectedColumns["Address"]) { worksheet.Cell(1, col).Value = "Address"; columnMapping["Address"] = col++; }
+                    if (selectedColumns["CityVillage"]) { worksheet.Cell(1, col).Value = "City/Village"; columnMapping["CityVillage"] = col++; }
+                    if (selectedColumns["ParentMobile"]) { worksheet.Cell(1, col).Value = "Parent Mobile"; columnMapping["ParentMobile"] = col++; }
+                    if (selectedColumns["AadhaarNumber"]) { worksheet.Cell(1, col).Value = "Aadhaar Number"; columnMapping["AadhaarNumber"] = col++; }
+                    if (selectedColumns["OutstandingFees"]) { worksheet.Cell(1, col).Value = "Outstanding Fees"; columnMapping["OutstandingFees"] = col++; }
+
+                    // Style header row
+                    var headerRow = worksheet.Range(1, 1, 1, col - 1);
+                    headerRow.Style.Font.Bold = true;
+                    headerRow.Style.Fill.BackgroundColor = XLColor.LightBlue;
+                    headerRow.Style.Alignment.Horizontal = XLAlignmentHorizontalValues.Center;
+
+                    // Add data for selected columns only
+                    int row = 2;
+                    foreach (StudentDto student in studentsToExport)
+                    {
+                        if (columnMapping.ContainsKey("SerialNo")) worksheet.Cell(row, columnMapping["SerialNo"]).Value = student.SerialNo;
+                        if (columnMapping.ContainsKey("StudentNumber")) worksheet.Cell(row, columnMapping["StudentNumber"]).Value = student.StudentNumber;
+                        if (columnMapping.ContainsKey("FirstName")) worksheet.Cell(row, columnMapping["FirstName"]).Value = student.FirstName;
+                        if (columnMapping.ContainsKey("FatherName")) worksheet.Cell(row, columnMapping["FatherName"]).Value = student.FatherName;
+                        if (columnMapping.ContainsKey("Surname")) worksheet.Cell(row, columnMapping["Surname"]).Value = student.Surname;
+                        if (columnMapping.ContainsKey("MotherName")) worksheet.Cell(row, columnMapping["MotherName"]).Value = student.MotherName;
+                        if (columnMapping.ContainsKey("DateOfBirth")) worksheet.Cell(row, columnMapping["DateOfBirth"]).Value = student.FormattedDateOfBirth;
+                        if (columnMapping.ContainsKey("Gender")) worksheet.Cell(row, columnMapping["Gender"]).Value = student.Gender;
+                        if (columnMapping.ContainsKey("Standard")) worksheet.Cell(row, columnMapping["Standard"]).Value = student.Standard;
+                        if (columnMapping.ContainsKey("Division")) worksheet.Cell(row, columnMapping["Division"]).Value = student.ClassDivision;
+                        if (columnMapping.ContainsKey("AdmissionDate")) worksheet.Cell(row, columnMapping["AdmissionDate"]).Value = student.FormattedAdmissionDate;
+                        if (columnMapping.ContainsKey("CasteCategory")) worksheet.Cell(row, columnMapping["CasteCategory"]).Value = student.CasteCategory;
+                        if (columnMapping.ContainsKey("Religion")) worksheet.Cell(row, columnMapping["Religion"]).Value = student.Religion;
+                        if (columnMapping.ContainsKey("BPL")) worksheet.Cell(row, columnMapping["BPL"]).Value = student.IsBPL ? "Yes" : "No";
+                        if (columnMapping.ContainsKey("SemiEnglish")) worksheet.Cell(row, columnMapping["SemiEnglish"]).Value = student.IsSemiEnglish ? "Yes" : "No";
+                        if (columnMapping.ContainsKey("Address")) worksheet.Cell(row, columnMapping["Address"]).Value = student.Address;
+                        if (columnMapping.ContainsKey("CityVillage")) worksheet.Cell(row, columnMapping["CityVillage"]).Value = student.CityVillage;
+                        if (columnMapping.ContainsKey("ParentMobile")) worksheet.Cell(row, columnMapping["ParentMobile"]).Value = student.ParentMobileNumber;
+                        if (columnMapping.ContainsKey("AadhaarNumber")) worksheet.Cell(row, columnMapping["AadhaarNumber"]).Value = student.AadhaarNumber ?? string.Empty;
+                        if (columnMapping.ContainsKey("OutstandingFees")) worksheet.Cell(row, columnMapping["OutstandingFees"]).Value = student.FormattedOutstandingFees;
+                        row++;
+                    }
+
+                    // Auto-fit columns
+                    worksheet.Columns().AdjustToContents();
+
+                    // Save the file
+                    workbook.SaveAs(saveFileDialog.FileName);
+                }
+
+                toastNotification.Message = $"Successfully exported {studentsToExport.Cast<StudentDto>().Count()} students to Excel!";
+                toastNotification.ToastType = ToastType.Success;
+                toastNotification.Show();
+
+                lblStatus.Text = "Students exported to Excel successfully";
+
+                // Ask if user wants to open the file
+                var result = MessageBox.Show(
+                    "Export completed successfully. Do you want to open the file?",
+                    "Export Complete",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
+                if (result == MessageBoxResult.Yes)
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = saveFileDialog.FileName,
+                        UseShellExecute = true
+                    });
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            toastNotification.Message = $"Error exporting to Excel: {ex.Message}";
+            toastNotification.ToastType = ToastType.Error;
+            toastNotification.Show();
+            lblStatus.Text = "Error exporting students";
+        }
     }
 
     // Class Management Events
@@ -891,8 +1026,8 @@ public partial class StudentsManagementWindow : Window
                     if (txtDistrict != null) txtDistrict.Text = ""; // Empty by default, user can fill
                     if (txtBirthState != null) txtBirthState.Text = "Maharashtra"; // Default state
 
-                    // Auto-populate additional fields that don't exist in database yet
-                    if (txtAadhaarNumber != null) txtAadhaarNumber.Text = ""; // Empty by default, user must fill
+                    // Auto-populate additional fields
+                    if (txtAadhaarNumber != null) txtAadhaarNumber.Text = selectedStudent.AadhaarNumber ?? ""; // Auto-populate from student data
                     if (txtEmail != null) txtEmail.Text = ""; // Empty by default, user can fill
 
                     // Set default Academic Session based on current date
@@ -984,6 +1119,9 @@ public partial class StudentsManagementWindow : Window
             if (FindName("CertGeneralRegisterNumber") is TextBlock certGeneralRegisterNumber)
                 certGeneralRegisterNumber.Text = student.StudentNumber;
 
+            if (FindName("CertAadhaarNumber") is TextBlock certAadhaarNumber)
+                certAadhaarNumber.Text = student.AadhaarNumber ?? "";
+
             // Set default leaving date to today
             dpLeavingDate.SelectedDate = DateTime.Now;
         }
@@ -992,6 +1130,23 @@ public partial class StudentsManagementWindow : Window
             toastNotification.Message = $"Error populating certificate: {ex.Message}";
             toastNotification.ToastType = ToastType.Error;
             toastNotification.Show();
+        }
+    }
+
+    private void LeavingCertField_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        // Update the preview when Student ID or Aadhaar number is changed manually
+        try
+        {
+            if (FindName("CertStudentId") is TextBlock certStudentId && txtStudentId != null)
+                certStudentId.Text = txtStudentId.Text;
+
+            if (FindName("CertAadhaarNumber") is TextBlock certAadhaarNumber && txtAadhaarNumber != null)
+                certAadhaarNumber.Text = txtAadhaarNumber.Text;
+        }
+        catch
+        {
+            // Silently ignore errors during preview update
         }
     }
 
@@ -1329,24 +1484,41 @@ public partial class StudentsManagementWindow : Window
                 // First generate the certificate if not already done
                 BtnGenerateLeavingCert_Click(sender, e);
 
-                // Create save file dialog
+                // Create save file dialog - offering both XPS and PDF options
                 var saveFileDialog = new SaveFileDialog
                 {
-                    Filter = "PDF files (*.pdf)|*.pdf",
-                    DefaultExt = "pdf",
-                    FileName = $"School_Leaving_Certificate_{selectedStudent.FullName.Replace(" ", "_")}_{DateTime.Now:yyyyMMdd}.pdf"
+                    Filter = "XPS Document (*.xps)|*.xps|PDF files (*.pdf)|*.pdf",
+                    DefaultExt = "xps",
+                    FilterIndex = 1,
+                    FileName = $"School_Leaving_Certificate_{selectedStudent.FullName.Replace(" ", "_")}_{DateTime.Now:yyyyMMdd}"
                 };
 
                 if (saveFileDialog.ShowDialog() == true)
                 {
-                    // Export certificate to PDF using visual capture
-                    ExportCertificateToPDF(LeavingCertificateBorder, saveFileDialog.FileName);
+                    var extension = Path.GetExtension(saveFileDialog.FileName).ToLower();
 
-                    toastNotification.Message = "Certificate exported to PDF successfully!";
-                    toastNotification.ToastType = ToastType.Success;
-                    toastNotification.Show();
+                    if (extension == ".xps")
+                    {
+                        // Direct XPS export (native Windows format)
+                        ExportCertificateToXPS(LeavingCertificateBorder, saveFileDialog.FileName);
 
-                    lblStatus.Text = "Certificate exported to PDF";
+                        toastNotification.Message = "Certificate exported to XPS successfully!\n\nYou can view this in Windows or print to PDF.";
+                        toastNotification.ToastType = ToastType.Success;
+                        toastNotification.Show();
+
+                        lblStatus.Text = "Certificate exported to XPS";
+                    }
+                    else
+                    {
+                        // PDF export (requires conversion)
+                        ExportCertificateToPDF(LeavingCertificateBorder, saveFileDialog.FileName);
+
+                        toastNotification.Message = "Certificate export initiated. Follow the on-screen instructions.";
+                        toastNotification.ToastType = ToastType.Info;
+                        toastNotification.Show();
+
+                        lblStatus.Text = "Certificate export initiated";
+                    }
                 }
             }
             else
@@ -1366,74 +1538,159 @@ public partial class StudentsManagementWindow : Window
 
     private void ExportCertificateToPDF(FrameworkElement element, string filePath)
     {
-        // Ensure the element is measured and arranged
-        element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-        element.Arrange(new Rect(element.DesiredSize));
-
-        // Update layout to ensure all elements are rendered
-        element.UpdateLayout();
-
-        // Create render target bitmap with high DPI for quality
-        var dpi = 300; // High DPI for PDF quality
-        var renderBitmap = new RenderTargetBitmap(
-            (int)(element.ActualWidth * dpi / 96),
-            (int)(element.ActualHeight * dpi / 96),
-            dpi, dpi, PixelFormats.Pbgra32);
-
-        // Render the visual
-        renderBitmap.Render(element);
-
-        // Create print dialog to convert to PDF
-        var printDialog = new PrintDialog();
-
-        // Set printer to Microsoft Print to PDF if available
-        var printServer = new System.Printing.LocalPrintServer();
-        var printQueue = printServer.GetPrintQueue("Microsoft Print to PDF");
-
-        if (printQueue != null)
+        try
         {
-            printDialog.PrintQueue = printQueue;
+            // Save as XPS first (which can be opened in Windows or printed to PDF)
+            var xpsPath = Path.ChangeExtension(filePath, ".xps");
+            ExportCertificateToXPS(element, xpsPath);
+
+            // Inform the user
+            MessageBox.Show(
+                $"Certificate saved as: {xpsPath}\n\n" +
+                "To convert to PDF:\n" +
+                "1. Open the XPS file\n" +
+                "2. Press Ctrl+P to print\n" +
+                "3. Select 'Microsoft Print to PDF'\n" +
+                "4. Save as PDF",
+                "Certificate Exported",
+                MessageBoxButton.OK,
+                MessageBoxImage.Information
+            );
         }
-
-        // Create a document for printing
-        var printDocument = new System.Windows.Documents.FixedDocument();
-        var pageContent = new System.Windows.Documents.PageContent();
-        var fixedPage = new System.Windows.Documents.FixedPage
+        catch (Exception ex)
         {
-            Width = 793.7, // A4 width in device units (96 DPI)
-            Height = 1122.5 // A4 height in device units (96 DPI)
-        };
+            throw new Exception($"Failed to export certificate: {ex.Message}", ex);
+        }
+    }
 
-        // Calculate scale to fit A4 page
-        var scaleX = fixedPage.Width / element.ActualWidth;
-        var scaleY = fixedPage.Height / element.ActualHeight;
-        var scale = Math.Min(scaleX, scaleY);
-
-        // Create a visual brush from the certificate
-        var visualBrush = new VisualBrush(element)
+    private void ConvertXpsToPdf(string xpsFilePath, string pdfFilePath)
+    {
+        try
         {
-            Stretch = Stretch.Uniform,
-            TileMode = TileMode.None
-        };
+            // Try to use Microsoft Print to PDF for conversion
+            var printDialog = new PrintDialog();
 
-        // Create a rectangle to hold the visual
-        var rectangle = new System.Windows.Shapes.Rectangle
+            // Get all print queues and find a PDF printer
+            var printServer = new System.Printing.LocalPrintServer();
+            System.Printing.PrintQueue pdfPrintQueue = null;
+
+            // Try to find Microsoft Print to PDF or any other PDF printer
+            var pdfPrinters = new[] { "Microsoft Print to PDF", "Microsoft XPS Document Writer", "Adobe PDF" };
+
+            foreach (var printerName in pdfPrinters)
+            {
+                try
+                {
+                    pdfPrintQueue = printServer.GetPrintQueue(printerName);
+                    if (pdfPrintQueue != null)
+                        break;
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+
+            if (pdfPrintQueue == null)
+            {
+                // Fallback: Copy XPS file as is (Windows can view XPS files natively)
+                var xpsOutputPath = Path.ChangeExtension(pdfFilePath, ".xps");
+                File.Copy(xpsFilePath, xpsOutputPath, true);
+                throw new Exception($"No PDF printer found. Certificate saved as XPS file instead: {xpsOutputPath}\n\nYou can open this file in Windows or convert it to PDF using 'Microsoft Print to PDF' from your print dialog.");
+            }
+
+            // Load the XPS document
+            using (var xpsDocument = new System.Windows.Xps.Packaging.XpsDocument(xpsFilePath, FileAccess.Read))
+            {
+                var documentPaginator = xpsDocument.GetFixedDocumentSequence().DocumentPaginator;
+
+                // Set the print queue
+                printDialog.PrintQueue = pdfPrintQueue;
+
+                // For Microsoft Print to PDF, we need to set the output file
+                if (pdfPrintQueue.Name.Contains("Microsoft Print to PDF"))
+                {
+                    // Use reflection to set the output file path for Microsoft Print to PDF
+                    var printTicket = printDialog.PrintTicket;
+                    printDialog.PrintDocument(documentPaginator, Path.GetFileNameWithoutExtension(pdfFilePath));
+
+                    // Since PrintDialog doesn't directly support file output path,
+                    // we'll use a workaround: save as XPS and let user print to PDF manually
+                    var xpsOutputPath = Path.ChangeExtension(pdfFilePath, ".xps");
+                    File.Copy(xpsFilePath, xpsOutputPath, true);
+
+                    // Also copy to the desired PDF path as XPS for now
+                    // User can manually print to PDF from Windows
+                    File.Copy(xpsFilePath, pdfFilePath + ".xps", true);
+
+                    throw new Exception($"Certificate saved as XPS file: {pdfFilePath}.xps\n\nTo convert to PDF:\n1. Open the XPS file\n2. Press Ctrl+P to print\n3. Select 'Microsoft Print to PDF'\n4. Save to {pdfFilePath}");
+                }
+            }
+        }
+        catch (Exception ex)
         {
-            Width = element.ActualWidth * scale,
-            Height = element.ActualHeight * scale,
-            Fill = visualBrush
-        };
+            throw new Exception($"XPS to PDF conversion failed: {ex.Message}", ex);
+        }
+    }
 
-        // Center the content on the page
-        System.Windows.Documents.FixedPage.SetLeft(rectangle, (fixedPage.Width - rectangle.Width) / 2);
-        System.Windows.Documents.FixedPage.SetTop(rectangle, (fixedPage.Height - rectangle.Height) / 2);
+    private void ExportCertificateToXPS(FrameworkElement element, string filePath)
+    {
+        try
+        {
+            // Ensure the element is measured and arranged
+            element.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            element.Arrange(new Rect(element.DesiredSize));
+            element.UpdateLayout();
 
-        fixedPage.Children.Add(rectangle);
-        pageContent.Child = fixedPage;
-        printDocument.Pages.Add(pageContent);
+            // Create a FixedDocument for the certificate
+            var fixedDocument = new System.Windows.Documents.FixedDocument();
+            var pageContent = new System.Windows.Documents.PageContent();
+            var fixedPage = new System.Windows.Documents.FixedPage
+            {
+                Width = 793.7,  // A4 width at 96 DPI
+                Height = 1122.5 // A4 height at 96 DPI
+            };
 
-        // Print the document
-        printDialog.PrintDocument(printDocument.DocumentPaginator, $"School Leaving Certificate - {DateTime.Now:yyyy-MM-dd}");
+            // Calculate scale to fit A4 page while maintaining aspect ratio
+            var scaleX = fixedPage.Width / element.ActualWidth;
+            var scaleY = fixedPage.Height / element.ActualHeight;
+            var scale = Math.Min(scaleX, scaleY);
+
+            // Create a visual brush from the certificate
+            var visualBrush = new VisualBrush(element)
+            {
+                Stretch = Stretch.Uniform,
+                TileMode = TileMode.None
+            };
+
+            // Create a rectangle to hold the visual
+            var rectangle = new System.Windows.Shapes.Rectangle
+            {
+                Width = element.ActualWidth * scale,
+                Height = element.ActualHeight * scale,
+                Fill = visualBrush
+            };
+
+            // Center the content on the page
+            System.Windows.Documents.FixedPage.SetLeft(rectangle, (fixedPage.Width - rectangle.Width) / 2);
+            System.Windows.Documents.FixedPage.SetTop(rectangle, (fixedPage.Height - rectangle.Height) / 2);
+
+            fixedPage.Children.Add(rectangle);
+            pageContent.Child = fixedPage;
+            fixedDocument.Pages.Add(pageContent);
+
+            // Create XPS document using Package API
+            using (var package = System.IO.Packaging.Package.Open(filePath, FileMode.Create))
+            using (var xpsDocument = new System.Windows.Xps.Packaging.XpsDocument(package))
+            {
+                var xpsWriter = System.Windows.Xps.Packaging.XpsDocument.CreateXpsDocumentWriter(xpsDocument);
+                xpsWriter.Write(fixedDocument);
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Failed to export certificate to XPS: {ex.Message}", ex);
+        }
     }
 
     private void CmbMotherTongue_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -1834,23 +2091,15 @@ public partial class StudentsManagementWindow : Window
         {
             try
             {
-                if (sender is Button btn && btn.Tag is int studentId)
+                if (dgStudents.SelectedItem is StudentDto selectedStudent)
                 {
-                    var selectedStudent = _allStudents.FirstOrDefault(s => s.Id == studentId);
-                    if (selectedStudent != null)
-                    {
-                        var studentFeeStatusWindow = new StudentFeeStatusWindow(_feePaymentService, studentId, "2024-25");
-                        studentFeeStatusWindow.Owner = this;
-                        studentFeeStatusWindow.ShowDialog();
-                    }
-                    else
-                    {
-                        MessageBox.Show("Student not found.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
-                    }
+                    var studentFeeStatusWindow = new StudentFeeStatusWindow(_feePaymentService, selectedStudent.Id, "2024-25");
+                    studentFeeStatusWindow.Owner = this;
+                    studentFeeStatusWindow.ShowDialog();
                 }
                 else
                 {
-                    MessageBox.Show("Invalid student selection.", "Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    MessageBox.Show("Please select a student to view their fees.", "No Selection", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
             }
             catch (Exception ex)
@@ -1858,6 +2107,15 @@ public partial class StudentsManagementWindow : Window
                 MessageBox.Show($"Error opening student fee status: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }, "Student Fee Status Error");
+    }
+
+    private void DgStudents_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        // Double-click on a student row opens the fee status window
+        if (dgStudents.SelectedItem is StudentDto selectedStudent)
+        {
+            BtnViewStudentFees_Click(sender, e);
+        }
     }
 
     #region Fee Structure Management

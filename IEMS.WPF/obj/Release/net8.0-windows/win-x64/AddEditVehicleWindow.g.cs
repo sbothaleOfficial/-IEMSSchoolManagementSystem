@@ -131,7 +131,7 @@ namespace IEMS.WPF {
                 return;
             }
             _contentLoaded = true;
-            System.Uri resourceLocater = new System.Uri("/IEMS.WPF;component/addeditvehiclewindow.xaml", System.UriKind.Relative);
+            System.Uri resourceLocater = new System.Uri("/IEMS;component/addeditvehiclewindow.xaml", System.UriKind.Relative);
             
             #line 1 "..\..\..\..\AddEditVehicleWindow.xaml"
             System.Windows.Application.LoadComponent(this, resourceLocater);

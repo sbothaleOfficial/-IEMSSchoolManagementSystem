@@ -2,6 +2,7 @@ using IEMS.Core.Entities;
 using IEMS.Core.Enums;
 using IEMS.Core.Interfaces;
 using IEMS.Application.DTOs;
+using IEMS.Application.Interfaces;
 using IEMS.Core.Services;
 
 namespace IEMS.Application.Services;
@@ -14,6 +15,7 @@ public class FeePaymentService
     private readonly IClassRepository _classRepository;
     private readonly FeeCalculationService _feeCalculationService;
     private readonly AmountToWordsService _amountToWordsService;
+    private readonly ISystemSettingsService _systemSettingsService;
 
     public FeePaymentService(
         IFeePaymentRepository feePaymentRepository,
@@ -21,7 +23,8 @@ public class FeePaymentService
         IStudentRepository studentRepository,
         IClassRepository classRepository,
         FeeCalculationService feeCalculationService,
-        AmountToWordsService amountToWordsService)
+        AmountToWordsService amountToWordsService,
+        ISystemSettingsService systemSettingsService)
     {
         _feePaymentRepository = feePaymentRepository;
         _feeStructureRepository = feeStructureRepository;
@@ -29,6 +32,7 @@ public class FeePaymentService
         _classRepository = classRepository;
         _feeCalculationService = feeCalculationService;
         _amountToWordsService = amountToWordsService;
+        _systemSettingsService = systemSettingsService;
     }
 
     public async Task<IEnumerable<FeePaymentDto>> GetAllFeePaymentsAsync()
@@ -80,8 +84,9 @@ public class FeePaymentService
             var totalPaid = feeTypePayments.Sum(p => p.AmountPaid);
             var lastPayment = feeTypePayments.OrderByDescending(p => p.PaymentDate).FirstOrDefault();
 
-            // Calculate outstanding for this fee type
-            var outstandingForType = Math.Max(0, feeStructure.Amount - totalPaid);
+            // FIXED: Use the RemainingBalance from the latest payment instead of recalculating
+            // This ensures late fees, discounts, and previous balances are properly accounted for
+            var outstandingForType = lastPayment?.RemainingBalance ?? feeStructure.Amount;
             totalOutstanding += outstandingForType;
 
             feeTypeStatuses.Add(new StudentFeeTypeStatusDto
@@ -166,6 +171,22 @@ public class FeePaymentService
         var totalOwed = previousBalance + totalFeeAmount + createDto.LateFee - createDto.Discount;
         var newRemainingBalance = Math.Max(0, totalOwed - createDto.AmountPaid);
 
+        // FIXED BUG #7: Track overpayment in payment notes
+        var paymentNotes = createDto.PaymentNotes ?? "";
+        if (createDto.AmountPaid > totalOwed)
+        {
+            var overpayment = createDto.AmountPaid - totalOwed;
+            var overpaymentNote = $"[OVERPAYMENT: ₹{overpayment:F2} excess paid. Total owed was ₹{totalOwed:F2}]";
+
+            // Add overpayment note to payment notes
+            paymentNotes = string.IsNullOrWhiteSpace(paymentNotes)
+                ? overpaymentNote
+                : $"{paymentNotes}\n{overpaymentNote}";
+
+            // Log warning for financial reconciliation
+            System.Diagnostics.Debug.WriteLine($"WARNING: Overpayment detected - Student {student.StudentNumber}, Receipt {receiptNumber}, Overpayment: ₹{overpayment:F2}");
+        }
+
         var feePayment = new FeePayment
         {
             ReceiptNumber = receiptNumber,
@@ -176,7 +197,7 @@ public class FeePaymentService
             TransactionId = createDto.TransactionId,
             ChequeNumber = createDto.ChequeNumber,
             BankName = createDto.BankName,
-            PaymentNotes = createDto.PaymentNotes,
+            PaymentNotes = paymentNotes,
             PreviousBalance = previousBalance,
             RemainingBalance = newRemainingBalance,
             LateFee = createDto.LateFee,
@@ -203,13 +224,34 @@ public class FeePaymentService
         var feeStructure = await _feeStructureRepository.GetByClassIdFeeTypeAndAcademicYearAsync(
             feePayment.Student.ClassId, feePayment.FeeType, feePayment.AcademicYear);
 
+        // FIXED BUG #9: Throw exception if fee structure not found instead of silently setting to 0
+        if (feeStructure == null)
+            throw new InvalidOperationException($"Fee structure not found for {feePayment.FeeType} in class {feePayment.Student.Class?.Name ?? "Unknown"} for academic year {feePayment.AcademicYear}");
+
+        // Load school information from system settings
+        var schoolName = await _systemSettingsService.GetSettingValueAsync("School.Name") ?? "INSPIRE ENGLISH MEDIUM SCHOOL, MARDI";
+        var schoolAddress = await _systemSettingsService.GetSettingValueAsync("School.AddressLine1") ?? "Tah. Maregaon, Dist. Yavatmal (Maharashtra)";
+        var schoolPinCode = await _systemSettingsService.GetSettingValueAsync("School.PinCode") ?? "445303";
+        var schoolPhone = await _systemSettingsService.GetSettingValueAsync("School.Phone") ?? "8483949981";
+        var schoolEmail = await _systemSettingsService.GetSettingValueAsync("School.Email") ?? "inspire.mardi@gmail.com";
+
+        // Format school address with pin code
+        var fullAddress = $"{schoolAddress} – {schoolPinCode}";
+        var formattedPhone = $"+91 {schoolPhone}";
+
         return new FeeReceiptDto
         {
+            SchoolName = schoolName.ToUpper(),
+            SchoolAddress = fullAddress,
+            SchoolPhone = formattedPhone,
+            SchoolEmail = schoolEmail,
             ReceiptNumber = feePayment.ReceiptNumber,
             ReceiptDate = feePayment.PaymentDate,
             AcademicYear = feePayment.AcademicYear,
             StudentName = $"{feePayment.Student.FirstName} {feePayment.Student.Surname}",
-            ClassName = feePayment.Student.Class?.Name + " - " + feePayment.Student.Class?.Section,
+            ClassName = feePayment.Student.Class != null
+                ? $"{feePayment.Student.Class.Name} - {feePayment.Student.Class.Section}"
+                : "No Class Assigned",
             StudentNumber = feePayment.Student.StudentNumber,
             ParentPhone = feePayment.Student.ParentMobileNumber,
             FeeType = feePayment.FeeType,
@@ -219,7 +261,7 @@ public class FeePaymentService
             BankName = feePayment.BankName,
             AmountPaid = feePayment.AmountPaid,
             AmountInWords = ConvertAmountToWords(feePayment.AmountPaid),
-            TotalFees = feeStructure?.Amount ?? 0,
+            TotalFees = feeStructure.Amount,
             PreviousBalance = feePayment.PreviousBalance,
             RemainingBalance = feePayment.RemainingBalance,
             LateFee = feePayment.LateFee,
@@ -387,8 +429,19 @@ public class FeePaymentService
             .Select(g =>
             {
                 var totalCollected = g.Sum(fp => fp.AmountPaid);
-                var totalPending = g.Sum(fp => fp.RemainingBalance);
-                var studentsWithPending = g.Where(fp => fp.RemainingBalance > 0).Select(fp => fp.StudentId).Distinct().Count();
+
+                // FIXED: Take only the latest payment's RemainingBalance per student
+                // instead of summing all remaining balances (which double/triple counts)
+                var totalPending = g
+                    .GroupBy(fp => fp.StudentId)
+                    .Select(studentGroup => studentGroup.OrderByDescending(fp => fp.PaymentDate).First().RemainingBalance)
+                    .Sum();
+
+                var studentsWithPending = g
+                    .GroupBy(fp => fp.StudentId)
+                    .Where(studentGroup => studentGroup.OrderByDescending(fp => fp.PaymentDate).First().RemainingBalance > 0)
+                    .Count();
+
                 var collectionRate = (totalCollected + totalPending) > 0 ? (totalCollected / (totalCollected + totalPending)) * 100 : 0;
 
                 return new FeeTypeAnalyticsDto
@@ -413,7 +466,6 @@ public class FeePaymentService
         var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYear == academicYear).ToList();
 
         var studentsWithPending = currentYearPayments
-            .Where(fp => fp.RemainingBalance > 0)
             .GroupBy(fp => fp.StudentId)
             .Select(g =>
             {
@@ -421,7 +473,18 @@ public class FeePaymentService
                 if (classId.HasValue && student.ClassId != classId.Value)
                     return null;
 
-                var totalPending = g.Sum(fp => fp.RemainingBalance);
+                // FIXED: Calculate total pending using only the latest payment per fee type
+                var latestPaymentsByFeeType = g
+                    .GroupBy(fp => fp.FeeType)
+                    .Select(feeTypeGroup => feeTypeGroup.OrderByDescending(fp => fp.PaymentDate).First())
+                    .ToList();
+
+                var totalPending = latestPaymentsByFeeType.Sum(fp => fp.RemainingBalance);
+
+                // Only include students who actually have pending fees
+                if (totalPending <= 0)
+                    return null;
+
                 var lastPayment = g.OrderByDescending(fp => fp.PaymentDate).FirstOrDefault();
                 var daysSinceLastPayment = lastPayment != null ?
                     (DateTime.Now - lastPayment.PaymentDate).Days : 0;
@@ -436,15 +499,14 @@ public class FeePaymentService
                     TotalPendingAmount = totalPending,
                     LastPaymentDate = lastPayment?.PaymentDate,
                     DaysSinceLastPayment = daysSinceLastPayment,
-                    PendingByFeeType = g.GroupBy(fp => fp.FeeType)
-                        .Where(ft => ft.Sum(fp => fp.RemainingBalance) > 0)
-                        .Select(ft => new FeeTypePendingDto
+                    PendingByFeeType = latestPaymentsByFeeType
+                        .Where(fp => fp.RemainingBalance > 0)
+                        .Select(fp => new FeeTypePendingDto
                         {
-                            FeeType = ft.Key,
-                            PendingAmount = ft.Sum(fp => fp.RemainingBalance),
-                            LastPaid = ft.OrderByDescending(fp => fp.PaymentDate).FirstOrDefault()?.PaymentDate,
-                            OverdueDays = ft.OrderByDescending(fp => fp.PaymentDate).FirstOrDefault()?.PaymentDate != null ?
-                                (DateTime.Now - ft.OrderByDescending(fp => fp.PaymentDate).First().PaymentDate).Days : 0
+                            FeeType = fp.FeeType,
+                            PendingAmount = fp.RemainingBalance,
+                            LastPaid = fp.PaymentDate,
+                            OverdueDays = (DateTime.Now - fp.PaymentDate).Days
                         }).ToList()
                 };
             })
@@ -464,7 +526,9 @@ public class FeePaymentService
             ReceiptNumber = feePayment.ReceiptNumber,
             StudentId = feePayment.StudentId,
             StudentName = $"{feePayment.Student.FirstName} {feePayment.Student.Surname}",
-            ClassName = feePayment.Student.Class?.Name + " - " + feePayment.Student.Class?.Section ?? "",
+            ClassName = feePayment.Student.Class != null
+                ? $"{feePayment.Student.Class.Name} - {feePayment.Student.Class.Section}"
+                : "No Class Assigned",
             StudentNumber = feePayment.Student.StudentNumber,
             ParentMobileNumber = feePayment.Student.ParentMobileNumber,
             FeeType = feePayment.FeeType,

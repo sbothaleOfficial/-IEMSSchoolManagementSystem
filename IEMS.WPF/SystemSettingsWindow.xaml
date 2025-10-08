@@ -142,9 +142,13 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="btnBack" Content="← Back"
+                            Click="CloseButton_Click"
+                            Background="White" Foreground="Black" BorderBrush="#CCCCCC" BorderThickness="1"
+                            Width="100" Height="35" Margin="0,0,20,0" FontWeight="SemiBold"/>
                     <TextBlock Text="⚙️" FontSize="28" VerticalAlignment="Center" Margin="0,0,15,0"/>
-                    <StackPanel>
+                    <StackPanel VerticalAlignment="Center">
                         <TextBlock Text="System Settings" FontSize="24" FontWeight="Bold" Foreground="White"/>
                         <TextBlock Text="Configure system preferences and application settings" FontSize="14" Foreground="#E6F3FF" Margin="0,2,0,0"/>
                     </StackPanel>
@@ -176,10 +180,6 @@
                         Style="{StaticResource SecondaryButtonStyle}"
                         Click="ResetCategoryButton_Click"
                         Width="130"/>
-                <Button Content="❌ Close"
-                        Style="{StaticResource SecondaryButtonStyle}"
-                        Click="CloseButton_Click"
-                        Width="80"/>
             </StackPanel>
         </Border>
     </Grid>

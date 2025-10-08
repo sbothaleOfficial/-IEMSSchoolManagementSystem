@@ -297,7 +297,7 @@
       "version": "1.0.0",
       "restore": {
         "projectUniqueName": "C:\\Users\\SP\\Development\\IEMSSchoolManagementSystem\\IEMS.WPF\\IEMS.WPF.csproj",
-        "projectName": "IEMS.WPF",
+        "projectName": "IEMS",
         "projectPath": "C:\\Users\\SP\\Development\\IEMSSchoolManagementSystem\\IEMS.WPF\\IEMS.WPF.csproj",
         "packagesPath": "C:\\Users\\SP\\.nuget\\packages\\",
         "outputPath": "C:\\Users\\SP\\Development\\IEMSSchoolManagementSystem\\IEMS.WPF\\obj\\",
@@ -345,6 +345,10 @@
         "net8.0-windows7.0": {
           "targetAlias": "net8.0-windows",
           "dependencies": {
+            "ClosedXML": {
+              "target": "Package",
+              "version": "[0.105.0, )"
+            },
             "Microsoft.Extensions.DependencyInjection": {
               "target": "Package",
               "version": "[8.0.0, )"

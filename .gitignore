@@ -1,0 +1,102 @@
+## .NET Core
+bin/
+obj/
+*.user
+*.suo
+*.userprefs
+*.userosscache
+*.sln.docstates
+
+## Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.vscode/
+
+## Database files
+*.db
+*.db-shm
+*.db-wal
+school.db*
+
+## WPF temp files
+*_wpftmp.csproj
+*_wpftmp.AssemblyInfo.cs
+*_wpftmp.AssemblyInfoInputs.cache
+*_wpftmp.GeneratedMSBuildEditorConfig.editorconfig
+*_wpftmp.GlobalUsings.g.cs
+*_wpftmp.assets.cache
+
+## Rider
+.idea/
+*.sln.iml
+
+## User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+## Folder config file
+Desktop.ini
+
+## Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+## VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+## NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+
+## Test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+## Publish folders
+publish/
+publish_*/
+IEMS_Release_Package/
+
+## Temporary files
+*.tmp
+*.log
+*.bak
+*.swp
+*~
+nul
+
+## Backup files
+*_backup*
+*.backup
