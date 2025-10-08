@@ -539,6 +539,9 @@ public class ApplicationDbContext : DbContext
         );
 
         // SystemSettings seed data - Only Academic Year and Backup Settings
+        // FIXED BUG #10: Use portable path instead of hardcoded user-specific path
+        var defaultBackupPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "IEMS_Backups");
+
         modelBuilder.Entity<SystemSetting>().HasData(
             // Academic Settings
             new SystemSetting { Key = "Academic.CurrentYear", Value = "2024-25", Description = "Current academic year", Category = "Academic", DataType = "String", DefaultValue = "2024-25", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
@@ -546,7 +549,7 @@ public class ApplicationDbContext : DbContext
             // Backup Settings
             new SystemSetting { Key = "Backup.AutoBackupEnabled", Value = "true", Description = "Enable automatic backup", Category = "Backup", DataType = "Boolean", DefaultValue = "true", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
             new SystemSetting { Key = "Backup.RetentionDays", Value = "30", Description = "Days to retain backup files", Category = "Backup", DataType = "Integer", DefaultValue = "30", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
-            new SystemSetting { Key = "Backup.BackupPath", Value = "C:\\Users\\SP\\Documents\\IEMS_Backups", Description = "Default backup directory path", Category = "Backup", DataType = "DirectoryPath", DefaultValue = "", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
+            new SystemSetting { Key = "Backup.BackupPath", Value = defaultBackupPath, Description = "Default backup directory path", Category = "Backup", DataType = "DirectoryPath", DefaultValue = defaultBackupPath, IsReadOnly = false, CreatedAt = DateTime.UtcNow },
 
             // School Information Settings
             new SystemSetting { Key = "School.ManagementName", Value = "Mahalakmi Bahuddeshiy Sanstha, Chikhalgaon", Description = "Name of school management organization", Category = "School", DataType = "String", DefaultValue = "Mahalakmi Bahuddeshiy Sanstha, Chikhalgaon", IsReadOnly = false, CreatedAt = DateTime.UtcNow },

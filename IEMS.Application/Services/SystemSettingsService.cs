@@ -78,14 +78,20 @@ namespace IEMS.Application.Services
 
                 return (T)Convert.ChangeType(value, typeof(T), CultureInfo.InvariantCulture);
             }
-            catch
+            catch (Exception ex)
             {
+                // FIXED BUG #4: Log exception details to help diagnose type conversion and database issues
+                System.Diagnostics.Debug.WriteLine($"Error converting setting '{key}' to type {typeof(T).Name}: {ex.Message}");
                 return default(T);
             }
         }
 
         public async Task<bool> UpdateSettingAsync(string key, string value)
         {
+            // FIXED BUG #13: Validate key parameter to prevent ArgumentException
+            if (string.IsNullOrWhiteSpace(key))
+                return false;
+
             var setting = await GetSettingAsync(key);
             if (setting == null || setting.IsReadOnly)
                 return false;
@@ -107,6 +113,9 @@ namespace IEMS.Application.Services
 
         public async Task<bool> UpdateSettingsAsync(IEnumerable<SystemSetting> settings)
         {
+            // FIXED BUG #1: Add transaction management to ensure data integrity
+            // If any part of the update fails, all changes are rolled back
+            using var transaction = await _context.Database.BeginTransactionAsync();
             try
             {
                 // Fetch all settings to update in one query to avoid N+1 problem
@@ -128,10 +137,12 @@ namespace IEMS.Application.Services
                 }
 
                 await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
                 return true;
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
                 System.Diagnostics.Debug.WriteLine($"Error updating settings: {ex.Message}\nStack Trace: {ex.StackTrace}");
                 return false;
             }
@@ -160,8 +171,10 @@ namespace IEMS.Application.Services
 
         public async Task<bool> ResetCategoryToDefaultAsync(string category)
         {
-            var settings = await GetSettingsByCategoryAsync(category);
-            var resettableSettings = settings.Where(s => !s.IsReadOnly && !string.IsNullOrEmpty(s.DefaultValue));
+            // FIXED BUG #12: Query database with filters instead of loading all and filtering in memory
+            var resettableSettings = await _context.SystemSettings
+                .Where(s => s.Category == category && !s.IsReadOnly && s.DefaultValue != null && s.DefaultValue != "")
+                .ToListAsync();
 
             if (!resettableSettings.Any())
                 return false;
@@ -186,8 +199,10 @@ namespace IEMS.Application.Services
 
         public async Task<bool> ResetAllToDefaultAsync()
         {
-            var settings = await GetAllSettingsAsync();
-            var resettableSettings = settings.Where(s => !s.IsReadOnly && !string.IsNullOrEmpty(s.DefaultValue));
+            // FIXED BUG #12: Query database with filters instead of loading all and filtering in memory
+            var resettableSettings = await _context.SystemSettings
+                .Where(s => !s.IsReadOnly && s.DefaultValue != null && s.DefaultValue != "")
+                .ToListAsync();
 
             if (!resettableSettings.Any())
                 return false;

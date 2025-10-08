@@ -11,6 +11,7 @@ namespace IEMS.WPF
         private readonly ISystemSettingsService _systemSettingsService;
         private List<SystemSetting> _currentSettings = new();
         private readonly Dictionary<string, Control> _settingControls = new();
+        private bool _isBusy = false;  // FIXED BUG #7: Prevent race condition between save and category change
 
         public SystemSettingsWindow()
         {
@@ -58,7 +59,7 @@ namespace IEMS.WPF
                     _currentSettings = (await _systemSettingsService.GetSettingsByCategoryAsync(category)).ToList();
                 }
 
-                await BuildSettingsUIAsync();
+                await BuildSettingsUI();  // Updated method name
             }
             catch (Exception ex)
             {
@@ -66,19 +67,38 @@ namespace IEMS.WPF
             }
         }
 
-        private async Task BuildSettingsUIAsync()
+        // FIXED BUG #5, #14: Removed async keyword as method doesn't perform async work
+        // Method still returns Task for consistency with async callers
+        private Task BuildSettingsUI()
         {
             SettingsPanel.Children.Clear();
             _settingControls.Clear();
+
+            // FIXED BUG #11: Handle empty settings list with user-friendly message
+            if (!_currentSettings.Any())
+            {
+                var emptyMessage = new TextBlock
+                {
+                    Text = "No settings available for this category.",
+                    FontSize = 16,
+                    Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Gray),
+                    Margin = new Thickness(20),
+                    TextAlignment = TextAlignment.Center
+                };
+                SettingsPanel.Children.Add(emptyMessage);
+                return Task.CompletedTask;
+            }
 
             var settingsByCategory = _currentSettings.GroupBy(s => s.Category);
 
             foreach (var categoryGroup in settingsByCategory.OrderBy(g => g.Key))
             {
                 // Category Header
+                // FIXED BUG #8: Use TryFindResource instead of FindResource to prevent exceptions
+                var cardStyle = TryFindResource("CardStyle") as Style;
                 var categoryBorder = new Border
                 {
-                    Style = (Style)FindResource("CardStyle"),
+                    Style = cardStyle,
                     Margin = new Thickness(0, 10, 0, 5)
                 };
 
@@ -104,6 +124,8 @@ namespace IEMS.WPF
                 categoryBorder.Child = categoryPanel;
                 SettingsPanel.Children.Add(categoryBorder);
             }
+
+            return Task.CompletedTask;
         }
 
         private StackPanel CreateSettingControl(SystemSetting setting)
@@ -163,12 +185,16 @@ namespace IEMS.WPF
         {
             Control control;
 
+            // FIXED BUG #8: Use TryFindResource instead of FindResource to prevent exceptions
+            var checkBoxStyle = TryFindResource("ModernCheckBoxStyle") as Style;
+            var textBoxStyle = TryFindResource("ModernTextBoxStyle") as Style;
+
             switch (setting.DataType.ToLower())
             {
                 case "boolean":
                     var checkBox = new CheckBox
                     {
-                        Style = (Style)FindResource("ModernCheckBoxStyle"),
+                        Style = checkBoxStyle,
                         IsChecked = bool.TryParse(setting.Value, out bool boolValue) && boolValue,
                         IsEnabled = !setting.IsReadOnly
                     };
@@ -179,7 +205,7 @@ namespace IEMS.WPF
                 case "decimal":
                     var numberBox = new TextBox
                     {
-                        Style = (Style)FindResource("ModernTextBoxStyle"),
+                        Style = textBoxStyle,
                         Text = setting.Value,
                         IsEnabled = !setting.IsReadOnly,
                         Width = 200,
@@ -192,7 +218,7 @@ namespace IEMS.WPF
                 case "directorypath":
                     var pathBox = new TextBox
                     {
-                        Style = (Style)FindResource("ModernTextBoxStyle"),
+                        Style = textBoxStyle,
                         Text = setting.Value,
                         IsEnabled = !setting.IsReadOnly,
                         Width = 400,
@@ -206,7 +232,7 @@ namespace IEMS.WPF
                 default: // String and others
                     var textBox = new TextBox
                     {
-                        Style = (Style)FindResource("ModernTextBoxStyle"),
+                        Style = textBoxStyle,
                         Text = setting.Value,
                         IsEnabled = !setting.IsReadOnly,
                         Width = 400,
@@ -221,14 +247,35 @@ namespace IEMS.WPF
 
         private async void CategoryComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (CategoryComboBox.SelectedItem is string selectedCategory)
+            // FIXED BUG #2: Add try-catch to prevent unhandled exception crashes
+            // This prevents application crashes if LoadSettingsAsync fails
+            try
             {
-                await LoadSettingsAsync(selectedCategory == "All Categories" ? null : selectedCategory);
+                if (_systemSettingsService == null) return;  // FIXED BUG #9: Guard against early firing
+                if (_isBusy) return;  // FIXED BUG #7: Don't allow category changes during save
+
+                if (CategoryComboBox.SelectedItem is string selectedCategory)
+                {
+                    await LoadSettingsAsync(selectedCategory == "All Categories" ? null : selectedCategory);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading settings: {ex.Message}", "Error",
+                              MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            // FIXED BUG #7: Prevent race condition with category changes during save
+            if (_isBusy) return;
+            _isBusy = true;
+
+            // Disable UI controls during save operation
+            SaveButton.IsEnabled = false;
+            CategoryComboBox.IsEnabled = false;
+
             try
             {
                 var updatedSettings = new List<SystemSetting>();
@@ -295,6 +342,13 @@ namespace IEMS.WPF
                 MessageBox.Show($"Error saving settings: {ex.Message}", "Error",
                               MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            finally
+            {
+                // Re-enable UI controls after save completes
+                SaveButton.IsEnabled = true;
+                CategoryComboBox.IsEnabled = true;
+                _isBusy = false;
+            }
         }
 
         private string GetControlValue(Control control, string dataType)
@@ -318,9 +372,22 @@ namespace IEMS.WPF
             switch (dataType.ToLower())
             {
                 case "integer":
-                    if (!int.TryParse(value, out _))
+                    if (!int.TryParse(value, out int intValue))
                     {
                         return (false, $"{settingKey.Split('.').Last()}: Must be a valid integer number");
+                    }
+
+                    // FIXED BUG #6: Add range validation for specific integer settings
+                    if (settingKey == "Backup.RetentionDays")
+                    {
+                        if (intValue < 1)
+                        {
+                            return (false, $"{settingKey.Split('.').Last()}: Must be at least 1 day");
+                        }
+                        if (intValue > 3650)
+                        {
+                            return (false, $"{settingKey.Split('.').Last()}: Cannot exceed 3650 days (10 years)");
+                        }
                     }
                     break;
 
@@ -347,10 +414,30 @@ namespace IEMS.WPF
                     break;
 
                 case "directorypath":
-                    // Optional: Validate directory path format
-                    if (!string.IsNullOrEmpty(value) && value.IndexOfAny(System.IO.Path.GetInvalidPathChars()) >= 0)
+                    // FIXED BUG #3: Comprehensive directory path validation to prevent backup failures
+                    if (!string.IsNullOrWhiteSpace(value))
                     {
-                        return (false, $"{settingKey.Split('.').Last()}: Contains invalid path characters");
+                        // Check for invalid path characters
+                        if (value.IndexOfAny(System.IO.Path.GetInvalidPathChars()) >= 0)
+                        {
+                            return (false, $"{settingKey.Split('.').Last()}: Contains invalid path characters");
+                        }
+
+                        // Check if path is absolute (rooted)
+                        if (!System.IO.Path.IsPathRooted(value))
+                        {
+                            return (false, $"{settingKey.Split('.').Last()}: Path must be absolute (e.g., C:\\Backups)");
+                        }
+
+                        // Try to create directory if it doesn't exist (validates write access)
+                        try
+                        {
+                            System.IO.Directory.CreateDirectory(value);
+                        }
+                        catch (Exception ex)
+                        {
+                            return (false, $"{settingKey.Split('.').Last()}: Cannot access or create directory - {ex.Message}");
+                        }
                     }
                     break;
             }

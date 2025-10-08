@@ -172,7 +172,8 @@
         <!-- Footer -->
         <Border Grid.Row="2" Background="White" BorderBrush="#E0E0E0" BorderThickness="0,1,0,0" Padding="20">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="💾 Save All Changes"
+                <Button x:Name="SaveButton"
+                        Content="💾 Save All Changes"
                         Style="{StaticResource SuccessButtonStyle}"
                         Click="SaveButton_Click"
                         Width="150"/>
