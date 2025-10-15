@@ -75,29 +75,32 @@
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="Actions" Width="*">
+                            <DataGridTemplateColumn Header="Actions" Width="250">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Button Content="✏️ Edit"
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="5,0">
+                                            <Button Content="✏️"
                                                     Style="{StaticResource PrimaryButtonStyle}"
                                                     Click="BtnEdit_Click"
                                                     Tag="{Binding}"
-                                                    Width="70" Height="28" Margin="2"
-                                                    FontSize="11" Padding="5,3"/>
-                                            <Button Content="⭐ Set Current"
+                                                    Width="32" Height="28" Margin="0,0,5,0"
+                                                    FontSize="13" Padding="0"
+                                                    ToolTip="Edit Academic Year"/>
+                                            <Button Content="⭐"
                                                     Style="{StaticResource WarningButtonStyle}"
                                                     Click="BtnSetCurrent_Click"
                                                     Tag="{Binding}"
-                                                    Width="90" Height="28" Margin="2"
-                                                    FontSize="11" Padding="5,3"
+                                                    Width="32" Height="28" Margin="0,0,5,0"
+                                                    FontSize="13" Padding="0"
+                                                    ToolTip="Set as Current Year"
                                                     Visibility="{Binding IsCurrent, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                                            <Button Content="🗑️ Delete"
+                                            <Button Content="🗑️"
                                                     Style="{StaticResource DangerButtonStyle}"
                                                     Click="BtnDelete_Click"
                                                     Tag="{Binding}"
-                                                    Width="70" Height="28" Margin="2"
-                                                    FontSize="11" Padding="5,3"/>
+                                                    Width="32" Height="28" Margin="0,0,5,0"
+                                                    FontSize="13" Padding="0"
+                                                    ToolTip="Delete Academic Year"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
@@ -163,16 +166,24 @@
                             </Border>
 
                             <!-- Action Buttons -->
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Margin="0,10,0,0">
-                                <Button x:Name="btnSave" Content="💾 Save"
+                            <Grid Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="btnSave" Grid.Column="0"
+                                        Content="💾 Save"
                                         Style="{StaticResource SuccessButtonStyle}"
                                         Click="BtnSave_Click"
-                                        Width="120" Margin="0,0,10,0"/>
-                                <Button x:Name="btnCancel" Content="❌ Cancel"
+                                        Height="36" Margin="0,0,5,0"
+                                        FontSize="13"/>
+                                <Button x:Name="btnCancel" Grid.Column="1"
+                                        Content="❌ Cancel"
                                         Style="{StaticResource SecondaryButtonStyle}"
                                         Click="BtnCancel_Click"
-                                        Width="100"/>
-                            </StackPanel>
+                                        Height="36" Margin="5,0,0,0"
+                                        FontSize="13"/>
+                            </Grid>
 
                             <!-- Info Panel -->
                             <Border Background="{StaticResource InfoLightBrush}"

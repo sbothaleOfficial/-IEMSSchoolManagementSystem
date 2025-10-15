@@ -229,3 +229,5 @@ C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-w
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\ref\IEMS.dll
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\ColumnPickerDialog.baml
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\ColumnPickerDialog.g.cs
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\AcademicYearManagementWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Release\net8.0-windows\AcademicYearManagementWindow.g.cs
