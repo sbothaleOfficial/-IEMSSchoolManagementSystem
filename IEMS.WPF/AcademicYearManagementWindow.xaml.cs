@@ -269,7 +269,7 @@ namespace IEMS.WPF
 
         private void BtnEdit_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.Tag is AcademicYearDto academicYear)
+            if (dgAcademicYears.SelectedItem is AcademicYearDto academicYear)
             {
                 EditAcademicYear(academicYear);
             }
@@ -289,7 +289,7 @@ namespace IEMS.WPF
 
         private void BtnSetCurrent_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.Tag is AcademicYearDto academicYear)
+            if (dgAcademicYears.SelectedItem is AcademicYearDto academicYear)
             {
                 var result = MessageBox.Show(
                     $"Set '{academicYear.Year}' as the current academic year?\n\n" +
@@ -327,7 +327,7 @@ namespace IEMS.WPF
 
         private void BtnDelete_Click(object sender, RoutedEventArgs e)
         {
-            if (sender is Button btn && btn.Tag is AcademicYearDto academicYear)
+            if (dgAcademicYears.SelectedItem is AcademicYearDto academicYear)
             {
                 if (academicYear.IsCurrent)
                 {
@@ -374,7 +374,15 @@ namespace IEMS.WPF
 
         private void DgAcademicYears_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            // Optional: Could auto-populate form on selection
+            var selectedYear = dgAcademicYears.SelectedItem as AcademicYearDto;
+            bool hasSelection = selectedYear != null;
+
+            // Enable/disable toolbar buttons based on selection
+            btnEdit.IsEnabled = hasSelection;
+            btnDelete.IsEnabled = hasSelection;
+
+            // Set Current button only enabled if selection exists and is not already current
+            btnSetCurrent.IsEnabled = hasSelection && selectedYear?.IsCurrent == false;
         }
 
         private void DgAcademicYears_MouseDoubleClick(object sender, MouseButtonEventArgs e)

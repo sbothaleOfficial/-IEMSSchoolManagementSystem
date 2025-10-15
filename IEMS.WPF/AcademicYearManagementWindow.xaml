@@ -45,6 +45,21 @@
                                 Style="{StaticResource SuccessButtonStyle}"
                                 Click="BtnAdd_Click"
                                 Width="150" Margin="0,0,10,0"/>
+                        <Button x:Name="btnEdit" Content="✏️ Edit"
+                                Style="{StaticResource PrimaryButtonStyle}"
+                                Click="BtnEdit_Click"
+                                Width="100" Margin="0,0,10,0"
+                                IsEnabled="False"/>
+                        <Button x:Name="btnDelete" Content="🗑️ Delete"
+                                Style="{StaticResource DangerButtonStyle}"
+                                Click="BtnDelete_Click"
+                                Width="100" Margin="0,0,10,0"
+                                IsEnabled="False"/>
+                        <Button x:Name="btnSetCurrent" Content="⭐ Set Current"
+                                Style="{StaticResource WarningButtonStyle}"
+                                Click="BtnSetCurrent_Click"
+                                Width="130" Margin="0,0,10,0"
+                                IsEnabled="False"/>
                         <Button x:Name="btnRefresh" Content="🔄 Refresh"
                                 Style="{StaticResource SecondaryButtonStyle}"
                                 Click="BtnRefresh_Click"
@@ -58,10 +73,10 @@
                               SelectionChanged="DgAcademicYears_SelectionChanged"
                               MouseDoubleClick="DgAcademicYears_MouseDoubleClick">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Year" Binding="{Binding Year}" Width="100"/>
-                            <DataGridTextColumn Header="Start Date" Binding="{Binding StartDate, StringFormat='{}{0:dd/MM/yyyy}'}" Width="120"/>
-                            <DataGridTextColumn Header="End Date" Binding="{Binding EndDate, StringFormat='{}{0:dd/MM/yyyy}'}" Width="120"/>
-                            <DataGridTemplateColumn Header="Status" Width="100">
+                            <DataGridTextColumn Header="Year" Binding="{Binding Year}" Width="120"/>
+                            <DataGridTextColumn Header="Start Date" Binding="{Binding StartDate, StringFormat='{}{0:dd/MM/yyyy}'}" Width="150"/>
+                            <DataGridTextColumn Header="End Date" Binding="{Binding EndDate, StringFormat='{}{0:dd/MM/yyyy}'}" Width="150"/>
+                            <DataGridTemplateColumn Header="Status" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border Background="{Binding IsCurrent, Converter={StaticResource CurrentStatusConverter}}"
@@ -72,36 +87,6 @@
                                                        FontWeight="SemiBold"
                                                        FontSize="11"/>
                                         </Border>
-                                    </DataTemplate>
-                                </DataGridTemplateColumn.CellTemplate>
-                            </DataGridTemplateColumn>
-                            <DataGridTemplateColumn Header="Actions" Width="250">
-                                <DataGridTemplateColumn.CellTemplate>
-                                    <DataTemplate>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Margin="5,0">
-                                            <Button Content="✏️"
-                                                    Style="{StaticResource PrimaryButtonStyle}"
-                                                    Click="BtnEdit_Click"
-                                                    Tag="{Binding}"
-                                                    Width="32" Height="28" Margin="0,0,5,0"
-                                                    FontSize="13" Padding="0"
-                                                    ToolTip="Edit Academic Year"/>
-                                            <Button Content="🗑️"
-                                                    Style="{StaticResource DangerButtonStyle}"
-                                                    Click="BtnDelete_Click"
-                                                    Tag="{Binding}"
-                                                    Width="32" Height="28" Margin="0,0,5,0"
-                                                    FontSize="13" Padding="0"
-                                                    ToolTip="Delete Academic Year"/>
-                                            <Button Content="⭐"
-                                                    Style="{StaticResource WarningButtonStyle}"
-                                                    Click="BtnSetCurrent_Click"
-                                                    Tag="{Binding}"
-                                                    Width="32" Height="28" Margin="0,0,5,0"
-                                                    FontSize="13" Padding="0"
-                                                    ToolTip="Set as Current Year"
-                                                    Visibility="{Binding IsCurrent, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                                        </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
