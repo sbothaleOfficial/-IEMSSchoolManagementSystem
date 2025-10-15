@@ -86,6 +86,13 @@
                                                     Width="32" Height="28" Margin="0,0,5,0"
                                                     FontSize="13" Padding="0"
                                                     ToolTip="Edit Academic Year"/>
+                                            <Button Content="🗑️"
+                                                    Style="{StaticResource DangerButtonStyle}"
+                                                    Click="BtnDelete_Click"
+                                                    Tag="{Binding}"
+                                                    Width="32" Height="28" Margin="0,0,5,0"
+                                                    FontSize="13" Padding="0"
+                                                    ToolTip="Delete Academic Year"/>
                                             <Button Content="⭐"
                                                     Style="{StaticResource WarningButtonStyle}"
                                                     Click="BtnSetCurrent_Click"
@@ -94,13 +101,6 @@
                                                     FontSize="13" Padding="0"
                                                     ToolTip="Set as Current Year"
                                                     Visibility="{Binding IsCurrent, Converter={StaticResource InverseBooleanToVisibilityConverter}}"/>
-                                            <Button Content="🗑️"
-                                                    Style="{StaticResource DangerButtonStyle}"
-                                                    Click="BtnDelete_Click"
-                                                    Tag="{Binding}"
-                                                    Width="32" Height="28" Margin="0,0,5,0"
-                                                    FontSize="13" Padding="0"
-                                                    ToolTip="Delete Academic Year"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
