@@ -1,3 +1,5 @@
+using System;
+
 namespace IEMS.Core.Entities;
 
 public class Student
@@ -22,6 +24,15 @@ public class Student
     public string CityVillage { get; set; } = string.Empty;
     public string ParentMobileNumber { get; set; } = string.Empty;
     public string? AadhaarNumber { get; set; }
+
+    // NEW: Foreign key to AcademicYear table for admission year
+    public int? AdmissionAcademicYearId { get; set; }
+    public virtual AcademicYear? AdmissionAcademicYear { get; set; }
+
+    // DEPRECATED: Legacy string field
+    [Obsolete("Use AdmissionAcademicYearId instead. This field will be removed in a future version.")]
+    public string? AdmissionAcademicYearString { get; set; }
+
     public int ClassId { get; set; }
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

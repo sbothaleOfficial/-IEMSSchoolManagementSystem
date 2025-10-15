@@ -25,6 +25,7 @@ namespace IEMS.WPF
         private readonly TransportExpenseService _transportExpenseService;
         private readonly TeacherService _teacherService;
         private readonly StaffService _staffService;
+        private readonly AcademicYearService _academicYearService;
         private List<FeePaymentDto> _allFeePayments = new();
         private List<ClassDto> _allClasses = new();
         private string _currentAcademicYear = DateTime.Now.Year.ToString() + "-" + (DateTime.Now.Year + 1).ToString().Substring(2);
@@ -34,7 +35,7 @@ namespace IEMS.WPF
         private ObservableCollection<ElectricityBillDto> _electricityBills = new();
         private ObservableCollection<OtherExpenseDto> _otherExpenses = new();
 
-        public FinanceManagementWindow(FeePaymentService feePaymentService, ClassService classService, StudentService studentService, FeeStructureService feeStructureService, ElectricityBillService electricityBillService, OtherExpenseService otherExpenseService, TransportExpenseService transportExpenseService, TeacherService teacherService, StaffService staffService)
+        public FinanceManagementWindow(FeePaymentService feePaymentService, ClassService classService, StudentService studentService, FeeStructureService feeStructureService, ElectricityBillService electricityBillService, OtherExpenseService otherExpenseService, TransportExpenseService transportExpenseService, TeacherService teacherService, StaffService staffService, AcademicYearService academicYearService)
         {
             InitializeComponent();
             _feePaymentService = feePaymentService;
@@ -46,6 +47,7 @@ namespace IEMS.WPF
             _transportExpenseService = transportExpenseService;
             _teacherService = teacherService;
             _staffService = staffService;
+            _academicYearService = academicYearService;
             Loaded += Window_Loaded;
         }
 
@@ -78,19 +80,43 @@ namespace IEMS.WPF
             }, "Finance Management Window Loading Error");
         }
 
-        private void InitializeAcademicYears()
+        private async void InitializeAcademicYears()
         {
-            var currentYear = DateTime.Now.Year;
-            var academicYears = new List<string>();
-
-            for (int i = -2; i <= 1; i++)
+            try
             {
-                var year = currentYear + i;
-                academicYears.Add($"{year}-{(year + 1).ToString().Substring(2)}");
-            }
+                // Load academic years from database
+                var academicYears = await _academicYearService.GetAllAcademicYearsAsync();
+                var yearsList = academicYears.OrderByDescending(ay => ay.StartDate).Select(ay => ay.Year).ToList();
 
-            cmbAcademicYear.ItemsSource = academicYears;
-            cmbAcademicYear.SelectedItem = _currentAcademicYear;
+                cmbAcademicYear.ItemsSource = yearsList;
+
+                // Select current academic year
+                var currentYear = academicYears.FirstOrDefault(ay => ay.IsCurrent);
+                if (currentYear != null)
+                {
+                    _currentAcademicYear = currentYear.Year;
+                    cmbAcademicYear.SelectedItem = _currentAcademicYear;
+                }
+                else if (yearsList.Any())
+                {
+                    cmbAcademicYear.SelectedIndex = 0;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading academic years: {ex.Message}\n\nUsing fallback years.", "Warning", MessageBoxButton.OK, MessageBoxImage.Warning);
+
+                // Fallback: Generate current and next year dynamically
+                var currentYear = DateTime.Now.Year;
+                var fallbackYears = new List<string>
+                {
+                    $"{currentYear}-{(currentYear + 1).ToString().Substring(2)}",
+                    $"{currentYear + 1}-{(currentYear + 2).ToString().Substring(2)}",
+                    $"{currentYear - 1}-{currentYear.ToString().Substring(2)}"
+                };
+                cmbAcademicYear.ItemsSource = fallbackYears;
+                cmbAcademicYear.SelectedIndex = 0;
+            }
         }
 
         private async Task LoadClasses()

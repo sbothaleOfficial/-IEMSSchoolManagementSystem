@@ -135,7 +135,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            var financeWindow = new FinanceManagementWindow(_feePaymentService, _classService, _studentService, _feeStructureService, _electricityBillService, _otherExpenseService, _transportExpenseService, _teacherService, _staffService);
+            var financeWindow = new FinanceManagementWindow(_feePaymentService, _classService, _studentService, _feeStructureService, _electricityBillService, _otherExpenseService, _transportExpenseService, _teacherService, _staffService, _academicYearService);
             financeWindow.ShowDialog();
             lblStatus.Text = "Finance Management module accessed";
         }
@@ -188,6 +188,21 @@ public partial class MainWindow : Window
         {
             MessageBox.Show($"Error opening User Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             lblStatus.Text = "Error opening User Management";
+        }
+    }
+
+    private void BtnAcademicYearManagement_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var academicYearWindow = new AcademicYearManagementWindow(_academicYearService);
+            academicYearWindow.ShowDialog();
+            lblStatus.Text = "Academic Year Management module accessed";
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Error opening Academic Year Management: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            lblStatus.Text = "Error opening Academic Year Management";
         }
     }
 

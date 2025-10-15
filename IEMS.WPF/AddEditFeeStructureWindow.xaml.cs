@@ -15,14 +15,16 @@ namespace IEMS.WPF
     {
         private readonly FeeStructureService _feeStructureService;
         private readonly ClassService _classService;
+        private readonly AcademicYearService _academicYearService;
         private int? _feeStructureId;
         private FeeStructureDto? _currentFeeStructure;
 
-        public AddEditFeeStructureWindow(FeeStructureService feeStructureService, ClassService classService)
+        public AddEditFeeStructureWindow(FeeStructureService feeStructureService, ClassService classService, AcademicYearService academicYearService)
         {
             InitializeComponent();
             _feeStructureService = feeStructureService;
             _classService = classService;
+            _academicYearService = academicYearService;
             Loaded += Window_Loaded;
         }
 
@@ -32,25 +34,42 @@ namespace IEMS.WPF
             {
                 try
                 {
-                    // Initialize Academic Year dropdown
-                    var currentYear = DateTime.Now.Year;
-                    var currentMonth = DateTime.Now.Month;
-
-                    // If month is after June, current academic year is current-next
-                    // Otherwise, it's previous-current
-                    var academicYears = new List<string>();
-                    for (int i = -2; i <= 2; i++)
+                    // Initialize Academic Year dropdown from database
+                    try
                     {
-                        var year = currentYear + i;
-                        academicYears.Add($"{year}-{(year + 1).ToString().Substring(2)}");
-                    }
-                    cmbAcademicYear.ItemsSource = academicYears;
+                        var academicYears = await _academicYearService.GetAllAcademicYearsAsync();
+                        var yearsList = academicYears.OrderByDescending(ay => ay.StartDate).Select(ay => ay.Year).ToList();
+                        cmbAcademicYear.ItemsSource = yearsList;
 
-                    // Select current academic year by default
-                    if (currentMonth >= 6)
-                        cmbAcademicYear.SelectedItem = $"{currentYear}-{(currentYear + 1).ToString().Substring(2)}";
-                    else
-                        cmbAcademicYear.SelectedItem = $"{currentYear - 1}-{currentYear.ToString().Substring(2)}";
+                        // Select current academic year by default
+                        var currentAcademicYear = academicYears.FirstOrDefault(ay => ay.IsCurrent);
+                        if (currentAcademicYear != null)
+                        {
+                            cmbAcademicYear.SelectedItem = currentAcademicYear.Year;
+                        }
+                        else if (yearsList.Any())
+                        {
+                            cmbAcademicYear.SelectedIndex = 0;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Fallback: Generate years dynamically if database loading fails
+                        var currentYear = DateTime.Now.Year;
+                        var currentMonth = DateTime.Now.Month;
+                        var academicYears = new List<string>();
+                        for (int i = -2; i <= 2; i++)
+                        {
+                            var year = currentYear + i;
+                            academicYears.Add($"{year}-{(year + 1).ToString().Substring(2)}");
+                        }
+                        cmbAcademicYear.ItemsSource = academicYears;
+
+                        if (currentMonth >= 6)
+                            cmbAcademicYear.SelectedItem = $"{currentYear}-{(currentYear + 1).ToString().Substring(2)}";
+                        else
+                            cmbAcademicYear.SelectedItem = $"{currentYear - 1}-{currentYear.ToString().Substring(2)}";
+                    }
 
                     // Load classes
                     var classes = await _classService.GetAllClassesAsync();

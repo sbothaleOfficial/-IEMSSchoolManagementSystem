@@ -62,12 +62,29 @@ public class FeePaymentRepository : IFeePaymentRepository
             .ToListAsync();
     }
 
+    // NEW: Methods using AcademicYearId foreign key
+    public async Task<IEnumerable<FeePayment>> GetByAcademicYearIdAsync(int academicYearId)
+    {
+        return await _context.FeePayments
+            .Include(fp => fp.Student)
+                .ThenInclude(s => s.Class)
+            .Include(fp => fp.AcademicYear)
+            .Where(fp => fp.AcademicYearId == academicYearId)
+            .OrderByDescending(fp => fp.PaymentDate)
+            .ToListAsync();
+    }
+
+    // DEPRECATED: String-based methods kept for backward compatibility during migration
+    [Obsolete("Use GetByAcademicYearIdAsync instead. This method will be removed in a future version.")]
     public async Task<IEnumerable<FeePayment>> GetByAcademicYearAsync(string academicYear)
     {
         return await _context.FeePayments
             .Include(fp => fp.Student)
                 .ThenInclude(s => s.Class)
-            .Where(fp => fp.AcademicYear == academicYear)
+            .Include(fp => fp.AcademicYear)
+#pragma warning disable CS0618 // Type or member is obsolete
+            .Where(fp => fp.AcademicYearString == academicYear)
+#pragma warning restore CS0618 // Type or member is obsolete
             .OrderByDescending(fp => fp.PaymentDate)
             .ToListAsync();
     }

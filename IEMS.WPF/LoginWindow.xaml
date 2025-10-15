@@ -140,12 +140,23 @@
                                    Visibility="Collapsed" Margin="0,0,0,20"/>
 
                         <!-- Additional Options -->
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <TextBlock Text="Need help? " FontSize="12"
-                                       Foreground="{StaticResource TextSecondaryBrush}"/>
-                            <TextBlock Text="Contact Administrator" FontSize="12"
+                        <StackPanel HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <TextBlock Text="Need help? " FontSize="12"
+                                           Foreground="{StaticResource TextSecondaryBrush}"/>
+                                <TextBlock Text="Contact Administrator" FontSize="12"
+                                           Foreground="{StaticResource PrimaryBrush}"
+                                           FontWeight="SemiBold"/>
+                            </StackPanel>
+                            <TextBlock x:Name="txtAdminContact"
+                                       Text="Suraj Bothale: +91 6361986696"
+                                       FontSize="11"
                                        Foreground="{StaticResource PrimaryBrush}"
-                                       TextDecorations="Underline" Cursor="Hand"/>
+                                       TextDecorations="Underline"
+                                       Cursor="Hand"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,5,0,0"
+                                       MouseLeftButtonDown="TxtAdminContact_Click"/>
                         </StackPanel>
 
                     </StackPanel>

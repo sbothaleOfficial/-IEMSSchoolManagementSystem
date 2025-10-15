@@ -19,14 +19,16 @@ namespace IEMS.WPF
     {
         private readonly FeeStructureService _feeStructureService;
         private readonly ClassService _classService;
+        private readonly AcademicYearService _academicYearService;
         private List<FeeStructureDto> _allFeeStructures = new();
         private List<ClassDto> _allClasses = new();
 
-        public FeeStructureManagementWindow(FeeStructureService feeStructureService, ClassService classService)
+        public FeeStructureManagementWindow(FeeStructureService feeStructureService, ClassService classService, AcademicYearService academicYearService)
         {
             InitializeComponent();
             _feeStructureService = feeStructureService;
             _classService = classService;
+            _academicYearService = academicYearService;
             Loaded += Window_Loaded;
         }
 
@@ -37,7 +39,7 @@ namespace IEMS.WPF
                 try
                 {
                     await LoadClasses();
-                    InitializeFilters();
+                    await InitializeFilters();
                     await LoadFeeStructures();
                     lblStatus.Text = "Fee Structure Management Ready";
                 }
@@ -54,18 +56,30 @@ namespace IEMS.WPF
             _allClasses = (await _classService.GetAllClassesAsync()).ToList();
         }
 
-        private void InitializeFilters()
+        private async Task InitializeFilters()
         {
-            // Initialize Academic Year dropdown
-            var currentYear = DateTime.Now.Year;
-            var academicYears = new List<string> { "All" };
-            for (int i = -2; i <= 2; i++)
+            // Initialize Academic Year dropdown from database
+            try
             {
-                var year = currentYear + i;
-                academicYears.Add($"{year}-{(year + 1).ToString().Substring(2)}");
+                var academicYears = await _academicYearService.GetAllAcademicYearsAsync();
+                var yearsList = new List<string> { "All" };
+                yearsList.AddRange(academicYears.OrderByDescending(ay => ay.StartDate).Select(ay => ay.Year));
+                cmbAcademicYear.ItemsSource = yearsList;
+                cmbAcademicYear.SelectedIndex = 0;
             }
-            cmbAcademicYear.ItemsSource = academicYears;
-            cmbAcademicYear.SelectedIndex = 0;
+            catch (Exception)
+            {
+                // Fallback: Generate years dynamically
+                var currentYear = DateTime.Now.Year;
+                var academicYears = new List<string> { "All" };
+                for (int i = -2; i <= 2; i++)
+                {
+                    var year = currentYear + i;
+                    academicYears.Add($"{year}-{(year + 1).ToString().Substring(2)}");
+                }
+                cmbAcademicYear.ItemsSource = academicYears;
+                cmbAcademicYear.SelectedIndex = 0;
+            }
 
             // Initialize Class dropdown
             var classItems = new List<dynamic> { new { Id = -1, Display = "All Classes" } };

@@ -40,8 +40,12 @@ namespace IEMS.Core.Services
         {
             try
             {
+                System.Diagnostics.Debug.WriteLine($"DEBUG PasswordHashingService: Verifying password (length: {password?.Length})");
+                System.Diagnostics.Debug.WriteLine($"DEBUG PasswordHashingService: HashedPassword length: {hashedPassword?.Length}");
+
                 // Get hash bytes
                 byte[] hashBytes = Convert.FromBase64String(hashedPassword);
+                System.Diagnostics.Debug.WriteLine($"DEBUG PasswordHashingService: Hash bytes length: {hashBytes.Length} (expected: {SaltSize + HashSize})");
 
                 // Extract salt
                 byte[] salt = new byte[SaltSize];
@@ -63,10 +67,12 @@ namespace IEMS.Core.Services
                     isValid &= (hashBytes[i + SaltSize] == hash[i]);
                 }
 
+                System.Diagnostics.Debug.WriteLine($"DEBUG PasswordHashingService: Verification result: {isValid}");
                 return isValid;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"DEBUG PasswordHashingService: Exception during verification: {ex.Message}");
                 return false;
             }
         }

@@ -3,6 +3,7 @@ using IEMS.Core.Interfaces;
 using IEMS.Core.Services;
 using IEMS.Core.Entities;
 using IEMS.Core.Configuration;
+using IEMS.Infrastructure.Data;
 
 namespace IEMS.Application.Services;
 
@@ -14,6 +15,7 @@ public class BulkPromotionService
     private readonly StudentPromotionService _promotionService;
     private readonly StudentEligibilityValidator _eligibilityValidator;
     private readonly ClassProgressionValidator _progressionValidator;
+    private readonly ApplicationDbContext _context;
 
     public BulkPromotionService(
         IStudentRepository studentRepository,
@@ -21,7 +23,8 @@ public class BulkPromotionService
         IFeePaymentRepository feePaymentRepository,
         StudentPromotionService promotionService,
         StudentEligibilityValidator eligibilityValidator,
-        ClassProgressionValidator progressionValidator)
+        ClassProgressionValidator progressionValidator,
+        ApplicationDbContext context)
     {
         _studentRepository = studentRepository;
         _classRepository = classRepository;
@@ -29,6 +32,7 @@ public class BulkPromotionService
         _promotionService = promotionService;
         _eligibilityValidator = eligibilityValidator;
         _progressionValidator = progressionValidator;
+        _context = context;
     }
 
     public async Task<List<StudentPromotionDto>> GetPromotionPreviewAsync(int fromClassId, int toClassId)
@@ -111,14 +115,35 @@ public class BulkPromotionService
             {
                 try
                 {
+                    // Get current username for audit (passed from UI layer)
+                    var promotedBy = request.PromotedBy ?? "System";
+
                     // Simple class update - no complex validations
                     foreach (var student in studentsToPromote)
                     {
+                        // Save promotion history
+                        var promotionHistory = new StudentPromotionHistory
+                        {
+                            StudentId = student.Id,
+                            StudentName = student.FullName,
+                            FromClassId = request.FromClassId,
+                            FromClassName = fromClass.Name,
+                            ToClassId = request.ToClassId,
+                            ToClassName = toClass.Name,
+                            AcademicYearId = request.AcademicYearId,
+                            PromotionDate = DateTime.UtcNow,
+                            PromotedBy = promotedBy,
+                            Remarks = request.Remarks
+                        };
+                        _context.StudentPromotionHistory.Add(promotionHistory);
+
+                        // Update student class
                         student.ClassId = request.ToClassId;
                         student.UpdatedAt = DateTime.UtcNow;
                     }
 
                     await _studentRepository.UpdateMultipleStudentsAsync(studentsToPromote);
+                    await _context.SaveChangesAsync(); // Save promotion history
                     result.PromotedStudents = studentsToPromote.Count;
                 }
                 catch (Exception ex)

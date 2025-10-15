@@ -229,3 +229,5 @@ C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-win
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\IEMS.pdb
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\IEMS.WPF.genruntimeconfig.cache
 C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\ref\IEMS.dll
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\AcademicYearManagementWindow.baml
+C:\Users\SP\Development\IEMSSchoolManagementSystem\IEMS.WPF\obj\Debug\net8.0-windows\AcademicYearManagementWindow.g.cs

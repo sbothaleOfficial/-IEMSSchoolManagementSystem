@@ -1,3 +1,4 @@
+using System;
 using IEMS.Core.Enums;
 
 namespace IEMS.Core.Entities;
@@ -21,7 +22,15 @@ public class FeePayment
     public decimal Discount { get; set; }
     public int? InstallmentNumber { get; set; }
     public DateTime? NextDueDate { get; set; }
-    public string AcademicYear { get; set; } = string.Empty;
+
+    // NEW: Foreign key to AcademicYear table
+    public int AcademicYearId { get; set; }
+    public virtual AcademicYear AcademicYear { get; set; } = null!;
+
+    // DEPRECATED: Legacy string field - will be removed in future migration
+    [Obsolete("Use AcademicYearId instead. This field will be removed in a future version.")]
+    public string? AcademicYearString { get; set; }
+
     public string GeneratedBy { get; set; } = string.Empty;
     public DateTime PaymentDate { get; set; } = DateTime.Now;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

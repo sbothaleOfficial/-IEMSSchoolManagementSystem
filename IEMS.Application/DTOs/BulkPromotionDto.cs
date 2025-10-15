@@ -1,12 +1,23 @@
+using System;
+
 namespace IEMS.Application.DTOs;
 
 public class BulkPromotionRequest
 {
     public int FromClassId { get; set; }
     public int ToClassId { get; set; }
-    public string AcademicYear { get; set; } = string.Empty;
+
+    // NEW: Foreign key to AcademicYear table
+    public int AcademicYearId { get; set; }
+
+    // DEPRECATED: Legacy string field (optional for backward compatibility)
+    [Obsolete("Use AcademicYearId instead. This field will be removed in a future version.")]
+    public string? AcademicYear { get; set; }
+
     public List<int> ExcludedStudentIds { get; set; } = new();
     public string Reason { get; set; } = string.Empty;
+    public string? PromotedBy { get; set; }
+    public string? Remarks { get; set; }
 }
 
 public class BulkPromotionResult
@@ -17,6 +28,13 @@ public class BulkPromotionResult
     public List<PromotionError> Errors { get; set; } = new();
     public bool IsSuccess => FailedPromotions == 0;
     public DateTime PromotionDate { get; set; }
+
+    // NEW: Foreign key to AcademicYear table
+    public int AcademicYearId { get; set; }
+    public string AcademicYearDisplay { get; set; } = string.Empty;
+
+    // DEPRECATED: Legacy string field
+    [Obsolete("Use AcademicYearId and AcademicYearDisplay instead. This field will be removed in a future version.")]
     public string AcademicYear { get; set; } = string.Empty;
 }
 

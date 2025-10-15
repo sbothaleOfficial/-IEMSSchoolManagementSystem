@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("IEMS.Application")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+51678af74ca1ed9bb0896e05b96dd36be1ff0a10")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3d7afe6b2bd1e12e39ee2ca1bcb3f125b066c69c")]
 [assembly: System.Reflection.AssemblyProductAttribute("IEMS.Application")]
 [assembly: System.Reflection.AssemblyTitleAttribute("IEMS.Application")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

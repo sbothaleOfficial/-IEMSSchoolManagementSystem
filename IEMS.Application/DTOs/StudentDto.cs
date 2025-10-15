@@ -1,3 +1,5 @@
+using System;
+
 namespace IEMS.Application.DTOs;
 
 public class StudentDto
@@ -14,6 +16,11 @@ public class StudentDto
     public string MotherName { get; set; } = string.Empty;
     public string StudentNumber { get; set; } = string.Empty;
     public DateTime AdmissionDate { get; set; }
+
+    // NEW: Foreign key to AcademicYear table for admission year (nullable)
+    public int? AdmissionAcademicYearId { get; set; }
+    public string? AdmissionAcademicYearDisplay { get; set; }
+
     public string CasteCategory { get; set; } = string.Empty;
     public string Religion { get; set; } = string.Empty;
     public bool IsBPL { get; set; }

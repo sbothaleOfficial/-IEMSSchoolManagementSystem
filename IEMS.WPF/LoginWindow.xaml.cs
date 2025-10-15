@@ -5,19 +5,32 @@ using System.Threading.Tasks;
 using IEMS.Application.Services;
 using IEMS.Core.Entities;
 using IEMS.Core.Services;
+using System.Diagnostics;
+using System.IO;
+using System.Text.Json;
 
 namespace IEMS.WPF
 {
     public partial class LoginWindow : Window
     {
         public static User? CurrentUser { get; internal set; }
+        private const string RememberMeFilePath = "remember_me.json";
 
         public LoginWindow()
         {
             InitializeComponent();
 
-            // Set focus to username field
-            Loaded += (s, e) => txtUsername.Focus();
+            // Load remembered username if exists
+            LoadRememberedCredentials();
+
+            // Set focus to appropriate field
+            Loaded += (s, e) =>
+            {
+                if (!string.IsNullOrEmpty(txtUsername.Text))
+                    txtPassword.Focus();
+                else
+                    txtUsername.Focus();
+            };
 
             // Handle Enter key press
             KeyDown += LoginWindow_KeyDown;
@@ -67,6 +80,9 @@ namespace IEMS.WPF
 
                 if (isAuthenticated)
                 {
+                    // Save username if "Remember me" is checked
+                    SaveRememberedCredentials(username, chkRememberMe.IsChecked == true);
+
                     // Authentication successful
                     try
                     {
@@ -138,7 +154,18 @@ namespace IEMS.WPF
                 using (var scope = App.ServiceProvider.CreateScope())
                 {
                     var userService = scope.ServiceProvider.GetRequiredService<UserService>();
+
+                    // Debug: Check if user exists
+                    var existingUser = await userService.GetByUsernameAsync(username);
+                    System.Diagnostics.Debug.WriteLine($"DEBUG: User lookup for '{username}': {(existingUser != null ? "Found" : "Not Found")}");
+                    if (existingUser != null)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"DEBUG: User IsActive: {existingUser.IsActive}");
+                        System.Diagnostics.Debug.WriteLine($"DEBUG: User PasswordHash: {existingUser.PasswordHash?.Substring(0, Math.Min(20, existingUser.PasswordHash.Length))}...");
+                    }
+
                     var user = await userService.AuthenticateAsync(username, password);
+                    System.Diagnostics.Debug.WriteLine($"DEBUG: Authentication result: {(user != null ? "Success" : "Failed")}");
 
                     if (user != null)
                     {
@@ -223,6 +250,38 @@ namespace IEMS.WPF
             btnLogin.IsEnabled = !show;
         }
 
+        private void TxtAdminContact_Click(object sender, MouseButtonEventArgs e)
+        {
+            try
+            {
+                // Open phone dialer with the contact number
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = "tel:+916361986696",
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                // If phone dialer doesn't work, try opening in default browser
+                try
+                {
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = "https://wa.me/916361986696",
+                        UseShellExecute = true
+                    });
+                }
+                catch
+                {
+                    MessageBox.Show("Contact Administrator:\nSuraj Bothale\n+91 6361986696",
+                                  "Administrator Contact",
+                                  MessageBoxButton.OK,
+                                  MessageBoxImage.Information);
+                }
+            }
+        }
+
         protected override void OnClosed(EventArgs e)
         {
             // If login window is closed without successful login (MainWindow not set or not visible), exit the application
@@ -232,6 +291,53 @@ namespace IEMS.WPF
                 System.Windows.Application.Current.Shutdown();
             }
             base.OnClosed(e);
+        }
+
+        private void LoadRememberedCredentials()
+        {
+            try
+            {
+                if (File.Exists(RememberMeFilePath))
+                {
+                    var json = File.ReadAllText(RememberMeFilePath);
+                    var data = JsonSerializer.Deserialize<RememberMeData>(json);
+
+                    if (data != null && data.RememberMe)
+                    {
+                        txtUsername.Text = data.Username ?? "";
+                        chkRememberMe.IsChecked = true;
+                    }
+                }
+            }
+            catch
+            {
+                // If loading fails, just ignore and start fresh
+            }
+        }
+
+        private void SaveRememberedCredentials(string username, bool rememberMe)
+        {
+            try
+            {
+                var data = new RememberMeData
+                {
+                    Username = rememberMe ? username : "",
+                    RememberMe = rememberMe
+                };
+
+                var json = JsonSerializer.Serialize(data);
+                File.WriteAllText(RememberMeFilePath, json);
+            }
+            catch
+            {
+                // If saving fails, just ignore - not critical
+            }
+        }
+
+        private class RememberMeData
+        {
+            public string? Username { get; set; }
+            public bool RememberMe { get; set; }
         }
     }
 }

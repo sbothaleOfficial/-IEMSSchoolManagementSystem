@@ -38,7 +38,8 @@ namespace IEMS.WPF
         {
             try
             {
-                var dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "school.db");
+                // FIXED BUG #1: Use Directory.GetCurrentDirectory() to match Entity Framework and BackupService
+                var dbPath = Path.Combine(Directory.GetCurrentDirectory(), "school.db");
                 if (File.Exists(dbPath))
                 {
                     var fileInfo = new FileInfo(dbPath);
@@ -320,7 +321,8 @@ namespace IEMS.WPF
                     ValidationFileDateText.Text = $"Backup date: {fileInfo.LastWriteTime:G}";
 
                     // Check if backup is older than current
-                    var currentDbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "school.db");
+                    // FIXED BUG #1: Use Directory.GetCurrentDirectory() to match Entity Framework and BackupService
+                    var currentDbPath = Path.Combine(Directory.GetCurrentDirectory(), "school.db");
                     if (File.Exists(currentDbPath))
                     {
                         var currentInfo = new FileInfo(currentDbPath);

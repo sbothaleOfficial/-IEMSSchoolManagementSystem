@@ -15,38 +15,43 @@ namespace IEMS.WPF
     {
         private readonly BulkPromotionService _bulkPromotionService;
         private readonly ClassService _classService;
+        private readonly AcademicYearService _academicYearService;
         private List<StudentPromotionViewModel> _currentPreview = new();
         private List<ClassDto> _allClasses = new();
 
-        public BulkPromotionWindow(BulkPromotionService bulkPromotionService, ClassService classService)
+        public BulkPromotionWindow(BulkPromotionService bulkPromotionService, ClassService classService, AcademicYearService academicYearService)
         {
             InitializeComponent();
             _bulkPromotionService = bulkPromotionService;
             _classService = classService;
+            _academicYearService = academicYearService;
             Loaded += Window_Loaded;
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             Console.WriteLine("=== BulkPromotionWindow.Window_Loaded() CALLED ===");
-            try
+            AsyncHelper.SafeFireAndForget(async () =>
             {
-                LoadInitialData();
-                lblStatus.Text = "Bulk Promotion Ready";
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error loading bulk promotion data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                lblStatus.Text = "Error loading data";
-            }
+                try
+                {
+                    await LoadInitialDataAsync();
+                    lblStatus.Text = "Bulk Promotion Ready";
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error loading bulk promotion data: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    lblStatus.Text = "Error loading data";
+                }
+            }, "Bulk Promotion Window Loading Error");
         }
 
-        private void LoadInitialData()
+        private async Task LoadInitialDataAsync()
         {
-            Console.WriteLine("=== SIMPLIFIED IMPLEMENTATION - LoadInitialData() ===");
+            Console.WriteLine("=== SIMPLIFIED IMPLEMENTATION - LoadInitialDataAsync() ===");
 
             // Just load academic years - no class dropdown complexity needed
-            LoadExtendedAcademicYears();
+            await LoadExtendedAcademicYearsAsync();
 
             // Set placeholder text for class inputs
             txtFromClass.Text = "";
@@ -56,42 +61,59 @@ namespace IEMS.WPF
         }
 
 
-        private void LoadExtendedAcademicYears()
+        private async Task LoadExtendedAcademicYearsAsync()
         {
-            var currentYear = DateTime.Now.Year;
-            var academicYears = new List<SimpleAcademicYear>();
-
-            // Add past 10 years
-            for (int i = 10; i >= 1; i--)
+            try
             {
-                var year = currentYear - i;
+                // Load from database
+                var academicYears = await _academicYearService.GetAllAcademicYearsAsync();
+                var yearsList = academicYears.OrderByDescending(ay => ay.StartDate).Select(ay => new SimpleAcademicYear
+                {
+                    Year = ay.Year,
+                    IsCurrent = ay.IsCurrent
+                }).ToList();
+
+                cmbAcademicYear.ItemsSource = yearsList;
+                cmbAcademicYear.SelectedItem = yearsList.FirstOrDefault(ay => ay.IsCurrent);
+            }
+            catch (Exception)
+            {
+                // Fallback: Generate years dynamically
+                var currentYear = DateTime.Now.Year;
+                var academicYears = new List<SimpleAcademicYear>();
+
+                // Add past 10 years
+                for (int i = 10; i >= 1; i--)
+                {
+                    var year = currentYear - i;
+                    academicYears.Add(new SimpleAcademicYear
+                    {
+                        Year = $"{year}-{(year + 1).ToString().Substring(2)}",
+                        IsCurrent = false
+                    });
+                }
+
+                // Add current year
                 academicYears.Add(new SimpleAcademicYear
                 {
-                    Year = year,
-                    IsCurrent = false
+                    Year = $"{currentYear}-{(currentYear + 1).ToString().Substring(2)}",
+                    IsCurrent = true
                 });
-            }
 
-            // Add current year
-            academicYears.Add(new SimpleAcademicYear
-            {
-                Year = currentYear,
-                IsCurrent = true
-            });
-
-            // Add future 40 years
-            for (int i = 1; i <= 40; i++)
-            {
-                var year = currentYear + i;
-                academicYears.Add(new SimpleAcademicYear
+                // Add future 5 years
+                for (int i = 1; i <= 5; i++)
                 {
-                    Year = year,
-                    IsCurrent = false
-                });
-            }
+                    var year = currentYear + i;
+                    academicYears.Add(new SimpleAcademicYear
+                    {
+                        Year = $"{year}-{(year + 1).ToString().Substring(2)}",
+                        IsCurrent = false
+                    });
+                }
 
-            cmbAcademicYear.ItemsSource = academicYears;
-            cmbAcademicYear.SelectedItem = academicYears.FirstOrDefault(ay => ay.IsCurrent);
+                cmbAcademicYear.ItemsSource = academicYears;
+                cmbAcademicYear.SelectedItem = academicYears.FirstOrDefault(ay => ay.IsCurrent);
+            }
         }
 
         private void TxtFromClass_TextChanged(object sender, TextChangedEventArgs e)
@@ -256,9 +278,11 @@ namespace IEMS.WPF
                 {
                     FromClassId = GetClassIdByName(fromClassName!),
                     ToClassId = GetClassIdByName(toClassName!),
-                    AcademicYear = selectedAcademicYear!.Year.ToString(),
+                    AcademicYear = selectedAcademicYear!.Year,
                     ExcludedStudentIds = _currentPreview.Where(p => p.IsExcluded).Select(p => p.StudentId).ToList(),
-                    Reason = "Annual Promotion"
+                    Reason = "Annual Promotion",
+                    PromotedBy = LoginWindow.CurrentUser?.Username,
+                    Remarks = "Bulk promotion via Bulk Promotion Window"
                 };
 
                 var promotionResult = await _bulkPromotionService.ExecuteBulkPromotionAsync(request);
@@ -364,7 +388,7 @@ namespace IEMS.WPF
 
     public class SimpleAcademicYear
     {
-        public int Year { get; set; }
+        public string Year { get; set; } = string.Empty;  // e.g., "2024-25"
         public bool IsCurrent { get; set; }
     }
 }

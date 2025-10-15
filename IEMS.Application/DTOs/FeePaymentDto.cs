@@ -1,4 +1,5 @@
 using IEMS.Core.Enums;
+using System;
 
 namespace IEMS.Application.DTOs;
 
@@ -29,7 +30,15 @@ public class FeePaymentDto
     public int? InstallmentNumber { get; set; }
     public DateTime? NextDueDate { get; set; }
     public string? NextDueDateFormatted => NextDueDate?.ToString("dd/MM/yyyy");
+
+    // NEW: Foreign key to AcademicYear table
+    public int AcademicYearId { get; set; }
+    public string AcademicYearDisplay { get; set; } = string.Empty;
+
+    // DEPRECATED: Legacy string field
+    [Obsolete("Use AcademicYearId and AcademicYearDisplay instead. This field will be removed in a future version.")]
     public string AcademicYear { get; set; } = string.Empty;
+
     public string GeneratedBy { get; set; } = string.Empty;
     public DateTime PaymentDate { get; set; }
     public string PaymentDateFormatted => PaymentDate.ToString("dd/MM/yyyy");
@@ -50,6 +59,13 @@ public class CreateFeePaymentDto
     public decimal Discount { get; set; }
     public int? InstallmentNumber { get; set; }
     public DateTime? NextDueDate { get; set; }
-    public string AcademicYear { get; set; } = string.Empty;
+
+    // NEW: Foreign key to AcademicYear table
+    public int AcademicYearId { get; set; }
+
+    // DEPRECATED: Legacy string field (optional for backward compatibility)
+    [Obsolete("Use AcademicYearId instead. This field will be removed in a future version.")]
+    public string? AcademicYear { get; set; }
+
     public string GeneratedBy { get; set; } = string.Empty;
 }

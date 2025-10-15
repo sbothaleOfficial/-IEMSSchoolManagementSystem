@@ -41,27 +41,70 @@ public class FeeStructureRepository : IFeeStructureRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<FeeStructure>> GetByClassIdAndAcademicYearAsync(int classId, string academicYear)
+    // NEW: Methods using AcademicYearId foreign key
+    public async Task<IEnumerable<FeeStructure>> GetByClassIdAndAcademicYearIdAsync(int classId, int academicYearId)
     {
         return await _context.FeeStructures
             .Include(fs => fs.Class)
-            .Where(fs => fs.ClassId == classId && fs.AcademicYear == academicYear && fs.IsActive)
+            .Include(fs => fs.AcademicYear)
+            .Where(fs => fs.ClassId == classId && fs.AcademicYearId == academicYearId && fs.IsActive)
             .OrderBy(fs => fs.FeeType)
             .ToListAsync();
     }
 
+    public async Task<FeeStructure?> GetByClassIdFeeTypeAndAcademicYearIdAsync(int classId, FeeType feeType, int academicYearId)
+    {
+        return await _context.FeeStructures
+            .Include(fs => fs.Class)
+            .Include(fs => fs.AcademicYear)
+            .FirstOrDefaultAsync(fs => fs.ClassId == classId && fs.FeeType == feeType && fs.AcademicYearId == academicYearId && fs.IsActive);
+    }
+
+    public async Task<IEnumerable<FeeStructure>> GetByAcademicYearIdAsync(int academicYearId)
+    {
+        return await _context.FeeStructures
+            .Include(fs => fs.Class)
+            .Include(fs => fs.AcademicYear)
+            .Where(fs => fs.AcademicYearId == academicYearId && fs.IsActive)
+            .OrderBy(fs => fs.Class.Name)
+            .ThenBy(fs => fs.FeeType)
+            .ToListAsync();
+    }
+
+    // DEPRECATED: String-based methods kept for backward compatibility during migration
+    [Obsolete("Use GetByClassIdAndAcademicYearIdAsync instead. This method will be removed in a future version.")]
+    public async Task<IEnumerable<FeeStructure>> GetByClassIdAndAcademicYearAsync(int classId, string academicYear)
+    {
+        return await _context.FeeStructures
+            .Include(fs => fs.Class)
+            .Include(fs => fs.AcademicYear)
+#pragma warning disable CS0618 // Type or member is obsolete
+            .Where(fs => fs.ClassId == classId && fs.AcademicYearString == academicYear && fs.IsActive)
+#pragma warning restore CS0618 // Type or member is obsolete
+            .OrderBy(fs => fs.FeeType)
+            .ToListAsync();
+    }
+
+    [Obsolete("Use GetByClassIdFeeTypeAndAcademicYearIdAsync instead. This method will be removed in a future version.")]
     public async Task<FeeStructure?> GetByClassIdFeeTypeAndAcademicYearAsync(int classId, FeeType feeType, string academicYear)
     {
         return await _context.FeeStructures
             .Include(fs => fs.Class)
-            .FirstOrDefaultAsync(fs => fs.ClassId == classId && fs.FeeType == feeType && fs.AcademicYear == academicYear && fs.IsActive);
+            .Include(fs => fs.AcademicYear)
+#pragma warning disable CS0618 // Type or member is obsolete
+            .FirstOrDefaultAsync(fs => fs.ClassId == classId && fs.FeeType == feeType && fs.AcademicYearString == academicYear && fs.IsActive);
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
+    [Obsolete("Use GetByAcademicYearIdAsync instead. This method will be removed in a future version.")]
     public async Task<IEnumerable<FeeStructure>> GetByAcademicYearAsync(string academicYear)
     {
         return await _context.FeeStructures
             .Include(fs => fs.Class)
-            .Where(fs => fs.AcademicYear == academicYear && fs.IsActive)
+            .Include(fs => fs.AcademicYear)
+#pragma warning disable CS0618 // Type or member is obsolete
+            .Where(fs => fs.AcademicYearString == academicYear && fs.IsActive)
+#pragma warning restore CS0618 // Type or member is obsolete
             .OrderBy(fs => fs.Class.Name)
             .ThenBy(fs => fs.FeeType)
             .ToListAsync();

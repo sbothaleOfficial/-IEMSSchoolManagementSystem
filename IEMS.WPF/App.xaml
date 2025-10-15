@@ -1,6 +1,7 @@
 <Application x:Class="IEMS.WPF.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:IEMS.WPF"
              ShutdownMode="OnMainWindowClose">
     <Application.Resources>
         <!-- Professional Color Palette - Modern Blue-Gray Theme -->
@@ -51,6 +52,9 @@
 
         <!-- Converters -->
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <local:CurrentStatusConverter x:Key="CurrentStatusConverter"/>
+        <local:CurrentStatusTextConverter x:Key="CurrentStatusTextConverter"/>
+        <local:InverseBooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter"/>
 
         <!-- Modern Button Style -->
         <Style x:Key="ModernButtonStyle" TargetType="Button">

@@ -13,6 +13,7 @@ public class FeePaymentService
     private readonly IFeeStructureRepository _feeStructureRepository;
     private readonly IStudentRepository _studentRepository;
     private readonly IClassRepository _classRepository;
+    private readonly IAcademicYearRepository _academicYearRepository;
     private readonly FeeCalculationService _feeCalculationService;
     private readonly AmountToWordsService _amountToWordsService;
     private readonly ISystemSettingsService _systemSettingsService;
@@ -22,6 +23,7 @@ public class FeePaymentService
         IFeeStructureRepository feeStructureRepository,
         IStudentRepository studentRepository,
         IClassRepository classRepository,
+        IAcademicYearRepository academicYearRepository,
         FeeCalculationService feeCalculationService,
         AmountToWordsService amountToWordsService,
         ISystemSettingsService systemSettingsService)
@@ -30,6 +32,7 @@ public class FeePaymentService
         _feeStructureRepository = feeStructureRepository;
         _studentRepository = studentRepository;
         _classRepository = classRepository;
+        _academicYearRepository = academicYearRepository;
         _feeCalculationService = feeCalculationService;
         _amountToWordsService = amountToWordsService;
         _systemSettingsService = systemSettingsService;
@@ -72,7 +75,9 @@ public class FeePaymentService
 
         // Get all payments for this student and academic year
         var allPayments = await _feePaymentRepository.GetByStudentIdAsync(studentId);
-        var paymentsThisYear = allPayments.Where(p => p.AcademicYear == academicYear).ToList();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var paymentsThisYear = allPayments.Where(p => p.AcademicYearString == academicYear).ToList();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         var feeTypeStatuses = new List<StudentFeeTypeStatusDto>();
         decimal totalOutstanding = 0;
@@ -98,7 +103,7 @@ public class FeePaymentService
                 OutstandingAmount = outstandingForType,
                 LastPaidAmount = lastPayment?.AmountPaid ?? 0,
                 LastPaymentDate = lastPayment?.PaymentDate,
-                PaymentCount = feeTypePayments.Count
+                PaymentCount = feeTypePayments.Count()
             });
         }
 
@@ -204,7 +209,9 @@ public class FeePaymentService
             Discount = createDto.Discount,
             InstallmentNumber = createDto.InstallmentNumber,
             NextDueDate = createDto.NextDueDate,
-            AcademicYear = createDto.AcademicYear,
+#pragma warning disable CS0618 // Type or member is obsolete
+            AcademicYearString = createDto.AcademicYear,
+#pragma warning restore CS0618 // Type or member is obsolete
             GeneratedBy = createDto.GeneratedBy,
             PaymentDate = DateTime.Now
         };
@@ -221,12 +228,16 @@ public class FeePaymentService
         if (feePayment == null)
             throw new ArgumentException("Fee payment not found");
 
+#pragma warning disable CS0618 // Type or member is obsolete
         var feeStructure = await _feeStructureRepository.GetByClassIdFeeTypeAndAcademicYearAsync(
-            feePayment.Student.ClassId, feePayment.FeeType, feePayment.AcademicYear);
+            feePayment.Student.ClassId, feePayment.FeeType, feePayment.AcademicYearString);
+#pragma warning restore CS0618 // Type or member is obsolete
 
         // FIXED BUG #9: Throw exception if fee structure not found instead of silently setting to 0
+#pragma warning disable CS0618 // Type or member is obsolete
         if (feeStructure == null)
-            throw new InvalidOperationException($"Fee structure not found for {feePayment.FeeType} in class {feePayment.Student.Class?.Name ?? "Unknown"} for academic year {feePayment.AcademicYear}");
+            throw new InvalidOperationException($"Fee structure not found for {feePayment.FeeType} in class {feePayment.Student.Class?.Name ?? "Unknown"} for academic year {feePayment.AcademicYearString}");
+#pragma warning restore CS0618 // Type or member is obsolete
 
         // Load school information from system settings
         var schoolName = await _systemSettingsService.GetSettingValueAsync("School.Name") ?? "INSPIRE ENGLISH MEDIUM SCHOOL, MARDI";
@@ -247,7 +258,9 @@ public class FeePaymentService
             SchoolEmail = schoolEmail,
             ReceiptNumber = feePayment.ReceiptNumber,
             ReceiptDate = feePayment.PaymentDate,
-            AcademicYear = feePayment.AcademicYear,
+#pragma warning disable CS0618 // Type or member is obsolete
+            AcademicYear = feePayment.AcademicYearString ?? string.Empty,
+#pragma warning restore CS0618 // Type or member is obsolete
             StudentName = $"{feePayment.Student.FirstName} {feePayment.Student.Surname}",
             ClassName = feePayment.Student.Class != null
                 ? $"{feePayment.Student.Class.Name} - {feePayment.Student.Class.Section}"
@@ -299,7 +312,9 @@ public class FeePaymentService
     {
         var allStudents = await _studentRepository.GetAllAsync();
         var allFeePayments = await _feePaymentRepository.GetAllAsync();
-        var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYear == academicYear).ToList();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYearString == academicYear).ToList();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         // Calculate basic analytics
         var totalCollection = currentYearPayments.Sum(fp => fp.AmountPaid);
@@ -347,7 +362,9 @@ public class FeePaymentService
     {
         var allClasses = await _classRepository.GetAllAsync();
         var allFeePayments = await _feePaymentRepository.GetAllAsync();
-        var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYear == academicYear).ToList();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYearString == academicYear).ToList();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         var classWiseData = new List<ClassWiseFeeDto>();
 
@@ -392,7 +409,9 @@ public class FeePaymentService
     public async Task<List<MonthlyCollectionDto>> GetMonthlyCollectionsAsync(string academicYear)
     {
         var allFeePayments = await _feePaymentRepository.GetAllAsync();
-        var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYear == academicYear).ToList();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYearString == academicYear).ToList();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         var monthlyData = currentYearPayments
             .GroupBy(fp => new { fp.PaymentDate.Year, fp.PaymentDate.Month })
@@ -422,7 +441,9 @@ public class FeePaymentService
     public async Task<List<FeeTypeAnalyticsDto>> GetFeeTypeAnalyticsAsync(string academicYear)
     {
         var allFeePayments = await _feePaymentRepository.GetAllAsync();
-        var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYear == academicYear).ToList();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYearString == academicYear).ToList();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         var feeTypeData = currentYearPayments
             .GroupBy(fp => fp.FeeType)
@@ -463,7 +484,9 @@ public class FeePaymentService
     public async Task<List<StudentFeeAnalyticsDto>> GetStudentsWithPendingFeesAsync(string academicYear, int? classId = null)
     {
         var allFeePayments = await _feePaymentRepository.GetAllAsync();
-        var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYear == academicYear).ToList();
+#pragma warning disable CS0618 // Type or member is obsolete
+        var currentYearPayments = allFeePayments.Where(fp => fp.AcademicYearString == academicYear).ToList();
+#pragma warning restore CS0618 // Type or member is obsolete
 
         var studentsWithPending = currentYearPayments
             .GroupBy(fp => fp.StudentId)
@@ -544,7 +567,9 @@ public class FeePaymentService
             Discount = feePayment.Discount,
             InstallmentNumber = feePayment.InstallmentNumber,
             NextDueDate = feePayment.NextDueDate,
-            AcademicYear = feePayment.AcademicYear,
+#pragma warning disable CS0618 // Type or member is obsolete
+            AcademicYear = feePayment.AcademicYearString ?? string.Empty,
+#pragma warning restore CS0618 // Type or member is obsolete
             GeneratedBy = feePayment.GeneratedBy,
             PaymentDate = feePayment.PaymentDate,
             AmountInWords = ConvertAmountToWords(feePayment.AmountPaid)

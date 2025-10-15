@@ -22,6 +22,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<AcademicYear> AcademicYears { get; set; }
     public DbSet<SystemSetting> SystemSettings { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<StudentPromotionHistory> StudentPromotionHistory { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -45,12 +46,22 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.CityVillage).HasMaxLength(100);
             entity.Property(e => e.ParentMobileNumber).HasMaxLength(15);
             entity.Property(e => e.AadhaarNumber).HasMaxLength(12);
+
+            // Legacy string field for backward compatibility during migration
+            entity.Property(e => e.AdmissionAcademicYearString).HasMaxLength(10);
+
             entity.HasIndex(e => e.StudentNumber).IsUnique();
             entity.HasIndex(e => e.SerialNo).IsUnique();
 
             entity.HasOne(e => e.Class)
                   .WithMany(c => c.Students)
                   .HasForeignKey(e => e.ClassId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            // NEW: Foreign key relationship to AcademicYear
+            entity.HasOne(e => e.AdmissionAcademicYear)
+                  .WithMany()
+                  .HasForeignKey(e => e.AdmissionAcademicYearId)
                   .OnDelete(DeleteBehavior.Restrict);
         });
 
@@ -106,7 +117,10 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.ChequeNumber).HasMaxLength(50);
             entity.Property(e => e.BankName).HasMaxLength(100);
             entity.Property(e => e.PaymentNotes).HasMaxLength(500);
-            entity.Property(e => e.AcademicYear).IsRequired().HasMaxLength(10);
+
+            // Legacy string field for backward compatibility during migration
+            entity.Property(e => e.AcademicYearString).HasMaxLength(10);
+
             entity.Property(e => e.GeneratedBy).IsRequired().HasMaxLength(100);
             entity.HasIndex(e => e.ReceiptNumber).IsUnique();
 
@@ -114,13 +128,22 @@ public class ApplicationDbContext : DbContext
                   .WithMany(s => s.FeePayments)
                   .HasForeignKey(e => e.StudentId)
                   .OnDelete(DeleteBehavior.Restrict);
+
+            // NEW: Foreign key relationship to AcademicYear
+            entity.HasOne(e => e.AcademicYear)
+                  .WithMany()
+                  .HasForeignKey(e => e.AcademicYearId)
+                  .OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<FeeStructure>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Amount).HasColumnType("decimal(18,2)");
-            entity.Property(e => e.AcademicYear).IsRequired().HasMaxLength(10);
+
+            // Legacy string field for backward compatibility during migration
+            entity.Property(e => e.AcademicYearString).HasMaxLength(10);
+
             entity.Property(e => e.Description).HasMaxLength(200);
 
             entity.HasOne(e => e.Class)
@@ -128,7 +151,13 @@ public class ApplicationDbContext : DbContext
                   .HasForeignKey(e => e.ClassId)
                   .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasIndex(e => new { e.ClassId, e.FeeType, e.AcademicYear }).IsUnique();
+            // NEW: Foreign key relationship to AcademicYear
+            entity.HasOne(e => e.AcademicYear)
+                  .WithMany()
+                  .HasForeignKey(e => e.AcademicYearId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => new { e.ClassId, e.FeeType, e.AcademicYearId }).IsUnique();
         });
 
         modelBuilder.Entity<Vehicle>(entity =>
@@ -194,6 +223,45 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.IsCurrent).IsRequired();
             entity.HasIndex(e => e.Year).IsUnique();
             entity.HasIndex(e => e.IsCurrent);
+        });
+
+        modelBuilder.Entity<StudentPromotionHistory>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.StudentName).IsRequired().HasMaxLength(100);
+            entity.Property(e => e.FromClassName).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.ToClassName).IsRequired().HasMaxLength(50);
+
+            // Legacy string field for backward compatibility during migration
+            entity.Property(e => e.AcademicYearString).HasMaxLength(10);
+
+            entity.Property(e => e.PromotedBy).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Remarks).HasMaxLength(500);
+
+            entity.HasOne(e => e.Student)
+                  .WithMany()
+                  .HasForeignKey(e => e.StudentId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.FromClass)
+                  .WithMany()
+                  .HasForeignKey(e => e.FromClassId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.ToClass)
+                  .WithMany()
+                  .HasForeignKey(e => e.ToClassId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            // NEW: Foreign key relationship to AcademicYear
+            entity.HasOne(e => e.AcademicYear)
+                  .WithMany()
+                  .HasForeignKey(e => e.AcademicYearId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasIndex(e => e.StudentId);
+            entity.HasIndex(e => e.AcademicYearId);
+            entity.HasIndex(e => e.PromotionDate);
         });
 
         modelBuilder.Entity<SystemSetting>(entity =>
@@ -385,48 +453,49 @@ public class ApplicationDbContext : DbContext
         );
 
         // Comprehensive FeeStructure records for all classes and fee types
+        // Using AcademicYearId = 3 for "2024-25" academic year
         modelBuilder.Entity<FeeStructure>().HasData(
             // TUITION fees for all classes
-            new FeeStructure { Id = 1, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 60000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 10-A" },
-            new FeeStructure { Id = 2, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 60000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 10-B" },
-            new FeeStructure { Id = 3, ClassId = 3, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 55000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 9-A" },
-            new FeeStructure { Id = 4, ClassId = 4, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 55000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 9-B" },
-            new FeeStructure { Id = 5, ClassId = 5, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 50000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 8-A" },
-            new FeeStructure { Id = 6, ClassId = 6, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 50000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 8-B" },
-            new FeeStructure { Id = 7, ClassId = 7, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 45000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 7-A" },
-            new FeeStructure { Id = 8, ClassId = 8, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 40000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 6-A" },
-            new FeeStructure { Id = 9, ClassId = 9, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 38000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 5-A" },
-            new FeeStructure { Id = 10, ClassId = 10, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 35000, AcademicYear = "2024-25", Description = "Annual Tuition Fees for Class 1-A" },
+            new FeeStructure { Id = 1, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 60000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Tuition Fees for Class 10-A" },
+            new FeeStructure { Id = 2, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 60000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Tuition Fees for Class 10-B" },
+            new FeeStructure { Id = 3, ClassId = 3, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 55000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Tuition Fees for Class 9-A" },
+            new FeeStructure { Id = 4, ClassId = 4, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 55000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Tuition Fees for Class 9-B" },
+            new FeeStructure { Id = 5, ClassId = 5, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 50000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Tuition Fees for Class 8-A" },
+            new FeeStructure { Id = 6, ClassId = 6, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 50000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Tuition Fees for Class 8-B" },
+            new FeeStructure { Id = 7, ClassId = 7, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 45000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Tuition Fees for Class 7-A" },
+            new FeeStructure { Id = 8, ClassId = 8, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 40000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Tuition Fees for Class 6-A" },
+            new FeeStructure { Id = 9, ClassId = 9, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 38000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Tuition Fees for Class 5-A" },
+            new FeeStructure { Id = 10, ClassId = 10, FeeType = IEMS.Core.Enums.FeeType.TUITION, Amount = 35000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Tuition Fees for Class 1-A" },
 
             // ADMISSION fees (one-time for new students)
-            new FeeStructure { Id = 11, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.ADMISSION, Amount = 5000, AcademicYear = "2024-25", Description = "Admission Fee for Class 10-A" },
-            new FeeStructure { Id = 12, ClassId = 10, FeeType = IEMS.Core.Enums.FeeType.ADMISSION, Amount = 3000, AcademicYear = "2024-25", Description = "Admission Fee for Class 1-A" },
+            new FeeStructure { Id = 11, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.ADMISSION, Amount = 5000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Admission Fee for Class 10-A" },
+            new FeeStructure { Id = 12, ClassId = 10, FeeType = IEMS.Core.Enums.FeeType.ADMISSION, Amount = 3000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Admission Fee for Class 1-A" },
 
             // EXAM fees (per academic year)
-            new FeeStructure { Id = 13, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 2000, AcademicYear = "2024-25", Description = "Examination Fee for Class 10-A" },
-            new FeeStructure { Id = 14, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 2000, AcademicYear = "2024-25", Description = "Examination Fee for Class 10-B" },
-            new FeeStructure { Id = 15, ClassId = 3, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 1800, AcademicYear = "2024-25", Description = "Examination Fee for Class 9-A" },
+            new FeeStructure { Id = 13, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 2000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Examination Fee for Class 10-A" },
+            new FeeStructure { Id = 14, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 2000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Examination Fee for Class 10-B" },
+            new FeeStructure { Id = 15, ClassId = 3, FeeType = IEMS.Core.Enums.FeeType.EXAM, Amount = 1800, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Examination Fee for Class 9-A" },
 
             // TRANSPORT fees (annual)
-            new FeeStructure { Id = 16, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 12000, AcademicYear = "2024-25", Description = "Annual Transport Fee for Class 10-A" },
-            new FeeStructure { Id = 17, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 12000, AcademicYear = "2024-25", Description = "Annual Transport Fee for Class 10-B" },
-            new FeeStructure { Id = 18, ClassId = 5, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 10000, AcademicYear = "2024-25", Description = "Annual Transport Fee for Class 8-A" },
+            new FeeStructure { Id = 16, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 12000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Transport Fee for Class 10-A" },
+            new FeeStructure { Id = 17, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 12000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Transport Fee for Class 10-B" },
+            new FeeStructure { Id = 18, ClassId = 5, FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, Amount = 10000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Transport Fee for Class 8-A" },
 
             // SPORTS fees (annual)
-            new FeeStructure { Id = 19, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.SPORTS, Amount = 3000, AcademicYear = "2024-25", Description = "Annual Sports Fee for Class 10-A" },
-            new FeeStructure { Id = 20, ClassId = 3, FeeType = IEMS.Core.Enums.FeeType.SPORTS, Amount = 2500, AcademicYear = "2024-25", Description = "Annual Sports Fee for Class 9-A" },
+            new FeeStructure { Id = 19, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.SPORTS, Amount = 3000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Sports Fee for Class 10-A" },
+            new FeeStructure { Id = 20, ClassId = 3, FeeType = IEMS.Core.Enums.FeeType.SPORTS, Amount = 2500, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Sports Fee for Class 9-A" },
 
             // LIBRARY fees (annual)
-            new FeeStructure { Id = 21, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.LIBRARY, Amount = 1500, AcademicYear = "2024-25", Description = "Annual Library Fee for Class 10-A" },
-            new FeeStructure { Id = 22, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.LIBRARY, Amount = 1500, AcademicYear = "2024-25", Description = "Annual Library Fee for Class 10-B" },
-            new FeeStructure { Id = 23, ClassId = 10, FeeType = IEMS.Core.Enums.FeeType.LIBRARY, Amount = 800, AcademicYear = "2024-25", Description = "Annual Library Fee for Class 1-A" },
+            new FeeStructure { Id = 21, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.LIBRARY, Amount = 1500, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Library Fee for Class 10-A" },
+            new FeeStructure { Id = 22, ClassId = 2, FeeType = IEMS.Core.Enums.FeeType.LIBRARY, Amount = 1500, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Library Fee for Class 10-B" },
+            new FeeStructure { Id = 23, ClassId = 10, FeeType = IEMS.Core.Enums.FeeType.LIBRARY, Amount = 800, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Annual Library Fee for Class 1-A" },
 
             // UNIFORM fees
-            new FeeStructure { Id = 24, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.UNIFORM, Amount = 4000, AcademicYear = "2024-25", Description = "Uniform Fee for Class 10-A" },
-            new FeeStructure { Id = 25, ClassId = 10, FeeType = IEMS.Core.Enums.FeeType.UNIFORM, Amount = 3000, AcademicYear = "2024-25", Description = "Uniform Fee for Class 1-A" },
+            new FeeStructure { Id = 24, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.UNIFORM, Amount = 4000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Uniform Fee for Class 10-A" },
+            new FeeStructure { Id = 25, ClassId = 10, FeeType = IEMS.Core.Enums.FeeType.UNIFORM, Amount = 3000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Uniform Fee for Class 1-A" },
 
             // MISCELLANEOUS fees
-            new FeeStructure { Id = 26, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.MISCELLANEOUS, Amount = 2000, AcademicYear = "2024-25", Description = "Miscellaneous Charges for Class 10-A" }
+            new FeeStructure { Id = 26, ClassId = 1, FeeType = IEMS.Core.Enums.FeeType.MISCELLANEOUS, Amount = 2000, AcademicYearId = 3, AcademicYearString = "2024-25", Description = "Miscellaneous Charges for Class 10-A" }
         );
 
         // 10 Vehicles for transport
@@ -488,27 +557,28 @@ public class ApplicationDbContext : DbContext
         // FIXED BUG #1: Corrected seed data - PreviousBalance should be 0 for first payments
         // Calculation: RemainingBalance = PreviousBalance (0) + FeeStructureAmount + LateFee - Discount - AmountPaid
         // 10 FeePayment records across different students
+        // Using AcademicYearId = 3 for "2024-25" academic year
         modelBuilder.Entity<FeePayment>().HasData(
             // Student 1 (ClassId=1): TUITION fee ₹60,000, paid ₹15,000, remaining ₹45,000
-            new FeePayment { Id = 1, StudentId = 1, ReceiptNumber = "REC001", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 15000, PaymentDate = DateTime.Today.AddDays(-20), PreviousBalance = 0, RemainingBalance = 45000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 1, StudentId = 1, ReceiptNumber = "REC001", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 15000, PaymentDate = DateTime.Today.AddDays(-20), PreviousBalance = 0, RemainingBalance = 45000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYearId = 3, AcademicYearString = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             // Student 2 (ClassId=1): TUITION fee ₹60,000, paid ₹20,000, remaining ₹40,000
-            new FeePayment { Id = 2, StudentId = 2, ReceiptNumber = "REC002", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 20000, PaymentDate = DateTime.Today.AddDays(-18), PreviousBalance = 0, RemainingBalance = 40000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN112233", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 2, StudentId = 2, ReceiptNumber = "REC002", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 20000, PaymentDate = DateTime.Today.AddDays(-18), PreviousBalance = 0, RemainingBalance = 40000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN112233", AcademicYearId = 3, AcademicYearString = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             // Student 3 (ClassId=1): TUITION fee ₹60,000 + ₹500 late fee, paid ₹18,000, remaining ₹42,500
-            new FeePayment { Id = 3, StudentId = 3, ReceiptNumber = "REC003", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 18000, PaymentDate = DateTime.Today.AddDays(-15), PreviousBalance = 0, RemainingBalance = 42500, LateFee = 500, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "CH445566", BankName = "HDFC Bank", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 3, StudentId = 3, ReceiptNumber = "REC003", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 18000, PaymentDate = DateTime.Today.AddDays(-15), PreviousBalance = 0, RemainingBalance = 42500, LateFee = 500, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "CH445566", BankName = "HDFC Bank", AcademicYearId = 3, AcademicYearString = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             // Student 10 (ClassId=1): TUITION fee ₹60,000 - ₹1,000 discount, paid ₹10,000, remaining ₹49,000
-            new FeePayment { Id = 4, StudentId = 10, ReceiptNumber = "REC004", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 10000, PaymentDate = DateTime.Today.AddDays(-25), PreviousBalance = 0, RemainingBalance = 49000, LateFee = 0, Discount = 1000, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 4, StudentId = 10, ReceiptNumber = "REC004", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 10000, PaymentDate = DateTime.Today.AddDays(-25), PreviousBalance = 0, RemainingBalance = 49000, LateFee = 0, Discount = 1000, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYearId = 3, AcademicYearString = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             // Student 15 (ClassId=2): TUITION fee ₹60,000, paid ₹12,000, remaining ₹48,000
-            new FeePayment { Id = 5, StudentId = 15, ReceiptNumber = "REC005", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 12000, PaymentDate = DateTime.Today.AddDays(-12), PreviousBalance = 0, RemainingBalance = 48000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN223344", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 5, StudentId = 15, ReceiptNumber = "REC005", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 12000, PaymentDate = DateTime.Today.AddDays(-12), PreviousBalance = 0, RemainingBalance = 48000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN223344", AcademicYearId = 3, AcademicYearString = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             // Student 20 (ClassId=1): ADMISSION fee ₹5,000, paid ₹5,000 (fully paid), remaining ₹0
-            new FeePayment { Id = 6, StudentId = 20, ReceiptNumber = "REC006", FeeType = IEMS.Core.Enums.FeeType.ADMISSION, AmountPaid = 5000, PaymentDate = DateTime.Today.AddDays(-30), PreviousBalance = 0, RemainingBalance = 0, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 6, StudentId = 20, ReceiptNumber = "REC006", FeeType = IEMS.Core.Enums.FeeType.ADMISSION, AmountPaid = 5000, PaymentDate = DateTime.Today.AddDays(-30), PreviousBalance = 0, RemainingBalance = 0, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYearId = 3, AcademicYearString = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             // Student 25 (ClassId=2): TRANSPORT fee ₹12,000, paid ₹4,000, remaining ₹8,000
-            new FeePayment { Id = 7, StudentId = 25, ReceiptNumber = "REC007", FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, AmountPaid = 4000, PaymentDate = DateTime.Today.AddDays(-22), PreviousBalance = 0, RemainingBalance = 8000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN334455", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 7, StudentId = 25, ReceiptNumber = "REC007", FeeType = IEMS.Core.Enums.FeeType.TRANSPORT, AmountPaid = 4000, PaymentDate = DateTime.Today.AddDays(-22), PreviousBalance = 0, RemainingBalance = 8000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN334455", AcademicYearId = 3, AcademicYearString = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             // Student 30 (ClassId=2): EXAM fee ₹2,000, paid ₹2,000 (fully paid), remaining ₹0
-            new FeePayment { Id = 8, StudentId = 30, ReceiptNumber = "REC008", FeeType = IEMS.Core.Enums.FeeType.EXAM, AmountPaid = 2000, PaymentDate = DateTime.Today.AddDays(-5), PreviousBalance = 0, RemainingBalance = 0, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 8, StudentId = 30, ReceiptNumber = "REC008", FeeType = IEMS.Core.Enums.FeeType.EXAM, AmountPaid = 2000, PaymentDate = DateTime.Today.AddDays(-5), PreviousBalance = 0, RemainingBalance = 0, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CASH, AcademicYearId = 3, AcademicYearString = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             // Student 35 (ClassId=3): TUITION fee ₹55,000 + ₹200 late fee - ₹500 discount, paid ₹8,000, remaining ₹46,700
-            new FeePayment { Id = 9, StudentId = 35, ReceiptNumber = "REC009", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 8000, PaymentDate = DateTime.Today.AddDays(-8), PreviousBalance = 0, RemainingBalance = 46700, LateFee = 200, Discount = 500, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "CH556677", BankName = "SBI Bank", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
+            new FeePayment { Id = 9, StudentId = 35, ReceiptNumber = "REC009", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 8000, PaymentDate = DateTime.Today.AddDays(-8), PreviousBalance = 0, RemainingBalance = 46700, LateFee = 200, Discount = 500, PaymentMethod = IEMS.Core.Enums.PaymentMethod.CHEQUE, ChequeNumber = "CH556677", BankName = "SBI Bank", AcademicYearId = 3, AcademicYearString = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow },
             // Student 40 (ClassId=3): TUITION fee ₹55,000, paid ₹16,000, remaining ₹39,000
-            new FeePayment { Id = 10, StudentId = 40, ReceiptNumber = "REC010", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 16000, PaymentDate = DateTime.Today.AddDays(-3), PreviousBalance = 0, RemainingBalance = 39000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN445566", AcademicYear = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
+            new FeePayment { Id = 10, StudentId = 40, ReceiptNumber = "REC010", FeeType = IEMS.Core.Enums.FeeType.TUITION, AmountPaid = 16000, PaymentDate = DateTime.Today.AddDays(-3), PreviousBalance = 0, RemainingBalance = 39000, LateFee = 0, Discount = 0, PaymentMethod = IEMS.Core.Enums.PaymentMethod.ONLINE, TransactionId = "TXN445566", AcademicYearId = 3, AcademicYearString = "2024-25", GeneratedBy = "Admin", CreatedAt = DateTime.UtcNow, UpdatedAt = DateTime.UtcNow }
         );
 
         modelBuilder.Entity<AcademicYear>().HasData(

@@ -2,6 +2,7 @@ using IEMS.Core.Entities;
 using IEMS.Core.Enums;
 using IEMS.Core.Interfaces;
 using IEMS.Application.DTOs;
+using System;
 
 namespace IEMS.Application.Services;
 
@@ -9,11 +10,16 @@ public class FeeStructureService
 {
     private readonly IFeeStructureRepository _feeStructureRepository;
     private readonly IClassRepository _classRepository;
+    private readonly IAcademicYearRepository _academicYearRepository;
 
-    public FeeStructureService(IFeeStructureRepository feeStructureRepository, IClassRepository classRepository)
+    public FeeStructureService(
+        IFeeStructureRepository feeStructureRepository,
+        IClassRepository classRepository,
+        IAcademicYearRepository academicYearRepository)
     {
         _feeStructureRepository = feeStructureRepository;
         _classRepository = classRepository;
+        _academicYearRepository = academicYearRepository;
     }
 
     public async Task<IEnumerable<FeeStructureDto>> GetAllFeeStructuresAsync()
@@ -34,26 +40,53 @@ public class FeeStructureService
         return feeStructures.Select(MapToDto);
     }
 
-    public async Task<IEnumerable<FeeStructureDto>> GetFeeStructuresByAcademicYearAsync(string academicYear)
+    // NEW: Methods using AcademicYearId foreign key
+    public async Task<IEnumerable<FeeStructureDto>> GetFeeStructuresByAcademicYearIdAsync(int academicYearId)
     {
-        var feeStructures = await _feeStructureRepository.GetByAcademicYearAsync(academicYear);
+        var feeStructures = await _feeStructureRepository.GetByAcademicYearIdAsync(academicYearId);
         return feeStructures.Select(MapToDto);
     }
 
+    public async Task<FeeStructureDto?> GetFeeStructureByClassFeeTypeAndYearIdAsync(int classId, FeeType feeType, int academicYearId)
+    {
+        var feeStructure = await _feeStructureRepository.GetByClassIdFeeTypeAndAcademicYearIdAsync(classId, feeType, academicYearId);
+        return feeStructure != null ? MapToDto(feeStructure) : null;
+    }
+
+    // DEPRECATED: String-based methods kept for backward compatibility during migration
+    [Obsolete("Use GetFeeStructuresByAcademicYearIdAsync instead. This method will be removed in a future version.")]
+    public async Task<IEnumerable<FeeStructureDto>> GetFeeStructuresByAcademicYearAsync(string academicYear)
+    {
+#pragma warning disable CS0618 // Type or member is obsolete
+        var feeStructures = await _feeStructureRepository.GetByAcademicYearAsync(academicYear);
+#pragma warning restore CS0618 // Type or member is obsolete
+        return feeStructures.Select(MapToDto);
+    }
+
+    [Obsolete("Use GetFeeStructureByClassFeeTypeAndYearIdAsync instead. This method will be removed in a future version.")]
     public async Task<FeeStructureDto?> GetFeeStructureByClassFeeTypeAndYearAsync(int classId, FeeType feeType, string academicYear)
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         var feeStructure = await _feeStructureRepository.GetByClassIdFeeTypeAndAcademicYearAsync(classId, feeType, academicYear);
+#pragma warning restore CS0618 // Type or member is obsolete
         return feeStructure != null ? MapToDto(feeStructure) : null;
     }
 
     public async Task<FeeStructureDto> CreateFeeStructureAsync(CreateFeeStructureDto createDto)
     {
+        // Validate Class exists
         var classEntity = await _classRepository.GetByIdAsync(createDto.ClassId);
         if (classEntity == null)
             throw new ArgumentException("Class not found");
 
-        var existingStructure = await _feeStructureRepository.GetByClassIdFeeTypeAndAcademicYearAsync(
-            createDto.ClassId, createDto.FeeType, createDto.AcademicYear);
+        // NEW: Validate AcademicYear exists
+        var academicYear = await _academicYearRepository.GetByIdAsync(createDto.AcademicYearId);
+        if (academicYear == null)
+            throw new ArgumentException($"Academic Year with ID {createDto.AcademicYearId} not found");
+
+        // Check for duplicate using the new ID-based method
+        var existingStructure = await _feeStructureRepository.GetByClassIdFeeTypeAndAcademicYearIdAsync(
+            createDto.ClassId, createDto.FeeType, createDto.AcademicYearId);
 
         if (existingStructure != null)
             throw new InvalidOperationException("Fee structure already exists for this class, fee type, and academic year");
@@ -63,7 +96,10 @@ public class FeeStructureService
             ClassId = createDto.ClassId,
             FeeType = createDto.FeeType,
             Amount = createDto.Amount,
-            AcademicYear = createDto.AcademicYear,
+            AcademicYearId = createDto.AcademicYearId,
+#pragma warning disable CS0618 // Type or member is obsolete
+            AcademicYearString = academicYear.Year, // Populate legacy field for backward compatibility
+#pragma warning restore CS0618 // Type or member is obsolete
             Description = createDto.Description,
             IsActive = true
         };
@@ -79,12 +115,19 @@ public class FeeStructureService
         if (feeStructure == null)
             throw new ArgumentException("Fee structure not found");
 
+        // Validate Class exists
         var classEntity = await _classRepository.GetByIdAsync(updateDto.ClassId);
         if (classEntity == null)
             throw new ArgumentException("Class not found");
 
-        var existingStructure = await _feeStructureRepository.GetByClassIdFeeTypeAndAcademicYearAsync(
-            updateDto.ClassId, updateDto.FeeType, updateDto.AcademicYear);
+        // NEW: Validate AcademicYear exists
+        var academicYear = await _academicYearRepository.GetByIdAsync(updateDto.AcademicYearId);
+        if (academicYear == null)
+            throw new ArgumentException($"Academic Year with ID {updateDto.AcademicYearId} not found");
+
+        // Check for duplicate using the new ID-based method
+        var existingStructure = await _feeStructureRepository.GetByClassIdFeeTypeAndAcademicYearIdAsync(
+            updateDto.ClassId, updateDto.FeeType, updateDto.AcademicYearId);
 
         if (existingStructure != null && existingStructure.Id != id)
             throw new InvalidOperationException("Fee structure already exists for this class, fee type, and academic year");
@@ -92,7 +135,10 @@ public class FeeStructureService
         feeStructure.ClassId = updateDto.ClassId;
         feeStructure.FeeType = updateDto.FeeType;
         feeStructure.Amount = updateDto.Amount;
-        feeStructure.AcademicYear = updateDto.AcademicYear;
+        feeStructure.AcademicYearId = updateDto.AcademicYearId;
+#pragma warning disable CS0618 // Type or member is obsolete
+        feeStructure.AcademicYearString = academicYear.Year; // Populate legacy field for backward compatibility
+#pragma warning restore CS0618 // Type or member is obsolete
         feeStructure.Description = updateDto.Description;
 
         await _feeStructureRepository.UpdateAsync(feeStructure);
@@ -115,7 +161,16 @@ public class FeeStructureService
             ClassName = feeStructure.Class?.Name + " - " + feeStructure.Class?.Section ?? "",
             FeeType = feeStructure.FeeType,
             Amount = feeStructure.Amount,
-            AcademicYear = feeStructure.AcademicYear,
+
+            // NEW: Map AcademicYearId and display
+            AcademicYearId = feeStructure.AcademicYearId,
+            AcademicYearDisplay = feeStructure.AcademicYear?.Year ?? "",
+
+            // DEPRECATED: Legacy string field
+#pragma warning disable CS0618 // Type or member is obsolete
+            AcademicYear = feeStructure.AcademicYearString ?? feeStructure.AcademicYear?.Year ?? "",
+#pragma warning restore CS0618 // Type or member is obsolete
+
             Description = feeStructure.Description,
             IsActive = feeStructure.IsActive
         };
