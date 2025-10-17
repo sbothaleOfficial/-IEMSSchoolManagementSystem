@@ -2,9 +2,6 @@
 
 > A comprehensive Windows desktop application for managing school operations, built with .NET 8 and WPF.
 
-[![.NET Version](https://img.shields.io/badge/.NET-8.0-blue)](https://dotnet.microsoft.com/download/dotnet/8.0)
-[![Platform](https://img.shields.io/badge/Platform-Windows-blue)](https://www.microsoft.com/windows)
-[![License](https://img.shields.io/badge/License-MIT-green)]()
 
 ## Overview
 
@@ -121,19 +118,10 @@ IEMS (Inspire English Medium School) Management System is a feature-rich desktop
 
 ## System Requirements
 
-### Minimum Requirements
-- **OS**: Windows 10 (64-bit) or Windows 11
-- **Processor**: Intel Core i3 or equivalent
-- **RAM**: 4 GB
+- **OS**: Windows 10/11 (64-bit)
+- **RAM**: 4 GB minimum, 8 GB recommended
 - **Storage**: 500 MB free space
-- **Display**: 1280x720 resolution
-
-### Recommended
-- **OS**: Windows 11
-- **Processor**: Intel Core i5 or higher
-- **RAM**: 8 GB or more
-- **Storage**: 1 GB free space
-- **Display**: 1920x1080 resolution or higher
+- **.NET**: .NET 8.0 Runtime (for framework-dependent builds)
 
 ## Installation & Setup
 
@@ -164,71 +152,19 @@ For detailed installation instructions, see [INSTALLATION_INSTRUCTIONS.txt](IEMS
    cd IEMSSchoolManagementSystem
    ```
 
-2. **Restore dependencies**
+2. **Build and run**
+
    ```bash
-   # Downloads all NuGet packages required by the solution
-   dotnet restore
-   ```
-
-3. **Build the solution**
-   ```bash
-   # Compiles the entire solution in Debug mode
-   dotnet build
-
-   # Or build in Release mode for better performance
-   dotnet build -c Release
-   ```
-
-4. **Run the application**
-
-   **Option A: Run from source (Development)**
-   ```bash
-   # Fastest for development - runs directly from source code
+   # Run from source
    dotnet run --project IEMS.WPF
+
+   # Or use convenience scripts
+   RunLatest.cmd          # Development build
+   PublishAndRun.cmd      # Published version
    ```
 
-   **Option B: Run compiled executable**
-   ```bash
-   # Run the Debug build executable
-   ./IEMS.WPF/bin/Debug/net8.0-windows/IEMS.WPF.exe
+3. **Database** is created automatically on first run with sample data
 
-   # Or run the Release build (better performance)
-   ./IEMS.WPF/bin/Release/net8.0-windows/IEMS.WPF.exe
-   ```
-
-   **Option C: Use convenience scripts**
-   ```bash
-   # Quick development run (builds and runs without full publish)
-   RunLatest.cmd
-
-   # Publish optimized version to publish/ folder and run
-   PublishAndRun.cmd
-   ```
-
-5. **Database initialization**
-   - The database (`school.db`) is created automatically on first run
-   - Seed data includes sample students, teachers, and admin user
-   - Database location: Root project directory
-
-### Common Development Tasks
-
-#### Clean build artifacts
-```bash
-# Removes all bin/ and obj/ folders
-dotnet clean
-```
-
-#### Rebuild from scratch
-```bash
-# Clean + Build
-dotnet clean && dotnet build
-```
-
-#### Run with hot reload (if available)
-```bash
-# Automatically rebuilds on code changes
-dotnet watch run --project IEMS.WPF
-```
 
 ## Project Structure
 
@@ -246,57 +182,14 @@ IEMSSchoolManagementSystem/
 └── school.db                  # SQLite database (auto-generated at runtime)
 ```
 
-### Architecture Layers
-
-1. **Core Layer** (`IEMS.Core`)
-   - Domain entities (Student, Teacher, Class, etc.)
-   - Repository interfaces
-   - Business domain logic
-
-2. **Application Layer** (`IEMS.Application`)
-   - Service implementations
-   - DTOs (Data Transfer Objects)
-   - Business use cases
-
-3. **Infrastructure Layer** (`IEMS.Infrastructure`)
-   - Entity Framework Core DbContext
-   - Repository implementations
-   - Database migrations and seed data
-
-4. **Presentation Layer** (`IEMS.WPF`)
-   - WPF Windows and Views
-   - UI logic and data binding
-   - User interaction handling
 
 ## Usage
 
-### First-Time Setup
-
 1. Launch the application
-2. Login with default credentials (admin/Admin@123)
-3. Navigate to **User Management** → Change password
-4. Configure **System Settings** with your school information
-5. Set up **Backup Schedule** for automatic backups
-
-### Common Workflows
-
-#### Adding Students
-1. Navigate to **Student Management**
-2. Click **Add Student**
-3. Fill in student details (all fields required)
-4. Click **Save**
-
-#### Recording Fee Payments
-1. Go to **Fee Management**
-2. Select student and fee type
-3. Enter payment details
-4. Generate and print receipt
-
-#### Creating Backups
-1. Navigate to **Backup & Restore**
-2. Click **Create Backup**
-3. Choose backup location
-4. Backup saved with timestamp
+2. Login with default credentials: **admin** / **Admin@123**
+3. **⚠️ Change the default password immediately** in User Management
+4. Configure school information in System Settings
+5. Set up automatic backup schedule
 
 ## Deployment
 
@@ -322,12 +215,6 @@ dotnet publish IEMS.WPF/IEMS.WPF.csproj -c Release -r win-x64 --self-contained t
 
 **Note**: The published package includes the executable, dependencies, and required DLLs. Database file (`school.db`) is created at runtime on first launch.
 
-### Creating Installer (Optional)
-
-1. Install [Inno Setup](https://jrsoftware.org/isinfo.php)
-2. Open `CreateInstaller.iss`
-3. Compile to generate `IEMS_Setup.exe`
-4. Distribute the installer
 
 ## Configuration
 
@@ -342,29 +229,13 @@ dotnet publish IEMS.WPF/IEMS.WPF.csproj -c Release -r win-x64 --self-contained t
 - Configurable via System Settings
 - Automatic backup schedule supported
 
-## Security Considerations
+## Security Notes
 
-⚠️ **IMPORTANT**: Please review these security notes before production use:
-
-1. **Default Admin Password**
-   - Uses a fixed salt (security risk)
-   - **Change immediately** after installation
-
-2. **Password Hashing**
-   - Current: PBKDF2 with 10,000 iterations
-   - Recommended: Increase to 100,000+ iterations
-
-3. **Database Security**
-   - Database stored unencrypted
-   - Contains sensitive student/financial data
-   - Restrict file access permissions
-   - Store backups in secure locations
-
-4. **Authorization**
-   - Primarily UI-level checks
-   - Ensure only trusted users have access
-
-For detailed security review, see the comprehensive analysis report.
+⚠️ **Important**:
+- Change default admin password immediately after installation
+- Database is stored unencrypted - restrict file access permissions
+- Store backups in secure locations
+- Ensure only trusted users have access to the application
 
 ## Troubleshooting
 
@@ -381,58 +252,10 @@ For detailed security review, see the comprehensive analysis report.
 - Run as Administrator
 - Or install in a folder with write permissions
 
-## Development
 
-### Running Tests
-```bash
-dotnet test
-```
-
-### Code Style
-- Follow C# coding conventions
-- Use meaningful variable names
-- Add XML documentation for public APIs
-
-### Contributing
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
-
-## Version History
-
-- **v1.0** (October 2024)
-  - Initial release
-  - Core student, teacher, class management
-  - Fee payment system with receipt generation
-  - Backup & restore functionality
-  - User management with RBAC
-  - Academic year management
-  - Transport and expense tracking
-  - Certificate generation (Leaving & Bonafide)
-
-## Support
-
-For issues or questions:
-- Check the built-in Help menu
-- Review the troubleshooting section above
-- Check the installation instructions in `IEMS_Release_Package/INSTALLATION_INSTRUCTIONS.txt`
-- Contact your system administrator
-
-## License
-
-This software is provided "AS IS" without warranty of any kind.
-
-## Credits
-
-Developed for Inspire English Medium School, Mardi
-Managed by Mahalakmi Bahuddeshiy Sanstha, Chikhalgaon
 
 ---
 
-**Last Updated**: October 2024
-**Framework**: .NET 8.0
-**Database**: SQLite 3
-**Platform**: Windows 10/11 (64-bit)
-**Architecture**: Clean Architecture with MVVM patterns
+**Developed for**: Inspire English Medium School, Mardi
+**Managed by**: Mahalakmi Bahuddeshiy Sanstha, Chikhalgaon
+**Version**: 1.0 | **Last Updated**: October 2024
