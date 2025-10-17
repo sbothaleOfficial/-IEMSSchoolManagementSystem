@@ -1857,7 +1857,13 @@ public partial class StudentsManagementWindow : Window
             // Load academic years
             var academicYears = await _academicYearService.GetRecentAcademicYearsAsync();
             cmbPromotionAcademicYear.ItemsSource = academicYears;
-            cmbPromotionAcademicYear.SelectedItem = academicYears.FirstOrDefault(ay => ay.IsCurrent);
+
+            // Use centralized method to get current academic year
+            var currentAcademicYear = await _academicYearService.GetCurrentAcademicYearAsync();
+            if (currentAcademicYear != null)
+            {
+                cmbPromotionAcademicYear.SelectedItem = academicYears.FirstOrDefault(ay => ay.Year == currentAcademicYear.Year);
+            }
         }
         catch (Exception ex)
         {

@@ -17,7 +17,8 @@
       "Bash(if [ -f \"school.db\" ])",
       "Bash(then rm \"school.db\")",
       "Bash(else echo \"Database not found\")",
-      "Bash(fi)"
+      "Bash(fi)",
+      "Bash(taskkill:*)"
     ],
     "deny": [],
     "ask": []

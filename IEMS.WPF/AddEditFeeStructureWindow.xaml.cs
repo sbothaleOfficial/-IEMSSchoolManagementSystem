@@ -41,8 +41,8 @@ namespace IEMS.WPF
                         var yearsList = academicYears.OrderByDescending(ay => ay.StartDate).Select(ay => ay.Year).ToList();
                         cmbAcademicYear.ItemsSource = yearsList;
 
-                        // Select current academic year by default
-                        var currentAcademicYear = academicYears.FirstOrDefault(ay => ay.IsCurrent);
+                        // Use centralized method to get current academic year
+                        var currentAcademicYear = await _academicYearService.GetCurrentAcademicYearAsync();
                         if (currentAcademicYear != null)
                         {
                             cmbAcademicYear.SelectedItem = currentAcademicYear.Year;

@@ -90,11 +90,11 @@ namespace IEMS.WPF
 
                 cmbAcademicYear.ItemsSource = yearsList;
 
-                // Select current academic year
-                var currentYear = academicYears.FirstOrDefault(ay => ay.IsCurrent);
-                if (currentYear != null)
+                // Use centralized method to get current academic year
+                var currentAcademicYear = await _academicYearService.GetCurrentAcademicYearAsync();
+                if (currentAcademicYear != null)
                 {
-                    _currentAcademicYear = currentYear.Year;
+                    _currentAcademicYear = currentAcademicYear.Year;
                     cmbAcademicYear.SelectedItem = _currentAcademicYear;
                 }
                 else if (yearsList.Any())

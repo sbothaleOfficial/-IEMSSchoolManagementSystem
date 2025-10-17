@@ -153,11 +153,11 @@ public partial class AddEditFeePaymentWindow : Window
             cmbAcademicYear.DisplayMemberPath = "Display";
             cmbAcademicYear.SelectedValuePath = "Value";
 
-            // Select current academic year if available
-            var currentYear = yearItems.FirstOrDefault(y => y.IsCurrent);
-            if (currentYear != null)
+            // Use centralized method to get current academic year
+            var currentAcademicYear = await _academicYearService.GetCurrentAcademicYearAsync();
+            if (currentAcademicYear != null)
             {
-                cmbAcademicYear.SelectedValue = currentYear.Value;
+                cmbAcademicYear.SelectedValue = currentAcademicYear.Year;
             }
             else
             {
