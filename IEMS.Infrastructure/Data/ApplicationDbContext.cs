@@ -608,14 +608,11 @@ public class ApplicationDbContext : DbContext
             }
         );
 
-        // SystemSettings seed data - Only Academic Year and Backup Settings
+        // SystemSettings seed data - Backup and School Settings
         // FIXED BUG #10: Use portable path instead of hardcoded user-specific path
         var defaultBackupPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "IEMS_Backups");
 
         modelBuilder.Entity<SystemSetting>().HasData(
-            // Academic Settings
-            new SystemSetting { Key = "Academic.CurrentYear", Value = "2024-25", Description = "Current academic year", Category = "Academic", DataType = "String", DefaultValue = "2024-25", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
-
             // Backup Settings
             new SystemSetting { Key = "Backup.AutoBackupEnabled", Value = "true", Description = "Enable automatic backup", Category = "Backup", DataType = "Boolean", DefaultValue = "true", IsReadOnly = false, CreatedAt = DateTime.UtcNow },
             new SystemSetting { Key = "Backup.RetentionDays", Value = "30", Description = "Days to retain backup files", Category = "Backup", DataType = "Integer", DefaultValue = "30", IsReadOnly = false, CreatedAt = DateTime.UtcNow },

@@ -633,28 +633,6 @@ namespace IEMS.WPF
                 }
             }
 
-            // FIXED BUG #10: Academic year format validation
-            if (settingKey == "Academic.CurrentYear" && !string.IsNullOrWhiteSpace(value))
-            {
-                if (!System.Text.RegularExpressions.Regex.IsMatch(value, @"^\d{4}-\d{2}$"))
-                {
-                    return (false, $"{fieldName}: Must be in format YYYY-YY (e.g., 2024-25)");
-                }
-
-                // Additional validation: check if years are sequential
-                var parts = value.Split('-');
-                if (parts.Length == 2 &&
-                    int.TryParse(parts[0], out int year1) &&
-                    int.TryParse(parts[1], out int year2))
-                {
-                    var expectedYear2 = (year1 + 1) % 100;
-                    if (year2 != expectedYear2)
-                    {
-                        return (false, $"{fieldName}: Years must be sequential (e.g., 2024-25, not 2024-26)");
-                    }
-                }
-            }
-
             return (true, string.Empty);
         }
 
