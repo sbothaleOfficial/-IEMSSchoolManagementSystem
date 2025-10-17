@@ -84,6 +84,24 @@
             </Setter>
         </Style>
 
+        <Style x:Key="DangerButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
+            <Setter Property="Background" Value="#DC3545"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#C82333"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <!-- TextBox Style -->
         <Style x:Key="ModernTextBoxStyle" TargetType="TextBox">
             <Setter Property="BorderBrush" Value="#CED4DA"/>
@@ -171,17 +189,27 @@
 
         <!-- Footer -->
         <Border Grid.Row="2" Background="White" BorderBrush="#E0E0E0" BorderThickness="0,1,0,0" Padding="20">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button x:Name="SaveButton"
-                        Content="💾 Save All Changes"
-                        Style="{StaticResource SuccessButtonStyle}"
-                        Click="SaveButton_Click"
-                        Width="150"/>
-                <Button Content="🔄 Reset Category"
-                        Style="{StaticResource SecondaryButtonStyle}"
-                        Click="ResetCategoryButton_Click"
-                        Width="130"/>
-            </StackPanel>
+            <Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button x:Name="ClearTestDataButton"
+                            Content="🗑️ Clear Test Data"
+                            Style="{StaticResource DangerButtonStyle}"
+                            Click="ClearTestDataButton_Click"
+                            Width="160"
+                            ToolTip="Remove all test data (students, teachers, classes, fees) - Cannot be undone!"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button x:Name="SaveButton"
+                            Content="💾 Save All Changes"
+                            Style="{StaticResource SuccessButtonStyle}"
+                            Click="SaveButton_Click"
+                            Width="150"/>
+                    <Button Content="🔄 Reset Category"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Click="ResetCategoryButton_Click"
+                            Width="130"/>
+                </StackPanel>
+            </Grid>
         </Border>
     </Grid>
 </Window>

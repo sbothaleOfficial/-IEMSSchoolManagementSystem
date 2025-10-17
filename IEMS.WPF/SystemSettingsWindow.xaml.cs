@@ -675,6 +675,164 @@ namespace IEMS.WPF
             }
         }
 
+        private async void ClearTestDataButton_Click(object sender, RoutedEventArgs e)
+        {
+            // First confirmation dialog
+            var result = MessageBox.Show(
+                "⚠️ WARNING: This will permanently delete ALL test data including:\n\n" +
+                "• All Students\n" +
+                "• All Teachers\n" +
+                "• All Classes\n" +
+                "• All Fee Payments\n" +
+                "• All Fee Structures\n" +
+                "• All Staff Members\n" +
+                "• All Transport/Expense Records\n\n" +
+                "System Settings, Users, and Academic Years will be kept.\n\n" +
+                "This action CANNOT be undone!\n\n" +
+                "Are you absolutely sure you want to continue?",
+                "⚠️ Confirm Clear All Test Data",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Warning);
+
+            if (result != MessageBoxResult.Yes)
+                return;
+
+            // Second confirmation - require typing "DELETE"
+            var confirmWindow = new Window
+            {
+                Title = "Final Confirmation Required",
+                Width = 500,
+                Height = 200,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = this,
+                ResizeMode = ResizeMode.NoResize
+            };
+
+            var grid = new Grid { Margin = new Thickness(20) };
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+            var messageText = new TextBlock
+            {
+                Text = "Type DELETE in the box below to confirm:",
+                FontWeight = FontWeights.Bold,
+                FontSize = 14,
+                Margin = new Thickness(0, 0, 0, 15),
+                TextWrapping = TextWrapping.Wrap
+            };
+            Grid.SetRow(messageText, 0);
+            grid.Children.Add(messageText);
+
+            var confirmTextBox = new TextBox
+            {
+                Height = 35,
+                FontSize = 14,
+                Margin = new Thickness(0, 0, 0, 15)
+            };
+            Grid.SetRow(confirmTextBox, 1);
+            grid.Children.Add(confirmTextBox);
+
+            var buttonPanel = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                HorizontalAlignment = HorizontalAlignment.Right
+            };
+            Grid.SetRow(buttonPanel, 2);
+
+            var btnConfirm = new Button
+            {
+                Content = "Confirm Delete",
+                Width = 120,
+                Height = 35,
+                Margin = new Thickness(0, 0, 10, 0),
+                Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(220, 53, 69)),
+                Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.White),
+                FontWeight = FontWeights.SemiBold,
+                IsEnabled = false
+            };
+
+            var btnCancel = new Button
+            {
+                Content = "Cancel",
+                Width = 80,
+                Height = 35,
+                Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(108, 117, 125)),
+                Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.White),
+                FontWeight = FontWeights.SemiBold
+            };
+
+            confirmTextBox.TextChanged += (s, e) =>
+            {
+                btnConfirm.IsEnabled = confirmTextBox.Text == "DELETE";
+            };
+
+            bool confirmed = false;
+            btnConfirm.Click += (s, e) => { confirmed = true; confirmWindow.Close(); };
+            btnCancel.Click += (s, e) => confirmWindow.Close();
+
+            buttonPanel.Children.Add(btnConfirm);
+            buttonPanel.Children.Add(btnCancel);
+            grid.Children.Add(buttonPanel);
+
+            confirmWindow.Content = grid;
+            confirmWindow.ShowDialog();
+
+            if (!confirmed)
+                return;
+
+            // Proceed with clearing data
+            try
+            {
+                ClearTestDataButton.IsEnabled = false;
+                SaveButton.IsEnabled = false;
+
+                var serviceProvider = App.ServiceProvider;
+                var dbContext = serviceProvider.GetRequiredService<IEMS.Infrastructure.Data.ApplicationDbContext>();
+
+                // Delete data in correct order (respecting foreign key constraints)
+                dbContext.FeePayments.RemoveRange(dbContext.FeePayments);
+                dbContext.FeeStructures.RemoveRange(dbContext.FeeStructures);
+                dbContext.Students.RemoveRange(dbContext.Students);
+                dbContext.StudentPromotionHistory.RemoveRange(dbContext.StudentPromotionHistory);
+                dbContext.TransportExpenses.RemoveRange(dbContext.TransportExpenses);
+                dbContext.Vehicles.RemoveRange(dbContext.Vehicles);
+                dbContext.ElectricityBills.RemoveRange(dbContext.ElectricityBills);
+                dbContext.OtherExpenses.RemoveRange(dbContext.OtherExpenses);
+                dbContext.Staff.RemoveRange(dbContext.Staff);
+                dbContext.Classes.RemoveRange(dbContext.Classes);
+                dbContext.Teachers.RemoveRange(dbContext.Teachers);
+
+                var recordsDeleted = await dbContext.SaveChangesAsync();
+
+                MessageBox.Show(
+                    $"✅ Successfully cleared all test data!\n\n" +
+                    $"Total records deleted: {recordsDeleted}\n\n" +
+                    $"The database now contains only:\n" +
+                    $"• System Settings\n" +
+                    $"• User Accounts\n" +
+                    $"• Academic Years\n\n" +
+                    $"You can now start fresh with your own data.",
+                    "Success",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"Error clearing test data: {ex.Message}\n\n" +
+                    $"Some data may have been deleted. Please check the database.",
+                    "Error",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+            }
+            finally
+            {
+                ClearTestDataButton.IsEnabled = true;
+                SaveButton.IsEnabled = true;
+            }
+        }
+
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             Close();
