@@ -16,10 +16,12 @@ IEMS (Inspire English Medium School) Management System is a feature-rich desktop
 
 - **Student Management**
   - Complete CRUD operations
-  - Bulk student promotion
+  - Bulk student promotion with academic year tracking
   - Aadhaar number integration
   - Excel export functionality
-  - Search and filter capabilities
+  - Advanced search and filter capabilities
+  - Student fee status tracking
+  - Leaving certificate generation
 
 - **Teacher Management**
   - Teacher profiles with contact details
@@ -42,12 +44,15 @@ IEMS (Inspire English Medium School) Management System is a feature-rich desktop
 
 - **Fee Payment System**
   - Multiple payment methods (Cash, Online, Cheque, DD)
-  - Fee structure per class and type
-  - Receipt generation and printing
-  - Payment history tracking
+  - Fee structure management per class and fee type
+  - Professional receipt generation and printing
+  - Comprehensive payment history tracking
   - Late fee calculations
   - Discount management
-  - Academic year management
+  - Academic year integration
+  - Fee structure templates
+  - Transaction details (Transaction ID, Bank info)
+  - Amount in words conversion
 
 - **Finance Management**
   - Electricity bill tracking
@@ -55,9 +60,11 @@ IEMS (Inspire English Medium School) Management System is a feature-rich desktop
   - Financial analytics and reporting
 
 - **Transport Management**
-  - Vehicle information management
-  - Fuel tracking
+  - Vehicle information management (buses, vans)
+  - Fuel tracking and consumption
   - Transport expense monitoring
+  - Maintenance records
+  - Driver details management
 
 ### Administrative Features
 
@@ -77,19 +84,28 @@ IEMS (Inspire English Medium School) Management System is a feature-rich desktop
   - Configurable school information
   - Backup schedule configuration
   - Application preferences
+  - Clear test data functionality
+
+- **Academic Year Management**
+  - Create and manage academic years
+  - Set active academic year
+  - Year-based data filtering
+  - Promotion tracking across years
 
 ### Document Generation
 
 - **Leaving Certificate**
-  - Student details auto-population
+  - Student details auto-population from database
   - Customizable certificate templates
   - XPS/PDF export options
-  - Print functionality
+  - Direct print functionality
+  - Integrated within Student Management module
 
 - **Bonafide Certificate**
   - Student verification documents
-  - Configurable templates
+  - Professional certificate templates
   - Export and print capabilities
+  - Quick generation from student records
 
 ## Technology Stack
 
@@ -97,8 +113,11 @@ IEMS (Inspire English Medium School) Management System is a feature-rich desktop
 - **UI**: Windows Presentation Foundation (WPF)
 - **Database**: SQLite 3
 - **ORM**: Entity Framework Core 8.0
-- **Architecture**: Clean Architecture
+- **Architecture**: Clean Architecture with Dependency Injection
 - **Authentication**: Custom PBKDF2-based system
+- **Excel Export**: ClosedXML library
+- **Dependency Injection**: Microsoft.Extensions.DependencyInjection
+- **Hosting**: Microsoft.Extensions.Hosting
 
 ## System Requirements
 
@@ -220,8 +239,11 @@ IEMSSchoolManagementSystem/
 ├── IEMS.Infrastructure/       # Data access and EF Core
 ├── IEMS.WPF/                  # WPF UI layer
 ├── IEMS.Shared/               # Shared utilities
+├── IEMS_Release_Package/      # Published application files
 ├── CreateInstaller.iss        # Inno Setup installer script
-└── school.db                  # SQLite database (auto-generated)
+├── PublishAndRun.cmd          # Script to publish and run
+├── RunLatest.cmd              # Script to run from source
+└── school.db                  # SQLite database (auto-generated at runtime)
 ```
 
 ### Architecture Layers
@@ -280,17 +302,25 @@ IEMSSchoolManagementSystem/
 
 ### Creating Distribution Package
 
+**Method 1: Framework-Dependent (Recommended)**
 ```bash
-# Creates a self-contained single-file executable for distribution
-# -c Release: Build in Release mode for optimized performance
-# -r win-x64: Target Windows 64-bit platform
-# --self-contained true: Include .NET runtime (no .NET installation required)
-# -p:PublishSingleFile=true: Package everything into a single .exe file
-# -o: Output directory for the published files
-dotnet publish IEMS.WPF/IEMS.WPF.csproj -c Release -r win-x64 --self-contained true -o ./IEMS_Release_Package -p:PublishSingleFile=true
+# Requires .NET 8.0 Runtime to be installed on target machine
+# Results in smaller file size (~5-10 MB)
+dotnet publish IEMS.WPF/IEMS.WPF.csproj -c Release -r win-x64 --self-contained false -o ./IEMS_Release_Package
 ```
 
-**Note**: The main executable is approximately 191MB with bundled .NET runtime. Total package size is ~201MB including WPF dependencies and SQLite.
+**Method 2: Self-Contained (Standalone)**
+```bash
+# Bundles .NET runtime - no installation needed on target machine
+# Results in larger file size (~80-100 MB)
+# -c Release: Build in Release mode for optimized performance
+# -r win-x64: Target Windows 64-bit platform
+# --self-contained true: Include .NET runtime
+# -o: Output directory for the published files
+dotnet publish IEMS.WPF/IEMS.WPF.csproj -c Release -r win-x64 --self-contained true -o ./IEMS_Release_Package
+```
+
+**Note**: The published package includes the executable, dependencies, and required DLLs. Database file (`school.db`) is created at runtime on first launch.
 
 ### Creating Installer (Optional)
 
@@ -302,9 +332,10 @@ dotnet publish IEMS.WPF/IEMS.WPF.csproj -c Release -r win-x64 --self-contained t
 ## Configuration
 
 ### Database Connection
-- Default: SQLite database in application directory
-- Location: `school.db` (auto-created)
-- Connection string in `ApplicationDbContext.cs`
+- Default: SQLite database in application root directory
+- Location: `school.db` (auto-created on first run)
+- Portable: Can be moved with the application
+- Connection string configured in `ApplicationDbContext.cs`
 
 ### Backup Settings
 - Default location: `C:\Users\[Username]\Documents\IEMS_Backups`
@@ -371,18 +402,22 @@ dotnet test
 
 ## Version History
 
-- **v1.0** (October 2025)
+- **v1.0** (October 2024)
   - Initial release
   - Core student, teacher, class management
-  - Fee payment system
+  - Fee payment system with receipt generation
   - Backup & restore functionality
-  - User management with authentication
+  - User management with RBAC
+  - Academic year management
+  - Transport and expense tracking
+  - Certificate generation (Leaving & Bonafide)
 
 ## Support
 
 For issues or questions:
 - Check the built-in Help menu
-- Review [IEMS-Windows-Requirements.md](IEMS-Windows-Requirements.md)
+- Review the troubleshooting section above
+- Check the installation instructions in `IEMS_Release_Package/INSTALLATION_INSTRUCTIONS.txt`
 - Contact your system administrator
 
 ## License
@@ -396,7 +431,8 @@ Managed by Mahalakmi Bahuddeshiy Sanstha, Chikhalgaon
 
 ---
 
-**Build Date**: October 3, 2025
+**Last Updated**: October 2024
 **Framework**: .NET 8.0
-**Database**: SQLite
+**Database**: SQLite 3
 **Platform**: Windows 10/11 (64-bit)
+**Architecture**: Clean Architecture with MVVM patterns
