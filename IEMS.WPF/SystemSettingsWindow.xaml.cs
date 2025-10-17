@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 using IEMS.Application.Interfaces;
 using IEMS.Core.Entities;
 
@@ -677,6 +678,31 @@ namespace IEMS.WPF
 
         private async void ClearTestDataButton_Click(object sender, RoutedEventArgs e)
         {
+            // CRITICAL: Validate that database contains TEST data, not USER data
+            var serviceProvider = App.ServiceProvider;
+            var dbContext = serviceProvider.GetRequiredService<IEMS.Infrastructure.Data.ApplicationDbContext>();
+
+            // Check if data appears to be seed/test data
+            var isTestData = await ValidateIsTestDataAsync(dbContext);
+
+            if (!isTestData)
+            {
+                MessageBox.Show(
+                    "⚠️ SAFETY CHECK FAILED\n\n" +
+                    "The database does NOT contain the original test data pattern.\n" +
+                    "This means you've already added your own real data.\n\n" +
+                    "This button is ONLY for clearing the original seed/test data.\n" +
+                    "It cannot be used once you've added custom data.\n\n" +
+                    "If you need to clear your data:\n" +
+                    "1. Create a backup first (Backup & Restore menu)\n" +
+                    "2. Manually delete the database file (school.db)\n" +
+                    "3. Restart the application to recreate seed data",
+                    "Cannot Clear Data - Not Test Data",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Stop);
+                return;
+            }
+
             // First confirmation dialog
             var result = MessageBox.Show(
                 "⚠️ WARNING: This will permanently delete ALL test data including:\n\n" +
@@ -787,9 +813,6 @@ namespace IEMS.WPF
                 ClearTestDataButton.IsEnabled = false;
                 SaveButton.IsEnabled = false;
 
-                var serviceProvider = App.ServiceProvider;
-                var dbContext = serviceProvider.GetRequiredService<IEMS.Infrastructure.Data.ApplicationDbContext>();
-
                 // Delete data in correct order (respecting foreign key constraints)
                 dbContext.FeePayments.RemoveRange(dbContext.FeePayments);
                 dbContext.FeeStructures.RemoveRange(dbContext.FeeStructures);
@@ -830,6 +853,89 @@ namespace IEMS.WPF
             {
                 ClearTestDataButton.IsEnabled = true;
                 SaveButton.IsEnabled = true;
+            }
+        }
+
+        /// <summary>
+        /// Validates that the database contains the original seed/test data pattern.
+        /// Returns false if user has added their own data, preventing accidental deletion.
+        /// </summary>
+        private async Task<bool> ValidateIsTestDataAsync(IEMS.Infrastructure.Data.ApplicationDbContext dbContext)
+        {
+            try
+            {
+                // Check for exact seed data patterns
+
+                // 1. Students: Should be exactly 260 with StudentNumbers S001-S260
+                var studentCount = await dbContext.Students.CountAsync();
+                if (studentCount != 260)
+                    return false;
+
+                var firstStudent = await dbContext.Students
+                    .Where(s => s.StudentNumber == "S001")
+                    .FirstOrDefaultAsync();
+                var lastStudent = await dbContext.Students
+                    .Where(s => s.StudentNumber == "S260")
+                    .FirstOrDefaultAsync();
+
+                if (firstStudent == null || lastStudent == null)
+                    return false;
+
+                // 2. Teachers: Should be exactly 10 with EmployeeIds T001-T010
+                var teacherCount = await dbContext.Teachers.CountAsync();
+                if (teacherCount != 10)
+                    return false;
+
+                var firstTeacher = await dbContext.Teachers
+                    .Where(t => t.EmployeeId == "T001")
+                    .FirstOrDefaultAsync();
+                var lastTeacher = await dbContext.Teachers
+                    .Where(t => t.EmployeeId == "T010")
+                    .FirstOrDefaultAsync();
+
+                if (firstTeacher == null || lastTeacher == null)
+                    return false;
+
+                // 3. Classes: Should be exactly 13 (Nursery, KG1, KG2, Class 1-10)
+                var classCount = await dbContext.Classes.CountAsync();
+                if (classCount != 13)
+                    return false;
+
+                // 4. Staff: Should be exactly 10 with EmployeeIds ST001-ST010
+                var staffCount = await dbContext.Staff.CountAsync();
+                if (staffCount != 10)
+                    return false;
+
+                var firstStaff = await dbContext.Staff
+                    .Where(s => s.EmployeeId == "ST001")
+                    .FirstOrDefaultAsync();
+                var lastStaff = await dbContext.Staff
+                    .Where(s => s.EmployeeId == "ST010")
+                    .FirstOrDefaultAsync();
+
+                if (firstStaff == null || lastStaff == null)
+                    return false;
+
+                // 5. Vehicles: Should be exactly 10
+                var vehicleCount = await dbContext.Vehicles.CountAsync();
+                if (vehicleCount != 10)
+                    return false;
+
+                // 6. Check for specific seed data markers
+                var nurseryClass = await dbContext.Classes
+                    .Where(c => c.Name == "Nursery" && c.Section == "A")
+                    .FirstOrDefaultAsync();
+
+                if (nurseryClass == null)
+                    return false;
+
+                // All checks passed - this appears to be original seed data
+                return true;
+            }
+            catch
+            {
+                // If validation fails, assume it's NOT test data (safer)
+                return false;
             }
         }
 
