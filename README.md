@@ -141,8 +141,9 @@ For detailed installation instructions, see [INSTALLATION_INSTRUCTIONS.txt](IEMS
 
 #### Prerequisites
 - [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
-- Windows 10/11
-- Visual Studio 2022 or VS Code (optional)
+- Windows 10/11 (64-bit)
+- Visual Studio 2022 or VS Code (optional, but recommended for development)
+- Git (for cloning the repository)
 
 #### Setup Steps
 
@@ -152,18 +153,37 @@ For detailed installation instructions, see [INSTALLATION_INSTRUCTIONS.txt](IEMS
    cd IEMSSchoolManagementSystem
    ```
 
-2. **Build and run**
-
+2. **Restore dependencies**
    ```bash
-   # Run from source
-   dotnet run --project IEMS.WPF
+   dotnet restore IEMS.WindowsApp.sln
+   ```
+
+3. **Build the solution**
+   ```bash
+   # Debug build (for development)
+   dotnet build IEMS.WindowsApp.sln
+
+   # Release build (optimized for production)
+   dotnet build IEMS.WindowsApp.sln -c Release
+   ```
+
+4. **Run the application**
+   ```bash
+   # Run directly from source (Debug mode)
+   dotnet run --project IEMS.WPF/IEMS.WPF.csproj
+
+   # Run from Release build
+   dotnet run --project IEMS.WPF/IEMS.WPF.csproj -c Release
 
    # Or use convenience scripts
    RunLatest.cmd          # Development build
    PublishAndRun.cmd      # Published version
    ```
 
-3. **Database** is created automatically on first run with sample data
+5. **Database initialization**
+   - Database (`school.db`) is created automatically on first run
+   - Initial sample data is seeded automatically
+   - Default admin credentials: `admin` / `Admin@123`
 
 
 ## Project Structure
@@ -191,29 +211,160 @@ IEMSSchoolManagementSystem/
 4. Configure school information in System Settings
 5. Set up automatic backup schedule
 
-## Deployment
+## Building and Publishing
 
-### Creating Distribution Package
+### How to Build
 
-**Method 1: Framework-Dependent (Recommended)**
+**Development Build**
+```bash
+# Build for development (Debug configuration)
+dotnet build IEMS.WindowsApp.sln
+```
+
+**Production Build**
+```bash
+# Build for production (Release configuration with optimizations)
+dotnet build IEMS.WindowsApp.sln -c Release
+```
+
+**Build Status**: The build completes successfully with warnings (nullable references, obsolete API usage). These warnings do not affect functionality.
+
+### How to Run
+
+**From Source (Development)**
+```bash
+# Navigate to project directory
+cd IEMSSchoolManagementSystem
+
+# Run directly from source
+dotnet run --project IEMS.WPF/IEMS.WPF.csproj
+```
+
+**From Published Build**
+```bash
+# After publishing (see below), navigate to the output directory
+cd IEMS_Release_Package
+
+# Windows: Double-click IEMS.exe or run from command line
+IEMS.exe
+
+# Or using dotnet (for framework-dependent builds)
+dotnet IEMS.dll
+```
+
+### How to Publish
+
+Publishing creates a ready-to-distribute package for deployment on other Windows machines.
+
+#### Method 1: Framework-Dependent (Recommended for Development)
 ```bash
 # Requires .NET 8.0 Runtime to be installed on target machine
-# Results in smaller file size (~5-10 MB)
+# Smaller package size (~47 MB)
+# Faster build time
 dotnet publish IEMS.WPF/IEMS.WPF.csproj -c Release -r win-x64 --self-contained false -o ./IEMS_Release_Package
 ```
 
-**Method 2: Self-Contained (Standalone)**
+**Advantages**:
+- Smaller download size
+- Updates to .NET runtime benefit from system-wide patches
+- Ideal when target machines already have .NET 8.0 Runtime
+
+**Requirements on Target Machine**:
+- [.NET 8.0 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0/runtime) must be installed
+- Windows 10/11 (64-bit)
+
+#### Method 2: Self-Contained (Recommended for End Users)
 ```bash
 # Bundles .NET runtime - no installation needed on target machine
-# Results in larger file size (~80-100 MB)
-# -c Release: Build in Release mode for optimized performance
-# -r win-x64: Target Windows 64-bit platform
-# --self-contained true: Include .NET runtime
-# -o: Output directory for the published files
+# Larger package size (~208 MB)
+# Fully standalone executable
 dotnet publish IEMS.WPF/IEMS.WPF.csproj -c Release -r win-x64 --self-contained true -o ./IEMS_Release_Package
 ```
 
-**Note**: The published package includes the executable, dependencies, and required DLLs. Database file (`school.db`) is created at runtime on first launch.
+**Advantages**:
+- No prerequisites needed on target machine
+- True portable application
+- Guaranteed runtime version compatibility
+- Best for distribution to non-technical users
+
+**Requirements on Target Machine**:
+- Windows 10/11 (64-bit) only
+- No other dependencies
+
+#### Parameter Explanation
+- `-c Release`: Build in Release mode (optimized, smaller binaries)
+- `-r win-x64`: Target Windows 64-bit platform
+- `--self-contained true/false`: Include/exclude .NET runtime
+- `-o ./IEMS_Release_Package`: Output directory for published files
+
+### How to Use as Windows App
+
+#### Installation Steps
+
+1. **Publish the application** using one of the methods above
+
+2. **Copy the release package** to desired location:
+   ```
+   C:\Program Files\IEMS School Management
+   ```
+   Or any folder with write permissions (for portable installation):
+   ```
+   C:\Users\YourName\IEMS
+   ```
+
+3. **Run the application**:
+   - Navigate to the installation folder
+   - Double-click `IEMS.exe`
+   - The application window will launch
+
+4. **First-time setup**:
+   - Database (`school.db`) is created automatically in the same folder
+   - Sample data is loaded automatically
+   - Login with default credentials: `admin` / `Admin@123`
+   - **IMPORTANT**: Change the default password immediately
+
+5. **Create a desktop shortcut** (optional):
+   - Right-click `IEMS.exe`
+   - Select "Create shortcut"
+   - Move the shortcut to Desktop
+   - Rename to "IEMS School Management System"
+
+6. **Pin to Start Menu/Taskbar** (optional):
+   - Right-click `IEMS.exe`
+   - Select "Pin to Start" or "Pin to taskbar"
+
+#### Portable Installation
+
+For a truly portable installation that can run from USB or network drives:
+
+1. Use the **self-contained** publish method
+2. Copy the entire `IEMS_Release_Package` folder to your portable media
+3. No installation required - just run `IEMS.exe`
+4. Database and backups are created in the same folder
+
+#### Multi-User Installation
+
+For multiple users on the same computer:
+
+1. Install to a shared location: `C:\Program Files\IEMS School Management`
+2. Each user's database can be stored separately
+3. Configure backup paths to user-specific folders in System Settings
+
+#### Uninstallation
+
+1. Close the application if running
+2. Delete the installation folder
+3. Database backups (if created) are located in:
+   ```
+   C:\Users\[Username]\Documents\IEMS_Backups
+   ```
+   Delete this folder if you want to remove backups
+
+**Note**: The published package includes:
+- Executable (`IEMS.exe`)
+- All dependencies and DLLs
+- .NET runtime (for self-contained builds)
+- Database file (`school.db`) is created at runtime on first launch
 
 
 ## Configuration
