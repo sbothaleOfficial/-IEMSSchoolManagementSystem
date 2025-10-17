@@ -100,3 +100,12 @@ nul
 ## Backup files
 *_backup*
 *.backup
+
+## Claude AI files
+.claude/
+CLAUDE.md
+CODE_REVIEW_REPORT.md
+
+## Application runtime files
+remember_me.json
+login_debug.log
